@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var zoos = require('./routes/zoos');
+var categories = require('./routes/categories');
+var category_levels = require('./routes/category_levels');
+var species = require('./routes/species');
 
 var app = express();
 
@@ -26,6 +29,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/zoos', zoos);
+app.use('/categories', categories);
+app.use('/category_levels', category_levels);
+app.use('/species', species);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
