@@ -1,4 +1,4 @@
-var db=require('../dbconnection'); //reference of dbconnection.js
+var db=require('../dbconnection');
 
 var Zoos={
 
