@@ -14,6 +14,12 @@ var Species={
         });
     },
 
+    getSpeciesByCategoryId:function(id) {
+        return db.then(function(conn) {
+            return conn.query("select * from species where category_id=?",[id]);
+        });
+    },
+
     addSpecies:function(Zoo){
         return db.then(function(conn) {
             return conn.query("insert into species values (?,?,?)",[Zoo.CommonName,Zoo.LatinName,Zoo.CategoryId]);

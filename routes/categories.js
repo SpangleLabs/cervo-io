@@ -1,18 +1,26 @@
 var express = require('express');
 var Categories = require("../models/Categories.js");
+var Species = require("../models/Species.js");
 var Promise = require("promise");
 var router = express.Router();
 
 function add_subcategories_and_return(res, rows) {
     var subcategory_promises = [];
+    var species_promises = [];
     for (var a = 0; a < rows.length; a++) {
-        subcategory_promises.push(Categories.getCategoriesByParentId(rows[a].category_id).catch(function(err) {
+        var category_id = rows[a].category_id;
+        subcategory_promises.push(Categories.getCategoriesByParentId(category_id).catch(function(err) {
             res.json(err);
         }).then(function(sub_rows) {
             return sub_rows;
         }));
+        species_promises.push(Species.getSpeciesByCategoryId(category_id).catch(function(err) {
+            res.json(err);
+        }).then(function(species) {
+            return species;
+        }));
     }
-    Promise.all(subcategory_promises).catch(function(err) {
+    Promise.all(subcategory_promises.concat(species_promises)).catch(function(err) {
         res.json(err)
     }).then(function(values) {
         var row_results = [];
@@ -23,6 +31,7 @@ function add_subcategories_and_return(res, rows) {
             row_result.category_level_id = rows[b].category_level_id;
             row_result.parent_category_id = rows[b].parent_category_id;
             row_result.sub_categories = values[b];
+            row_result.species = values[b+rows.length];
             row_results.push(row_result);
         }
         res.json(row_results);
