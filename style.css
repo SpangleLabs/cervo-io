@@ -1,11 +1,12 @@
 ul {
     padding-left: 10px;
+    border-left: 1px dotted black;
 }
 li.category {
-    list-style-type: square;
+    list-style-type: none;
 }
 li.species {
-    list-style-type: circle;
+    list-style-type: none;
 }
 .latin_name {
     font-style: italic;
@@ -15,4 +16,13 @@ li.species {
 }
 form {
     display: inline;
+}
+li.closed:before {
+    content: "🗀";
+}
+li.open:before {
+    content: "🗁";
+}
+li.species:before {
+    content: "🦌";
 }

@@ -33,7 +33,7 @@ Animals list:
         var categoryLevelId = categoryData.category_level_id;
         var categoryLiId = "category-"+categoryId;
         var categoryLevelName = get_category_level(categoryLevelId).name;
-        element.append("<li class='category' id='"+categoryLiId+"'>" +
+        element.append("<li class='category closed' id='"+categoryLiId+"'>" +
             "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
             "<span class='category_level'>"+categoryLevelName+"</span>" +
             "</li>");
@@ -78,6 +78,8 @@ Animals list:
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(/*Category*/data) {
             var listElement = $("#"+categoryLiId);
+            listElement.addClass("open");
+            listElement.removeClass("closed");
             if(!listElement.has("ul").length) {
                 console.log("hello");
                 listElement.append("<ul></ul>");
@@ -106,8 +108,14 @@ Animals list:
                         listElement.find("ul").find("select").append("<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>");
                     }
                 }
+            } else if(!listElement.find("ul").is(":visible")) {
+                listElement.find("ul").show();
+                listElement.addClass("open");
+                listElement.removeClass("closed");
             } else {
-                listElement.find("ul").toggle();
+                listElement.find("ul").hide();
+                listElement.addClass("closed");
+                listElement.removeClass("open");
             }
         })
     }
