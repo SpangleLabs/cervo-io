@@ -23,4 +23,4 @@ var CategoryLevels={
     }
 
 };
-module.exports=Zoos;
+module.exports=CategoryLevels;
