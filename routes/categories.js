@@ -3,7 +3,7 @@ var Categories = require("../models/Categories.js");
 var Promise = require("promise");
 var router = express.Router();
 
-function add_subcategories_and_return(rows) {
+function add_subcategories_and_return(res, rows) {
     var subcategory_promises = [];
     for (var a = 0; a < rows.length; a++) {
         subcategory_promises.push(Categories.getCategoriesByParentId(rows[a].category_id).catch(function(err) {
@@ -35,13 +35,13 @@ router.get('/:id?', function(req, res, next) {
         Categories.getCategoryById(req.params.id).catch(function(err) {
             res.json(err);
         }).then(function(rows) {
-            add_subcategories_and_return(rows);
+            add_subcategories_and_return(res, rows);
         });
     } else {
         Categories.getBaseCategories().catch(function(err) {
             res.json(err);
         }).then(function(rows) {
-            add_subcategories_and_return(rows);
+            add_subcategories_and_return(res, rows);
         });
     }
 });
