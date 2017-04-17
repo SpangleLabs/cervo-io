@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+Animals list:
+<ul id="animals"><img src="images/gobutton.png" width="50" height="50" /></ul>
+</body>
+
+<script>
+    function load_category(id) {
+        var categoryLiId = "category-"+id;
+        $.get("http://localhost:3000/categories/"+id, function(data) {
+            $("#"+categoryLiId).append("<ul></ul>");
+            $.each(data[0].sub_categories, function(index, itemData) {
+                var subcategoryId = itemData.category_id;
+                var subcategoryName = itemData.name;
+                var subcategoryLiId = "category-"+subcategoryId;
+                $("#"+categoryLiId).find("ul").append("<li id='"+subcategoryLiId+"'>" +
+                    "<span onclick='load_category("+subcategoryId+")'>"+subcategoryName+"</span>" +
+                    "</li>");
+            })
+        })
+    }
+
+    $("#animals").find("img").click(function() {
+        $.get("http://localhost:3000/categories/", function(data) {
+            $.each(data, function(index, itemData) {
+                var categoryId = itemData.category_id;
+                var name = itemData.name;
+                var categoryLiId = "category-"+categoryId;
+                $("#animals").append("<li id='"+categoryLiId+"'>" +
+                    "<span onclick='load_category("+categoryId+")'>"+name+"</span>" +
+                    "</li>");
+            });
+        });
+    });
+</script>
+</html>
