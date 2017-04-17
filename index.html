@@ -15,10 +15,15 @@ Animals list:
     function add_category(element, categoryData) {
         var categoryId = categoryData.category_id;
         var name = categoryData.name;
+        var categoryLevelId = categoryData.category_level_id;
         var categoryLiId = "category-"+categoryId;
-        element.append("<li class='category' id='"+categoryLiId+"'>" +
-            "<span onclick='load_category("+categoryId+")'>"+name+"</span>" +
-            "</li>");
+        $.get("http://localhost:3000/category_levels/"+categoryLevelId, function(data) {
+            var categoryLevelName = data[0].name;
+            element.append("<li class='category' id='"+categoryLiId+"'>" +
+                "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
+                "<span class='category_level'>"+categoryLevelName+"</span>" +
+                "</li>");
+        });
     }
 
     function add_species(element, speciesData) {
