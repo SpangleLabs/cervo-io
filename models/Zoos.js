@@ -2,24 +2,34 @@ var db=require('../dbconnection');
 
 var Zoos={
 
-    getAllZoos:function(callback){
-        return db.query("select * from zoos",callback);
+    getAllZoos:function(){
+        return db.then(function(conn) {
+            return conn.query("select * from zoos");
+        });
     },
 
-    getZooById:function(id,callback){
-        return db.query("select * from zoos where zoo_id=?",[id],callback);
+    getZooById:function(id){
+        return db.then(function(conn) {
+            return conn.query("select * from zoos where zoo_id=?",[id]);
+        });
     },
 
-    addZoo:function(Zoo,callback){
-        return db.query("insert into zoos values (?,?,?)",[Zoo.Name,Zoo.Postcode,Zoo.Link],callback);
+    addZoo:function(Zoo){
+        return db.then(function(conn) {
+            return conn.query("insert into zoos values (?,?,?)",[Zoo.Name,Zoo.Postcode,Zoo.Link]);
+        });
     },
 
-    deleteZoo:function(id,callback){
-        return db.query("delete from zoos where zoo_id=?",[id],callback);
+    deleteZoo:function(id){
+        return db.then(function(conn) {
+            return conn.query("delete from zoos where zoo_id=?",[id]);
+        });
     },
 
-    updateZoo:function(id,Zoo,callback){
-        return db.query("update zoos set name=?, postcode=?, link=? where zoo_id=?",[Zoo.Name,Zoo.Postcode,Zoo.Link,id],callback);
+    updateZoo:function(id,Zoo){
+        return db.then(function(conn) {
+            return conn.query("update zoos set name=?, postcode=?, link=? where zoo_id=?",[Zoo.Name,Zoo.Postcode,Zoo.Link,id]);
+        });
     }
 
 };

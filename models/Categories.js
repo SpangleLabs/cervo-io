@@ -20,16 +20,22 @@ var Categories={
         });
     },
 
-    addCategory:function(Category,callback){
-        return db.query("insert into categories values (?,?,?)",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId],callback);
+    addCategory:function(Category){
+        return db.then(function(conn) {
+            return conn.query("insert into categories values (?,?,?)",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId]);
+        });
     },
 
-    deleteCategory:function(id,callback){
-        return db.query("delete from categories where zoo_id=?",[id],callback);
+    deleteCategory:function(id){
+        return db.then(function(conn) {
+            return conn.query("delete from categories where zoo_id=?",[id]);
+        });
     },
 
-    updateCategory:function(id,Category,callback){
-        return db.query("update categories set name=?, category_level_id=?, parent_category_id=? where category_id=?",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId,id],callback);
+    updateCategory:function(id,Category){
+        return db.then(function(conn) {
+            return conn.query("update categories set name=?, category_level_id=?, parent_category_id=? where category_id=?",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId,id]);
+        });
     }
 
 };
