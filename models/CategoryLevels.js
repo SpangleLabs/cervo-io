@@ -16,7 +16,7 @@ var CategoryLevels={
 
     addCategoryLevel:function(CategoryLevel){
         return db.then(function(conn) {
-            return conn.query("insert into category_levels values (?)",[CategoryLevel.Name]);
+            return conn.query("insert into category_levels values (?)",[CategoryLevel.name]);
         });
     },
 
@@ -28,7 +28,7 @@ var CategoryLevels={
 
     updateCategoryLevel:function(id,CategoryLevel){
         return db.then(function(conn) {
-            return conn.query("update category_levels set name=? where category_level_id=?",[CategoryLevel.Name,id]);
+            return conn.query("update category_levels set name=? where category_level_id=?",[CategoryLevel.name,id]);
         });
     }
 

@@ -20,9 +20,9 @@ var Species={
         });
     },
 
-    addSpecies:function(Zoo){
+    addSpecies:function(Species){
         return db.then(function(conn) {
-            return conn.query("insert into species values (?,?,?)",[Zoo.CommonName,Zoo.LatinName,Zoo.CategoryId]);
+            return conn.query("insert into species values (?,?,?)",[Species.common_name,Species.latin_name,Species.category_id]);
         });
     },
 
@@ -34,7 +34,7 @@ var Species={
 
     updateSpecies:function(id,Species){
         return db.then(function(conn) {
-            return conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",[Zoo.CommonName,Zoo.LatinName,Zoo.CategoryId,id]);
+            return conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",[Species.common_name,Species.latin_name,Species.category_id,id]);
         });
     }
 

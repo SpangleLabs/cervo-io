@@ -22,7 +22,7 @@ var Categories={
 
     addCategory:function(Category){
         return db.then(function(conn) {
-            return conn.query("insert into categories values (?,?,?)",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId]);
+            return conn.query("insert into categories values (?,?,?)",[Category.name,Category.category_level_id,Category.parent_category_id]);
         });
     },
 
@@ -34,7 +34,7 @@ var Categories={
 
     updateCategory:function(id,Category){
         return db.then(function(conn) {
-            return conn.query("update categories set name=?, category_level_id=?, parent_category_id=? where category_id=?",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId,id]);
+            return conn.query("update categories set name=?, category_level_id=?, parent_category_id=? where category_id=?",[Category.name,Category.category_level_id,Category.parent_category_id,id]);
         });
     }
 
