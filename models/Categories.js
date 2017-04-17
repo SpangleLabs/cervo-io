@@ -8,8 +8,10 @@ var Categories={
         });
     },
 
-    getCategoryById:function(id,callback){
-        return db.query("select * from categories where category_id=?",[id],callback);
+    getCategoryById:function(id){
+        return db.then(function(conn) {
+            return conn.query("select * from categories where category_id=?",[id]);
+        });
     },
 
     getCategoriesByParentId:function(id) {
