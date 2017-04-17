@@ -43,7 +43,26 @@ Animals list:
         inputObj.category_id = categoryId;
         console.log(inputObj);
         $.post("http://localhost:3000/species/", inputObj);
-        formElement.reset();
+        formElement[0].reset();
+        return false;
+    }
+
+    function send_add_category(categoryId) {
+        var formElement = $("#category-"+categoryId).find("form.add_category");
+        var inputName = formElement.find("input.name").val();
+        var inputlevelId = formElement.find("select").find(":selected").val();
+        var inputObj = {};
+        inputObj.name = inputName;
+        inputObj.category_level_id = inputlevelId;
+        inputObj.parent_category_id = categoryId;
+        console.log(inputObj);
+        $.post("http://localhost:3000/categories/", inputObj);
+        formElement[0].reset();
+        return false;
+    }
+
+    function false_func() {
+        return false;
     }
 
     function load_category(id) {
@@ -66,6 +85,18 @@ Animals list:
                         "<input class='latin_name' type='text' name='latin_name'>" +
                         "<input type='submit' />" +
                         "</form></li>");
+                } else {
+                    listElement.find("ul").append("<li class='category'>Add category:" +
+                        "<form class='add_category' onsubmit='send_add_category("+id+")'>" +
+                        "<input class='name' type='text' name='name'/>" +
+                        "<select class='category_level_id' name='category_level_id'></select>" +
+                        "<input type='submit'/>" +
+                        "</form></li>");
+                    $.get("http://localhost:3000/category_levels/", function(data) {
+                        for(var a = 0; a < data.length; a++) {
+                            listElement.find("ul").find("select").append("<option value='"+data[a].category_level_id+"'>"+data[a].name+"</option>");
+                        }
+                    });
                 }
             } else {
                 listElement.find("ul").toggle();
