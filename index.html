@@ -12,18 +12,31 @@ Animals list:
 </body>
 
 <script>
+    var category_level_cache = [];
+    $.get("http://localhost:3000/category_levels/", function(data) {
+        category_level_cache = data;
+    });
+    function get_category_levels() {
+        return category_level_cache;
+    }
+    function get_category_level(id) {
+        for ( var a = 0; a < category_level_cache.length; a++ ) {
+            if(category_level_cache[a].category_level_id === id) {
+                return category_level_cache[a];
+            }
+        }
+    }
+
     function add_category(element, categoryData) {
         var categoryId = categoryData.category_id;
         var name = categoryData.name;
         var categoryLevelId = categoryData.category_level_id;
         var categoryLiId = "category-"+categoryId;
-        $.get("http://localhost:3000/category_levels/"+categoryLevelId, function(data) {
-            var categoryLevelName = data[0].name;
-            element.append("<li class='category' id='"+categoryLiId+"'>" +
-                "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
-                "<span class='category_level'>"+categoryLevelName+"</span>" +
-                "</li>");
-        });
+        var categoryLevelName = get_category_level(categoryLevelId).name;
+        element.append("<li class='category' id='"+categoryLiId+"'>" +
+            "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
+            "<span class='category_level'>"+categoryLevelName+"</span>" +
+            "</li>");
     }
 
     function add_species(element, speciesData) {
@@ -61,10 +74,6 @@ Animals list:
         return false;
     }
 
-    function false_func() {
-        return false;
-    }
-
     function load_category(id) {
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(data) {
@@ -92,11 +101,10 @@ Animals list:
                         "<select class='category_level_id' name='category_level_id'></select>" +
                         "<input type='submit'/>" +
                         "</form></li>");
-                    $.get("http://localhost:3000/category_levels/", function(data) {
-                        for(var a = 0; a < data.length; a++) {
-                            listElement.find("ul").find("select").append("<option value='"+data[a].category_level_id+"'>"+data[a].name+"</option>");
-                        }
-                    });
+                    var catLevels = get_category_levels();
+                    for(var a = 0; a < catLevels.length; a++) {
+                        listElement.find("ul").find("select").append("<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>");
+                    }
                 }
             } else {
                 listElement.find("ul").toggle();
