@@ -16,9 +16,16 @@ Animals list:
         var categoryId = categoryData.category_id;
         var name = categoryData.name;
         var categoryLiId = "category-"+categoryId;
-        element.append("<li id='"+categoryLiId+"'>" +
+        element.append("<li class='category' id='"+categoryLiId+"'>" +
             "<span onclick='load_category("+categoryId+")'>"+name+"</span>" +
             "</li>");
+    }
+
+    function add_species(element, speciesData) {
+        var speciesId = speciesData.species_id;
+        var name = speciesData.common_name;
+        var latinName = speciesData.latin_name;
+        element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span></li>");
     }
 
     function load_category(id) {
@@ -30,7 +37,10 @@ Animals list:
                 listElement.append("<ul></ul>");
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);
-                })
+                });
+                $.each(data[0].species, function (index, itemData) {
+                    add_species(listElement.find("ul"), itemData);
+                });
             } else {
                 listElement.find("ul").toggle();
             }
