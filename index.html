@@ -15,15 +15,23 @@ Animals list:
     function load_category(id) {
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(data) {
-            $("#"+categoryLiId).append("<ul></ul>");
-            $.each(data[0].sub_categories, function(index, itemData) {
-                var subcategoryId = itemData.category_id;
-                var subcategoryName = itemData.name;
-                var subcategoryLiId = "category-"+subcategoryId;
-                $("#"+categoryLiId).find("ul").append("<li id='"+subcategoryLiId+"'>" +
-                    "<span onclick='load_category("+subcategoryId+")'>"+subcategoryName+"</span>" +
-                    "</li>");
-            })
+            var listElement = $("#"+categoryLiId);
+            if(!listElement.has("ul").length) {
+                console.log("hello");
+                listElement.append("<ul></ul>");
+                $.each(data[0].sub_categories, function (index, itemData) {
+                    var subcategoryId = itemData.category_id;
+                    var subcategoryName = itemData.name;
+                    var subcategoryLiId = "category-" + subcategoryId;
+                    listElement.find("ul").append("<li id='" + subcategoryLiId + "'>" +
+                        "<span onclick='load_category(" + subcategoryId + ")'>" + subcategoryName + "</span>" +
+                        "</li>");
+                })
+            } else if(!listElement.find("ul").is(":visible")) {
+                listElement.find("ul").show();
+            } else {
+                listElement.find("ul").hide();
+            }
         })
     }
 
