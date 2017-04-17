@@ -10,6 +10,10 @@ var Categories={
         return db.query("select * from categories where category_id=?",[id],callback);
     },
 
+    getCategoriesByParentId:function(id,callback) {
+        return db.query("select * from categories where parent_category_id=?",[id],callback);
+    },
+
     addCategory:function(Category,callback){
         return db.query("insert into categories values (?,?,?)",[Category.Name,Category.CategoryLevelId,Category.ParentCategoryId],callback);
     },
