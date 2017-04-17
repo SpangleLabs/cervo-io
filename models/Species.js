@@ -22,7 +22,8 @@ var Species={
 
     addSpecies:function(Species){
         return db.then(function(conn) {
-            return conn.query("insert into species values (?,?,?)",[Species.common_name,Species.latin_name,Species.category_id]);
+            return conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
+                "values (?,?,?)",[Species.common_name,Species.latin_name,Species.category_id]);
         });
     },
 
@@ -34,7 +35,8 @@ var Species={
 
     updateSpecies:function(id,Species){
         return db.then(function(conn) {
-            return conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",[Species.common_name,Species.latin_name,Species.category_id,id]);
+            return conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",
+                [Species.common_name,Species.latin_name,Species.category_id,id]);
         });
     }
 

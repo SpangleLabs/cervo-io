@@ -16,7 +16,8 @@ var Zoos={
 
     addZoo:function(Zoo){
         return db.then(function(conn) {
-            return conn.query("insert into zoos values (?,?,?)",[Zoo.name,Zoo.postcode,Zoo.link]);
+            return conn.query("insert into zoos (`name`,`postcode`,`link`) " +
+                "values (?,?,?)",[Zoo.name,Zoo.postcode,Zoo.link]);
         });
     },
 
@@ -28,7 +29,8 @@ var Zoos={
 
     updateZoo:function(id,Zoo){
         return db.then(function(conn) {
-            return conn.query("update zoos set name=?, postcode=?, link=? where zoo_id=?",[Zoo.name,Zoo.postcode,Zoo.link,id]);
+            return conn.query("update zoos set name=?, postcode=?, link=? where zoo_id=?",
+                [Zoo.name,Zoo.postcode,Zoo.link,id]);
         });
     }
 
