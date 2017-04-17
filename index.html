@@ -28,6 +28,19 @@ Animals list:
         element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span></li>");
     }
 
+    function send_add_species(categoryId) {
+        var formElement = $("#category-"+categoryId).find("form.add_species");
+        var inputName = formElement.find("input.name").val();
+        var inputLatin = formElement.find("input.latin_name").val();
+        var inputObj = {};
+        inputObj.common_name = inputName;
+        inputObj.latin_name = inputLatin;
+        inputObj.category_id = categoryId;
+        console.log(inputObj);
+        $.post("http://localhost:3000/species/", inputObj);
+        formElement.reset();
+    }
+
     function load_category(id) {
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(data) {
@@ -41,6 +54,14 @@ Animals list:
                 $.each(data[0].species, function (index, itemData) {
                     add_species(listElement.find("ul"), itemData);
                 });
+                if(data[0].category_level_id === 1) {
+                    listElement.find("ul").append("<li class='species'>Add species:" +
+                        "<form class='add_species' onsubmit='send_add_species("+id+")'>" +
+                        "<input class='name' type='text' name='name'/>" +
+                        "<input class='latin_name' type='text' name='latin_name'>" +
+                        "<input type='submit' />" +
+                        "</form></li>");
+                }
             } else {
                 listElement.find("ul").toggle();
             }
