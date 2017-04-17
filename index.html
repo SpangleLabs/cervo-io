@@ -31,10 +31,8 @@ Animals list:
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);
                 })
-            } else if(!listElement.find("ul").is(":visible")) {
-                listElement.find("ul").show();
             } else {
-                listElement.find("ul").hide();
+                listElement.find("ul").toggle();
             }
         })
     }
