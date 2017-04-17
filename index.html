@@ -76,7 +76,7 @@ Animals list:
 
     function load_category(id) {
         var categoryLiId = "category-"+id;
-        $.get("http://localhost:3000/categories/"+id, function(data) {
+        $.get("http://localhost:3000/categories/"+id, function(/*Category*/data) {
             var listElement = $("#"+categoryLiId);
             if(!listElement.has("ul").length) {
                 console.log("hello");
