@@ -12,6 +12,15 @@ Animals list:
 </body>
 
 <script>
+    function add_category(element, categoryData) {
+        var categoryId = categoryData.category_id;
+        var name = categoryData.name;
+        var categoryLiId = "category-"+categoryId;
+        element.append("<li id='"+categoryLiId+"'>" +
+            "<span onclick='load_category("+categoryId+")'>"+name+"</span>" +
+            "</li>");
+    }
+
     function load_category(id) {
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(data) {
@@ -20,12 +29,7 @@ Animals list:
                 console.log("hello");
                 listElement.append("<ul></ul>");
                 $.each(data[0].sub_categories, function (index, itemData) {
-                    var subcategoryId = itemData.category_id;
-                    var subcategoryName = itemData.name;
-                    var subcategoryLiId = "category-" + subcategoryId;
-                    listElement.find("ul").append("<li id='" + subcategoryLiId + "'>" +
-                        "<span onclick='load_category(" + subcategoryId + ")'>" + subcategoryName + "</span>" +
-                        "</li>");
+                    add_category(listElement.find("ul"), itemData);
                 })
             } else if(!listElement.find("ul").is(":visible")) {
                 listElement.find("ul").show();
@@ -38,12 +42,7 @@ Animals list:
     $(document).ready(function() {
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
-                var categoryId = itemData.category_id;
-                var name = itemData.name;
-                var categoryLiId = "category-"+categoryId;
-                $("#animals").append("<li id='"+categoryLiId+"'>" +
-                    "<span onclick='load_category("+categoryId+")'>"+name+"</span>" +
-                    "</li>");
+                add_category($("#animals"), itemData);
             });
         });
     });
