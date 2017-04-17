@@ -2,16 +2,20 @@ var db=require('../dbconnection');
 
 var Categories={
 
-    getBaseCategories:function(callback){
-        return db.query("select * from categories",callback);
+    getBaseCategories:function(){
+        return db.then(function(conn) {
+            return conn.query("select * from categories where parent_category_id is null");
+        });
     },
 
     getCategoryById:function(id,callback){
         return db.query("select * from categories where category_id=?",[id],callback);
     },
 
-    getCategoriesByParentId:function(id,callback) {
-        return db.query("select * from categories where parent_category_id=?",[id],callback);
+    getCategoriesByParentId:function(id) {
+        return db.then(function(conn) {
+            return conn.query("select * from categories where parent_category_id=?",[id]);
+        });
     },
 
     addCategory:function(Category,callback){
