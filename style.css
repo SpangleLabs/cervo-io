@@ -13,3 +13,6 @@ li.species {
 .category_level {
     font-style: italic;
 }
+form {
+    display: inline;
+}
