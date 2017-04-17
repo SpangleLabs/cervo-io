@@ -5,21 +5,17 @@ var router = express.Router();
 /* GET category levels listing. */
 router.get('/:id?', function(req, res, next) {
     if(req.params.id) {
-        CategoryLevels.getCategoryLevelById(req.params.id, function(err, rows) {
-            if(err) {
-                res.json(err);
-            } else {
-                res.json(rows);
-            }
-        })
+        CategoryLevels.getCategoryLevelById(req.params.id).catch(function(err) {
+            res.json(err);
+        }).then(function(rows) {
+            res.json(rows);
+        });
     } else {
-        CategoryLevels.getAllCategoryLevels(function(err, rows) {
-            if (err) {
-                res.json(err);
-            } else {
-                res.json(rows);
-            }
-        })
+        CategoryLevels.getAllCategoryLevels().catch(function(err) {
+            res.json(err);
+        }).then(function(rows) {
+            res.json(rows);
+        });
     }
 });
 

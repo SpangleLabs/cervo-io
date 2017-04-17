@@ -5,21 +5,17 @@ var router = express.Router();
 /* GET zoos listing. */
 router.get('/:id?', function(req, res, next) {
     if(req.params.id) {
-        Zoos.getZooById(req.params.id, function(err, rows) {
-            if(err) {
-                res.json(err);
-            } else {
-                res.json(rows);
-            }
-        })
+        Zoos.getZooById(req.params.id).catch(function(err) {
+            res.json(err);
+        }).then(function(rows) {
+            res.json(rows);
+        });
     } else {
-        Zoos.getAllZoos(function(err, rows) {
-            if (err) {
-                res.json(err);
-            } else {
-                res.json(rows);
-            }
-        })
+        Zoos.getAllZoos().catch(function(err) {
+            res.json(err);
+        }).then(function(rows) {
+            res.json(rows);
+        });
     }
 });
 

@@ -5,21 +5,17 @@ var router = express.Router();
 /* GET species listing. */
 router.get('/:id?', function(req, res, next) {
     if(req.params.id) {
-        Species.getSpeciesById(req.params.id, function(err, rows) {
-            if(err) {
-                res.json(err);
-            } else {
-                res.json(rows);
-            }
-        })
+        Species.getSpeciesById(req.params.id).catch(function(err) {
+            res.json(err);
+        }).then(function(rows) {
+            res.json(rows);
+        });
     } else {
-        Species.getAllSpecies(function(err, rows) {
-            if (err) {
-                res.json(err);
-            } else {
-                res.json(rows);
-            }
-        })
+        Species.getAllSpecies().catch(function(err) {
+            res.json(err);
+        }).then(function(rows) {
+            res.json(rows);
+        });
     }
 });
 
