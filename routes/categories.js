@@ -31,7 +31,7 @@ function add_subcategories_and_return(res, rows) {
             row_result.category_level_id = rows[b].category_level_id;
             row_result.parent_category_id = rows[b].parent_category_id;
             row_result.sub_categories = values[b];
-            row_result.species = values[b+rows.length];
+            row_result.species = values[b+rows.length]; // I don't know if this is nightmares.
             row_results.push(row_result);
         }
         res.json(row_results);
