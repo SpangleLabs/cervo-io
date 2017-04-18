@@ -112,11 +112,11 @@ Animals list:
                     load_category(data[0].sub_categories[0].category_id);
                 }
             } else if(!listElement.find("ul").is(":visible")) {
-                listElement.find("ul").show();
+                listElement.find("ul").first().show();
                 listElement.addClass("open");
                 listElement.removeClass("closed");
             } else {
-                listElement.find("ul").hide();
+                listElement.find("ul").first().hide();
                 listElement.addClass("closed");
                 listElement.removeClass("open");
             }
