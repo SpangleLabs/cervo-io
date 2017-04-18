@@ -20,13 +20,11 @@ router.get('/:id?', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    Zoos.addZoo(req.body, function(err, count) {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(req.body);
-        }
-    })
+    Zoos.addZoo(req.body).catch(function(err) {
+        res.json(err);
+    }).then(function(count) {
+        res.json(req.body);
+    });
 });
 
 module.exports = router;
