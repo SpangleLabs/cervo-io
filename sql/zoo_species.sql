@@ -57,8 +57,8 @@ CREATE TABLE `species` (
 DROP TABLE IF EXISTS `zoo_species`;
 CREATE TABLE `zoo_species`.`zoo_species` (
   `zoo_species_id` INT NOT NULL AUTO_INCREMENT COMMENT '',
-  `zoo_id` INT NULL COMMENT '',
-  `species_id` INT NULL COMMENT '',
+  `zoo_id` INT NOT NULL COMMENT '',
+  `species_id` INT NOT NULL COMMENT '',
   PRIMARY KEY (`zoo_species_id`)  COMMENT '',
   INDEX `zoo_id_idx` (`zoo_id` ASC)  COMMENT '',
   INDEX `species_id_idx` (`species_id` ASC)  COMMENT '',
