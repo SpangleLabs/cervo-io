@@ -16,9 +16,6 @@ Animals list:
     $.get("http://localhost:3000/category_levels/", function(data) {
         category_level_cache = data;
     });
-    function get_category_levels() {
-        return category_level_cache;
-    }
     function get_category_level(id) {
         for ( var a = 0; a < category_level_cache.length; a++ ) {
             if(category_level_cache[a].category_level_id === id) {
