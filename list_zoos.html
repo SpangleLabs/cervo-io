@@ -23,8 +23,8 @@
         $.get("http://localhost:3000/zoos/", function(data) {
             for(var a = 0; a < data.length; a++) {
                 tableElem.append("<tr><td>"+data[a].name+"</td>" +
-                    "<td>"+data[0].postcode+"</td>" +
-                    "<td>"+data[0].link+"</td></tr>")
+                    "<td>"+data[a].postcode+"</td>" +
+                    "<td>"+data[a].link+"</td></tr>");
             }
         });
     }
