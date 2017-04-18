@@ -1,6 +1,6 @@
 var express = require('express');
 var Zoos = require("../models/Zoos.js");
-var ZooSpecies = require("../models/ZooSpecies.js");
+var Species = require("../models/Species.js");
 var Promise = require("promise");
 var router = express.Router();
 
@@ -12,7 +12,7 @@ router.get('/:id?', function(req, res, next) {
         }).then(function(rows) {
             var zooSpecies = [];
             for(var a = 0; a < rows.length; a++) {
-                zooSpecies.push(ZooSpecies.getZooSpeciesByZooId(rows[a].zoo_id));
+                zooSpecies.push(Species.getSpeciesByZooId(rows[a].zoo_id));
             }
             Promise.all(zooSpecies).catch(function(err) {
                 res.json(err);

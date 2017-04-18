@@ -20,6 +20,14 @@ var Species={
         });
     },
 
+    getSpeciesByZooId:function(zoo_id) {
+        return db.then(function(conn) {
+            return conn.query("select * from zoo_species " +
+                "left join species on zoo_species.species_id = species.species_id " +
+                "where zoo_species.zoo_id = ?",[zoo_id]);
+        });
+    },
+
     addSpecies:function(Species){
         return db.then(function(conn) {
             return conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
