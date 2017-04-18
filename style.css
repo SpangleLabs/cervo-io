@@ -2,10 +2,7 @@ ul {
     padding-left: 10px;
     border-left: 1px dotted black;
 }
-li.category {
-    list-style-type: none;
-}
-li.species {
+li {
     list-style-type: none;
 }
 .latin_name {
@@ -18,11 +15,23 @@ form {
     display: inline;
 }
 li.closed:before {
-    content: "🗀";
+    content: "📁";
 }
 li.open:before {
-    content: "🗁";
+    content: "📂";
 }
 li.species:before {
-    content: "🦌";
+    content: "🐶";
+}
+li.add:before {
+    content: "+";
+}
+.add form {
+    display: none;
+}
+table {
+    border-collapse: collapse;
+}
+tr, th, td {
+    border: 1px solid black;
 }

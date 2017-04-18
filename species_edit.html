@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Edit species</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
@@ -40,10 +40,40 @@ Animals list:
     }
 
     function add_species(element, speciesData) {
-        var speciesId = speciesData.species_id;
+        //var speciesId = speciesData.species_id;
         var name = speciesData.common_name;
         var latinName = speciesData.latin_name;
         element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span></li>");
+    }
+
+    function add_new_category_form(element, parentCategoryId) {
+        element.find("ul").append("<li class='species add'>" +
+            "<span onclick='display_form("+parentCategoryId+")'>Add species </span>" +
+            "<form class='add_species' onsubmit='send_add_species("+parentCategoryId+")'>" +
+            "<input class='name' type='text' name='name'/>" +
+            "<input class='latin_name' type='text' name='latin_name'>" +
+            "<input type='submit' />" +
+            "</form></li>");
+    }
+
+    function add_new_species_form(element, parentCategoryId) {
+        var formString = "<li class='category add'>" +
+            "<span onclick='display_form("+parentCategoryId+")'>Add category </span>" +
+            "<form class='add_category' onsubmit='send_add_category("+parentCategoryId+")'>" +
+            "<input class='name' type='text' name='name'/>" +
+            "<select class='category_level_id' name='category_level_id'>";
+        var catLevels = get_category_levels();
+        for(var a = 0; a < catLevels.length; a++) {
+            formString += "<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>";
+        }
+        formString += "</select>" +
+            "<input type='submit'/>" +
+            "</form></li>";
+        element.find("ul").append(formString);
+    }
+
+    function display_form(id) {
+        $("#category-"+id).find("form").show();
     }
 
     function send_add_species(categoryId) {
@@ -76,44 +106,35 @@ Animals list:
 
     function load_category(id) {
         var categoryLiId = "category-"+id;
-        $.get("http://localhost:3000/categories/"+id, function(/*Category*/data) {
+        $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
             listElement.addClass("open");
             listElement.removeClass("closed");
             if(!listElement.has("ul").length) {
-                console.log("hello");
                 listElement.append("<ul></ul>");
+                // Add subcategories and species
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);
                 });
                 $.each(data[0].species, function (index, itemData) {
                     add_species(listElement.find("ul"), itemData);
                 });
+                // Adding forms
                 if(data[0].category_level_id === 1) {
-                    listElement.find("ul").append("<li class='species'>Add species:" +
-                        "<form class='add_species' onsubmit='send_add_species("+id+")'>" +
-                        "<input class='name' type='text' name='name'/>" +
-                        "<input class='latin_name' type='text' name='latin_name'>" +
-                        "<input type='submit' />" +
-                        "</form></li>");
+                    add_new_category_form(listElement, id);
                 } else {
-                    listElement.find("ul").append("<li class='category'>Add category:" +
-                        "<form class='add_category' onsubmit='send_add_category("+id+")'>" +
-                        "<input class='name' type='text' name='name'/>" +
-                        "<select class='category_level_id' name='category_level_id'></select>" +
-                        "<input type='submit'/>" +
-                        "</form></li>");
-                    var catLevels = get_category_levels();
-                    for(var a = 0; a < catLevels.length; a++) {
-                        listElement.find("ul").find("select").append("<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>");
-                    }
+                    add_new_species_form(listElement, id);
+                }
+                // If category contains only 1 subcategory, open the subcategory.
+                if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
+                    load_category(data[0].sub_categories[0].category_id);
                 }
             } else if(!listElement.find("ul").is(":visible")) {
-                listElement.find("ul").show();
+                listElement.find("ul").first().show();
                 listElement.addClass("open");
                 listElement.removeClass("closed");
             } else {
-                listElement.find("ul").hide();
+                listElement.find("ul").first().hide();
                 listElement.addClass("closed");
                 listElement.removeClass("open");
             }

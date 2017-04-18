@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View zoo</title>
+    <style>
+        .name {}
+    </style>
+</head>
+<body>
+Name: <span class="name"></span><br />
+Postcode: <span class="postcode"></span><br />
+Link: <span class="link"></span><br />
+Species list:<br />
+
+<script>
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
+    function load_zoo_data() {
+        var zooId = getUrlParameter("id");
+        $.get("http://localhost:3000/zoos/"+zooId, function(data) {
+            $(".name").append(data[0].name);
+            $(".postcode").append(data[0].postcode);
+            $(".link").append(data[0].link);
+        });
+    }
+
+    $(document).ready(function() {
+        load_zoo_data();
+    });
+</script>
+</body>
+</html>

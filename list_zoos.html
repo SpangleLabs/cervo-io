@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zoo list</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>List of UK zoos</h1>
+<form onsubmit='add_new_zoo()'>
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Postcode</th><th>Link</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</form>
+</body>
+<script>
+    function fill_table() {
+        var tableElem = $("table tbody");
+        $.get("http://localhost:3000/zoos/", function(/*[ZooObj]*/data) {
+            for(var a = 0; a < data.length; a++) {
+                tableElem.append("<tr><td><a href='view_zoo.html?id='"+data[a].zoo_id+"'>"+data[a].name+"</a></td>" +
+                    "<td>"+data[a].postcode+"</td>" +
+                    "<td>"+data[a].link+"</td></tr>");
+            }
+        });
+    }
+
+    function add_new_zoo() {
+        var formElement = $("form");
+        var inputName = formElement.find("input.input-name").val();
+        var inputPostcode = formElement.find("input.input-postcode").val();
+        var inputLink = formElement.find("input.input-link").val();
+        var inputObj = {};
+        inputObj.name = inputName;
+        inputObj.postcode = inputPostcode;
+        inputObj.link = inputLink;
+        console.log(inputObj);
+        $.post("http://localhost:3000/zoos/", inputObj);
+        formElement.first().reset();
+        return false;
+    }
+
+    function add_form_row() {
+        var tableElem = $("table");
+        tableElem.append("<tfoot>" +
+            "<tr>" +
+            "<td><input type='text' class='input-name' name='name' /></td>" +
+            "<td><input type='text' class='input-postcode' name='postcode' /></td>" +
+            "<td><input type='text' class='input-link' name='link' />" +
+            "<input type='submit' /></td>" +
+            "</tr></tfoot>");
+        console.log("added form");
+    }
+
+    $(document).ready(function () {
+        fill_table();
+        add_form_row();
+    });
+</script>
+</html>
