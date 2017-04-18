@@ -108,6 +108,9 @@ Animals list:
                         listElement.find("ul").find("select").append("<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>");
                     }
                 }
+                if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
+                    load_category(data[0].sub_categories[0].category_id);
+                }
             } else if(!listElement.find("ul").is(":visible")) {
                 listElement.find("ul").show();
                 listElement.addClass("open");
