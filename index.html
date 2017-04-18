@@ -105,19 +105,21 @@ Animals list:
             listElement.addClass("open");
             listElement.removeClass("closed");
             if(!listElement.has("ul").length) {
-                console.log("hello");
                 listElement.append("<ul></ul>");
+                // Add subcategories and species
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);
                 });
                 $.each(data[0].species, function (index, itemData) {
                     add_species(listElement.find("ul"), itemData);
                 });
+                // Adding forms
                 if(data[0].category_level_id === 1) {
                     add_new_category_form(listElement, id);
                 } else {
                     add_new_species_form(listElement, id);
                 }
+                // If category contains only 1 subcategory, open the subcategory.
                 if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
                     load_category(data[0].sub_categories[0].category_id);
                 }
