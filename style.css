@@ -2,10 +2,7 @@ ul {
     padding-left: 10px;
     border-left: 1px dotted black;
 }
-li.category {
-    list-style-type: none;
-}
-li.species {
+li {
     list-style-type: none;
 }
 .latin_name {
