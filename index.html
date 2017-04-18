@@ -46,6 +46,30 @@ Animals list:
         element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span></li>");
     }
 
+    function add_new_category_form(element, parentCategoryId) {
+        element.find("ul").append("<li class='species add'>Add species:" +
+            "<form class='add_species' onsubmit='send_add_species("+parentCategoryId+")'>" +
+            "<input class='name' type='text' name='name'/>" +
+            "<input class='latin_name' type='text' name='latin_name'>" +
+            "<input type='submit' />" +
+            "</form></li>");
+    }
+
+    function add_new_species_form(element, parentCategoryId) {
+        var formString = "<li class='category add'>Add category:" +
+            "<form class='add_category' onsubmit='send_add_category("+parentCategoryId+")'>" +
+            "<input class='name' type='text' name='name'/>" +
+            "<select class='category_level_id' name='category_level_id'>";
+        var catLevels = get_category_levels();
+        for(var a = 0; a < catLevels.length; a++) {
+            formString += "<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>";
+        }
+        formString += "</select>" +
+            "<input type='submit'/>" +
+            "</form></li>";
+        element.find("ul").append(formString);
+    }
+
     function send_add_species(categoryId) {
         var formElement = $("#category-"+categoryId).find("form.add_species");
         var inputName = formElement.find("input.name").val();
@@ -90,23 +114,9 @@ Animals list:
                     add_species(listElement.find("ul"), itemData);
                 });
                 if(data[0].category_level_id === 1) {
-                    listElement.find("ul").append("<li class='species add'>Add species:" +
-                        "<form class='add_species' onsubmit='send_add_species("+id+")'>" +
-                        "<input class='name' type='text' name='name'/>" +
-                        "<input class='latin_name' type='text' name='latin_name'>" +
-                        "<input type='submit' />" +
-                        "</form></li>");
+                    add_new_category_form(listElement, id);
                 } else {
-                    listElement.find("ul").append("<li class='category add'>Add category:" +
-                        "<form class='add_category' onsubmit='send_add_category("+id+")'>" +
-                        "<input class='name' type='text' name='name'/>" +
-                        "<select class='category_level_id' name='category_level_id'></select>" +
-                        "<input type='submit'/>" +
-                        "</form></li>");
-                    var catLevels = get_category_levels();
-                    for(var a = 0; a < catLevels.length; a++) {
-                        listElement.find("ul").find("select").append("<option value='"+catLevels[a].category_level_id+"'>"+catLevels[a].name+"</option>");
-                    }
+                    add_new_species_form(listElement, id);
                 }
                 if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
                     load_category(data[0].sub_categories[0].category_id);
