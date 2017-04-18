@@ -18,10 +18,10 @@ form {
     display: inline;
 }
 li.closed:before {
-    content: "🗀";
+    content: "📁";
 }
 li.open:before {
-    content: "🗁";
+    content: "📂";
 }
 li.species:before {
     content: "🦌";
