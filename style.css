@@ -29,3 +29,9 @@ li.add:before {
 .add form {
     display: none;
 }
+table {
+    border-collapse: collapse;
+}
+tr, th, td {
+    border: 1px solid black;
+}
