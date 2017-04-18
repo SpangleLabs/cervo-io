@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+Your postcode: <input type="text" name="postcode"/>(Enter this before expanding)<br />
 Animals list:
 <ul id="animals"></ul>
 </body>
@@ -24,6 +25,8 @@ Animals list:
         }
     }
 
+    function search_link
+
     function add_category(element, categoryData) {
         var categoryId = categoryData.category_id;
         var name = categoryData.name;
@@ -33,14 +36,17 @@ Animals list:
         element.append("<li class='category closed' id='"+categoryLiId+"'>" +
             "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
             "<span class='category_level'>"+categoryLevelName+"</span>" +
+            "<a href='locate_zoo.html?type=category&id="+categoryId+"&postcode="+$("input").first().val()+"'>🔍</a>" +
             "</li>");
     }
 
     function add_species(element, speciesData) {
-        //var speciesId = speciesData.species_id;
+        var speciesId = speciesData.species_id;
         var name = speciesData.common_name;
         var latinName = speciesData.latin_name;
-        element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span></li>");
+        element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span>" +
+            "<a href='locate_zoo.html?type=species&id="+speciesId+"&postcode="+$("input").first().val()+"'>🔍</a>" +
+            "</li>");
     }
 
     function load_category(id) {
