@@ -12,6 +12,7 @@ var zoos = require('./routes/zoos');
 var categories = require('./routes/categories');
 var category_levels = require('./routes/category_levels');
 var species = require('./routes/species');
+var zoo_species = require('./routes/zoo_species');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use('/zoos', zoos);
 app.use('/categories', categories);
 app.use('/category_levels', category_levels);
 app.use('/species', species);
+app.use('/zoo_species', zoo_species);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
