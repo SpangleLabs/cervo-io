@@ -24,7 +24,7 @@
             for(var a = 0; a < data.length; a++) {
                 tableElem.append("<tr><td><a href='view_zoo.html?id="+data[a].zoo_id+"'>"+data[a].name+"</a></td>" +
                     "<td>"+data[a].postcode+"</td>" +
-                    "<td>"+data[a].link+"</td></tr>");
+                    "<td><a href='"+data[a].link+"'>"+data[a].link+"</a></td></tr>");
             }
         });
     }

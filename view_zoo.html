@@ -43,7 +43,7 @@ Species list:<br />
         $.get("http://localhost:3000/zoos/"+zooId, function(data) {
             $(".name").append(data[0].name);
             $(".postcode").append(data[0].postcode);
-            $(".link").append(data[0].link);
+            $(".link").append("<a href='"+data[0].link+"'>"+data[0].link+"</a>");
             for(var a = 0; a < data[0].species.length; a++) {
                 $("#species_list").append("<li>"+data[0].species[a].common_name+" " +
                     "<span class='latin_name'>"+data[0].species[a].latin_name+"</span></li>");
