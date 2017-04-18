@@ -106,7 +106,7 @@ Animals list:
 
     function load_category(id) {
         var categoryLiId = "category-"+id;
-        $.get("http://localhost:3000/categories/"+id, function(/*Category*/data) {
+        $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
             listElement.addClass("open");
             listElement.removeClass("closed");
