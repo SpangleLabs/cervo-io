@@ -1,5 +1,7 @@
 CREATE DATABASE `zoo_species`;
 
+-- Create tables
+
 DROP TABLE IF EXISTS `zoos`;
 CREATE TABLE `zoos` (
   `zoo_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -39,3 +41,44 @@ CREATE TABLE `species` (
   KEY `category_id_idx` (`category_id`),
   CONSTRAINT `category_id` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Load up some data
+
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('genus');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('tribe');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('subfamily');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('family');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('infraorder');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('suborder');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('clade');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('order');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('superorder');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('magnorder');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('(unranked)');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('infraclass');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('subclass');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('class');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('phylum');
+INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('kingdom');
+
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`) VALUES ('animalia', '16');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('chordata', '15', '1');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('mammalia', '14', '2');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('theria', '13', '3');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('eutheria', '12', '4');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('exafroplacentalia', '11', '5');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('boreoeutheria', '10', '6');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('laurasiatheria', '9', '7');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('scrotifera', '11', '8');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('artiodactyla', '8', '9');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('artiofabula', '7', '10');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('cetruminantia', '7', '11');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('ruminantiamorpha', '7', '12');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('ruminantia', '6', '13');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('pecora', '5', '14');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('cervidae', '4', '15');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('cervinae', '3', '16');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('cervini', '2', '17');
+INSERT INTO `zoo_species`.`categories` (`name`, `category_level_id`, `parent_category_id`) VALUES ('axis', '1', '18');
+
+INSERT INTO `zoo_species`.`species` (`common_name`, `latin_name`, `category_id`) VALUES ('Chital', 'axis axis', '19');
