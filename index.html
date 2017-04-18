@@ -47,7 +47,8 @@ Animals list:
     }
 
     function add_new_category_form(element, parentCategoryId) {
-        element.find("ul").append("<li class='species add'>Add species:" +
+        element.find("ul").append("<li class='species add'>" +
+            "<span onclick='display_form("+parentCategoryId+")'>Add species </span>" +
             "<form class='add_species' onsubmit='send_add_species("+parentCategoryId+")'>" +
             "<input class='name' type='text' name='name'/>" +
             "<input class='latin_name' type='text' name='latin_name'>" +
@@ -56,7 +57,8 @@ Animals list:
     }
 
     function add_new_species_form(element, parentCategoryId) {
-        var formString = "<li class='category add'>Add category:" +
+        var formString = "<li class='category add'>" +
+            "<span onclick='display_form("+parentCategoryId+")'>Add category </span>" +
             "<form class='add_category' onsubmit='send_add_category("+parentCategoryId+")'>" +
             "<input class='name' type='text' name='name'/>" +
             "<select class='category_level_id' name='category_level_id'>";
@@ -68,6 +70,10 @@ Animals list:
             "<input type='submit'/>" +
             "</form></li>";
         element.find("ul").append(formString);
+    }
+
+    function display_form(id) {
+        $("#category-"+id).find("form").show();
     }
 
     function send_add_species(categoryId) {

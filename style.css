@@ -26,3 +26,6 @@ li.species:before {
 li.add:before {
     content: "+";
 }
+.add form {
+    display: none;
+}
