@@ -5,7 +5,9 @@
     <title>View zoo</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <style>
-        .name {}
+        .latin_name {
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -13,6 +15,7 @@ Name: <span class="name"></span><br />
 Postcode: <span class="postcode"></span><br />
 Link: <span class="link"></span><br />
 Species list:<br />
+<ul id="species_list"></ul>
 
 <script>
     var getUrlParameter = function getUrlParameter(sParam) {
@@ -36,6 +39,10 @@ Species list:<br />
             $(".name").append(data[0].name);
             $(".postcode").append(data[0].postcode);
             $(".link").append(data[0].link);
+            for(var a = 0; a < data[0].species.length; a++) {
+                $("#species_list").append("<li>"+data[0].species[a].common_name+" " +
+                    "<span class='latin_name'>"+data[0].species[a].latin_name+"</span></li>");
+            }
         });
     }
 
