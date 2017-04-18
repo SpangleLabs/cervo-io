@@ -27,8 +27,16 @@ CREATE TABLE `categories` (
   PRIMARY KEY (`category_id`),
   KEY `category_level_id_idx` (`category_level_id`),
   KEY `parent_category_id_idx` (`parent_category_id`),
-  CONSTRAINT `category_level_id` FOREIGN KEY (`category_level_id`) REFERENCES `category_levels` (`category_level_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `parent_category_id` FOREIGN KEY (`parent_category_id`) REFERENCES `categories` (`category_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `category_level_id`
+    FOREIGN KEY (`category_level_id`)
+    REFERENCES `category_levels` (`category_level_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `parent_category_id`
+    FOREIGN KEY (`parent_category_id`)
+    REFERENCES `categories` (`category_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `species`;
@@ -39,8 +47,31 @@ CREATE TABLE `species` (
   `category_id` int(11) NOT NULL,
   PRIMARY KEY (`species_id`),
   KEY `category_id_idx` (`category_id`),
-  CONSTRAINT `category_id` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `category_id`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `categories` (`category_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `zoo_species`;
+CREATE TABLE `zoo_species`.`zoo_species` (
+  `zoo_species_id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `zoo_id` INT NULL COMMENT '',
+  `species_id` INT NULL COMMENT '',
+  PRIMARY KEY (`zoo_species_id`)  COMMENT '',
+  INDEX `zoo_id_idx` (`zoo_id` ASC)  COMMENT '',
+  INDEX `species_id_idx` (`species_id` ASC)  COMMENT '',
+  CONSTRAINT `zoo_id`
+    FOREIGN KEY (`zoo_id`)
+    REFERENCES `zoo_species`.`zoos` (`zoo_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `species_id`
+    FOREIGN KEY (`species_id`)
+    REFERENCES `zoo_species`.`species` (`species_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 -- Load up some data
 
