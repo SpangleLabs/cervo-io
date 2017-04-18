@@ -90,14 +90,14 @@ Animals list:
                     add_species(listElement.find("ul"), itemData);
                 });
                 if(data[0].category_level_id === 1) {
-                    listElement.find("ul").append("<li class='species'>Add species:" +
+                    listElement.find("ul").append("<li class='species add'>Add species:" +
                         "<form class='add_species' onsubmit='send_add_species("+id+")'>" +
                         "<input class='name' type='text' name='name'/>" +
                         "<input class='latin_name' type='text' name='latin_name'>" +
                         "<input type='submit' />" +
                         "</form></li>");
                 } else {
-                    listElement.find("ul").append("<li class='category'>Add category:" +
+                    listElement.find("ul").append("<li class='category add'>Add category:" +
                         "<form class='add_category' onsubmit='send_add_category("+id+")'>" +
                         "<input class='name' type='text' name='name'/>" +
                         "<select class='category_level_id' name='category_level_id'></select>" +

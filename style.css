@@ -24,5 +24,8 @@ li.open:before {
     content: "📂";
 }
 li.species:before {
-    content: "🦌";
+    content: "🐶";
+}
+li.add:before {
+    content: "+";
 }
