@@ -30,7 +30,7 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeSector, zooIdList) {
         var zooPostcodeString = zooPostcodeList.join("|");
         var googleApiKey = ""; // TODO: add before running
         var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + "&destinations=" + zooPostcodeString + "&key=" + googleApiKey;
-        $.get(googleApiString, function (data) {
+        $.get(googleApiString, function (data) { //TODO: get a http request library
             var distanceResults = data.rows[0].elements;
             if (distanceResults.length !== zooIdList.length) {
                 Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
@@ -80,7 +80,7 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         console.log(err);
         res.status(500).send("Could not get postcode ID.");
     });
-    return;
+    return; // TODO continue from here
     UserPostcodes.getUserPostcodeByPostcodeSector(sector).catch(function(err) {
         var userPostcode = {};
         userPostcode.postcode_sector = sector;
