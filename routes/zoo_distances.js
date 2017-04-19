@@ -5,16 +5,49 @@ var Promise = require("promise");
 var router = express.Router();
 var Postcode = require("postcode");
 var UserPostcodes = require("../models/UserPostcodes.js");
+var ZooDistances = require("../models/ZooDistances.js");
+var Zoo = require("../models/Zoos.js");
 
-function getOrFindDistancePromise(postcodeId, zooId) {
-
-    //return an object with postcode id, zoo id, distance (metres)
-    var response = {};
-    response.zoo_id = zooId;
-    response.user_postcode_id = postcodeId;
-    response.metres = 0;
-    return response;
+function getDistanceOrNotPromise(postcodeId, zooId) {
+    return ZooDistances.getZooDistanceByZooIdAndUserPostcodeId(zooId, postcodeId).then(function(data) {
+        return data[0];
+    }).catch(function(err) {
+        return false;
+    });
 }
+
+function promiseToGetDistancesFromGoogleMaps(userPostcodeSector, zooIdList) {
+    var userPostcode = userPostcodeSector+"AA";
+    var zooPostcodePromises = [];
+    for(var a = 0; a < zooIdList; a++) {
+        zooPostcodePromises.push(Zoo.getZooById(zooIdList[a]));
+    }
+    Promise.all(zooPostcodePromises).then(function(values) {
+        var zooPostcodeList = [];
+        for(var b = 0; b < values.length; b++) {
+            zooPostcodeList.push(values[b].postcode);
+        }
+        var zooPostcodeString = zooPostcodeList.join("|");
+        var googleApiKey = ""; // TODO: add before running
+        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins="+userPostcode+"&destinations="+zooPostcodeString+"&key="+googleApiKey;
+        $.get(googleApiString, function(data) {
+            var distanceResults = data.rows[0].elements;
+            if(distanceResults.length !== zooIdList.length) {
+                Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
+            }
+            var zooDistances = [];
+            for(var c = 0; c < distanceResults.length; c++) {
+                var zooDistance = {};
+                zooDistance.user_postcode_id = "?"; //TODO
+                zooDistance.zoo_id = zooIdList[c];
+                zooDistance.metres = distanceResults[c].distance.value;
+                zooDistances.push(zooDistance);
+            }
+            return zooDistances;
+        })
+    });
+}
+
 /* GET zoo distances. */
 router.get('/:postcode/:zooIdList', function(req, res, next) {
     var postcode = new Postcode(req.params.postcode);
@@ -41,12 +74,31 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         // Get or create distances
         var distancePromises = [];
         for(var a = 0; a < zooIdList.length; a++) {
-            distancePromises.push(getOrFindDistancePromise(postcodeId, zooIdList[a]));
+            distancePromises.push(getDistanceOrNotPromise(postcodeId, zooIdList[a]));
         }
+        // Try and get distances from database
         Promise.all(distancePromises, function(values) {
-            // Construct response object (Actually, values is exactly my list of objects right now?
-            // Respond
-            res.json(values);
+            // Get the list of zoo IDs which failed
+            var failedIds = [];
+            for(var b = 0; b < zooIdList.length; b++) {
+                if(values[b] === false) {
+                    failedIds.push(zooIdList[b]);
+                }
+            }
+            // If no IDs failed, just respond
+            if(failedIds.length === 0) {
+                res.json(values);
+            }
+            // Construct the request to google maps API
+            promiseToGetDistancesFromGoogleMaps(sector, failedIds).catch(function(err) {
+                res.status(500).send("Failed to use google API");
+            }).then(function(data) {
+                // Save google api responses to database
+                // add api responses to overall response
+                // Respond
+                res.json(values);
+
+            });
         })
     });
 });
