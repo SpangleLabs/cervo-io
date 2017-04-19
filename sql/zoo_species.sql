@@ -77,7 +77,7 @@ DROP TABLE IF EXISTS `user_postcodes`;
 CREATE TABLE `zoo_species`.`user_postcodes` (
   `user_postcode_id` INT NOT NULL AUTO_INCREMENT,
   `postcode_sector` NVARCHAR(10) NOT NULL,
-  PRIMARY KEY (`user_postcodes_id`),
+  PRIMARY KEY (`user_postcode_id`),
   UNIQUE INDEX `postcode_sector_UNIQUE` (`postcode_sector` ASC));
 
 DROP TABLE IF EXISTS `zoo_distances`;
