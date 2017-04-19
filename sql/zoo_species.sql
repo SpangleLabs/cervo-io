@@ -85,6 +85,7 @@ CREATE TABLE `zoo_species`.`zoo_distances` (
   `zoo_distance_id` INT NOT NULL AUTO_INCREMENT,
   `zoo_id` INT NOT NULL,
   `user_postcode_id` INT NOT NULL,
+  `metres` INT NOT NULL,
   PRIMARY KEY (`zoo_distance_id`),
   INDEX `zoo_id_idx` (`zoo_id` ASC),
   INDEX `user_postcode_id_idx` (`user_postcode_id` ASC),
