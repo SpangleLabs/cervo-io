@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find zoo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+Searching for:
+<ul id="species_list"></ul>
+
+<script>
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
+    var speciesIdList = [];
+
+    function load_species_list() {
+        var getType = getUrlParameter("type");
+        if(getType === "species") {
+            var speciesId = getUrlParameter("id");
+            speciesIdList.push(speciesId);
+            $.get("http://localhost:3000/species/"+speciesId, function(data) {
+                $("#species_list").append("<li>"+data[0].common_name+"</li>");
+            })
+        } else {
+            var categoryId = getUrlParameter("id");
+            get_species_from_category(categoryId);
+        }
+    }
+
+    function get_species_from_category(id) {
+        $.get("http://localhost:3000/categories/"+id, function(data) {
+            for(var a = 0; a < data.length; a++) {
+                var subcats = data[a].sub_categories;
+                var species = data[a].species;
+                for(var b = 0; b < species.length; b++) {
+                    speciesIdList.push(species[b].species_id);
+                    $("#species_list").append("<li>"+species[b].common_name+"</li>");
+                }
+                for(var c = 0; c < subcats.length; c++) {
+                    get_species_from_category(subcats[c].category_id);
+                }
+            }
+        });
+    }
+
+    function fill_in_species_list() {
+        for(var a = 0; a < speciesIdList.length; a++) {
+
+        }
+    }
+
+    $(document).ready(function() {
+        load_species_list();
+        //fill_in_species_list();
+    });
+</script>
+</body>
+</html>
