@@ -8,13 +8,14 @@
   "dependencies": {
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
+    "cors": "~2.8.3",
     "debug": "~2.6.3",
     "express": "~4.15.2",
     "jade": "~1.11.0",
     "morgan": "~1.8.1",
-    "serve-favicon": "~2.4.2",
-    "promise-mysql": "latest",
+    "postcode": "^0.2.5",
     "promise": "latest",
-    "cors": "~2.8.3"
+    "promise-mysql": "latest",
+    "serve-favicon": "~2.4.2"
   }
 }
