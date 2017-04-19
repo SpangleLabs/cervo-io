@@ -19,7 +19,7 @@ router.get('/:id?', function(req, res, next) {
             }).then(function(values) {
                 var data = [];
                 for(var b = 0; b < rows.length; b++) {
-                    row_result = {};
+                    var row_result = {};
                     row_result.zoo_id = rows[b].zoo_id;
                     row_result.name = rows[b].name;
                     row_result.postcode = rows[b].postcode;

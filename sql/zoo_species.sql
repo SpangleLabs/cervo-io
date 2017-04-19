@@ -73,6 +73,34 @@ CREATE TABLE `zoo_species`.`zoo_species` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+DROP TABLE IF EXISTS `user_postcodes`;
+CREATE TABLE `zoo_species`.`user_postcodes` (
+  `user_postcode_id` INT NOT NULL AUTO_INCREMENT,
+  `postcode_sector` NVARCHAR(10) NOT NULL,
+  PRIMARY KEY (`user_postcodes_id`),
+  UNIQUE INDEX `postcode_sector_UNIQUE` (`postcode_sector` ASC));
+
+DROP TABLE IF EXISTS `zoo_distances`;
+CREATE TABLE `zoo_species`.`zoo_distances` (
+  `zoo_distance_id` INT NOT NULL AUTO_INCREMENT,
+  `zoo_id` INT NOT NULL,
+  `user_postcode_id` INT NOT NULL,
+  `metres` INT NOT NULL,
+  PRIMARY KEY (`zoo_distance_id`),
+  INDEX `zoo_id_idx` (`zoo_id` ASC),
+  INDEX `user_postcode_id_idx` (`user_postcode_id` ASC),
+  CONSTRAINT `zoo_id2`
+    FOREIGN KEY (`zoo_id`)
+    REFERENCES `zoo_species`.`zoos` (`zoo_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `user_postcode_id`
+    FOREIGN KEY (`user_postcode_id`)
+    REFERENCES `zoo_species`.`user_postcodes` (`user_postcode_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
 -- Load up some data
 
 INSERT INTO `zoo_species`.`category_levels` (`name`) VALUES ('genus');

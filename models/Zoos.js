@@ -14,6 +14,14 @@ var Zoos={
         });
     },
 
+    getZoosBySpeciesId:function(species_id) {
+        return db.then(function(conn) {
+            return conn.query("select * from zoo_species " +
+                "left join zoos on zoo_species.zoo_id = zoos.zoo_id " +
+                "where zoo_species.species_id = ?",[species_id]);
+        });
+    },
+
     addZoo:function(Zoo){
         return db.then(function(conn) {
             return conn.query("insert into zoos (`name`,`postcode`,`link`) " +
