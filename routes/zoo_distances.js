@@ -17,26 +17,26 @@ function getDistanceOrNotPromise(postcodeId, zooId) {
 }
 
 function promiseToGetDistancesFromGoogleMaps(userPostcodeSector, zooIdList) {
-    var userPostcode = userPostcodeSector+"AA";
+    var userPostcode = userPostcodeSector + "AA";
     var zooPostcodePromises = [];
-    for(var a = 0; a < zooIdList; a++) {
+    for (var a = 0; a < zooIdList; a++) {
         zooPostcodePromises.push(Zoo.getZooById(zooIdList[a]));
     }
-    Promise.all(zooPostcodePromises).then(function(values) {
+    Promise.all(zooPostcodePromises).then(function (values) {
         var zooPostcodeList = [];
-        for(var b = 0; b < values.length; b++) {
+        for (var b = 0; b < values.length; b++) {
             zooPostcodeList.push(values[b].postcode);
         }
         var zooPostcodeString = zooPostcodeList.join("|");
         var googleApiKey = ""; // TODO: add before running
-        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins="+userPostcode+"&destinations="+zooPostcodeString+"&key="+googleApiKey;
-        $.get(googleApiString, function(data) {
+        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + "&destinations=" + zooPostcodeString + "&key=" + googleApiKey;
+        $.get(googleApiString, function (data) {
             var distanceResults = data.rows[0].elements;
-            if(distanceResults.length !== zooIdList.length) {
+            if (distanceResults.length !== zooIdList.length) {
                 Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
             }
             var zooDistances = [];
-            for(var c = 0; c < distanceResults.length; c++) {
+            for (var c = 0; c < distanceResults.length; c++) {
                 var zooDistance = {};
                 zooDistance.user_postcode_id = "?"; //TODO
                 zooDistance.zoo_id = zooIdList[c];
@@ -48,18 +48,39 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeSector, zooIdList) {
     });
 }
 
+function promiseGetPostcodeId(postcodeSector) {
+    return UserPostcodes.getUserPostcodeByPostcodeSector(postcodeSector).then(function(data) {
+        if(data.length === 0) {
+            var userPostcode = {};
+            userPostcode.postcode_sector = postcodeSector;
+            return UserPostcodes.addUserPostcode(userPostcode).then(function (data) {
+                return data.insertId;
+            });
+        }
+        return data[0].user_postcode_id;
+    });
+}
+
 /* GET zoo distances. */
 router.get('/:postcode/:zooIdList', function(req, res, next) {
     var postcode = new Postcode(req.params.postcode);
     // Validate postcode
     if(!postcode.valid()) {
         res.status(500).send("Invalid postcode");
+        return;
     }
     // Get postcode sector
     var sector = postcode.sector();
     // Split up zoo id list
     var zooIdList = req.params.zooIdList.split(",");
-    // Check for postcode id?
+    // Check for (or create) postcode id
+    promiseGetPostcodeId(sector).then(function(postcodeId) {
+        res.send("Got postcode id: "+postcodeId);
+    }).catch(function(err) {
+        console.log(err);
+        res.status(500).send("Could not get postcode ID.");
+    });
+    return;
     UserPostcodes.getUserPostcodeByPostcodeSector(sector).catch(function(err) {
         var userPostcode = {};
         userPostcode.postcode_sector = sector;
