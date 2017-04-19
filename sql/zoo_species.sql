@@ -75,7 +75,7 @@ CREATE TABLE `zoo_species`.`zoo_species` (
 
 DROP TABLE IF EXISTS `user_postcodes`;
 CREATE TABLE `zoo_species`.`user_postcodes` (
-  `user_postcodes_id` INT NOT NULL AUTO_INCREMENT,
+  `user_postcode_id` INT NOT NULL AUTO_INCREMENT,
   `postcode_sector` NVARCHAR(10) NOT NULL,
   PRIMARY KEY (`user_postcodes_id`),
   UNIQUE INDEX `postcode_sector_UNIQUE` (`postcode_sector` ASC));
@@ -96,7 +96,7 @@ CREATE TABLE `zoo_species`.`zoo_distances` (
     ON UPDATE NO ACTION,
   CONSTRAINT `user_postcode_id`
     FOREIGN KEY (`user_postcode_id`)
-    REFERENCES `zoo_species`.`user_postcodes` (`user_postcodes_id`)
+    REFERENCES `zoo_species`.`user_postcodes` (`user_postcode_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
