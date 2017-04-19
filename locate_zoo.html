@@ -10,6 +10,8 @@
 
 Searching for:
 <ul id="species_list"></ul>
+Zoos:
+<ul id="zoo_list"></ul>
 
 <script>
     var getUrlParameter = function getUrlParameter(sParam) {
@@ -33,10 +35,7 @@ Searching for:
         var getType = getUrlParameter("type");
         if(getType === "species") {
             var speciesId = getUrlParameter("id");
-            speciesIdList.push(speciesId);
-            $.get("http://localhost:3000/species/"+speciesId, function(data) {
-                $("#species_list").append("<li>"+data[0].common_name+"</li>");
-            })
+            add_species_to_list(speciesId);
         } else {
             var categoryId = getUrlParameter("id");
             get_species_from_category(categoryId);
@@ -49,8 +48,7 @@ Searching for:
                 var subcats = data[a].sub_categories;
                 var species = data[a].species;
                 for(var b = 0; b < species.length; b++) {
-                    speciesIdList.push(species[b].species_id);
-                    $("#species_list").append("<li>"+species[b].common_name+"</li>");
+                    add_species_to_list(species[b].species_id);
                 }
                 for(var c = 0; c < subcats.length; c++) {
                     get_species_from_category(subcats[c].category_id);
@@ -59,15 +57,18 @@ Searching for:
         });
     }
 
-    function fill_in_species_list() {
-        for(var a = 0; a < speciesIdList.length; a++) {
-
-        }
+    function add_species_to_list(species_id) {
+        speciesIdList.push(species_id);
+        $.get("http://localhost:3000/species/"+species_id, function(data) {
+            $("#species_list").append("<li>"+data[0].common_name+"</li>");
+            for(var a = 0; a < data[0].zoos.length; a++ ) {
+                $("#zoo_list").append("<li>"+data[0].zoos[a].name+"</li>");
+            }
+        });
     }
 
     $(document).ready(function() {
         load_species_list();
-        //fill_in_species_list();
     });
 </script>
 </body>
