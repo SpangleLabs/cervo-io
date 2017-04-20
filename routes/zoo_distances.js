@@ -55,7 +55,6 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     requestOptions.uri = googleApiString;
     requestOptions.json = true;
     return RequestPromise(requestOptions).then(function(data) {
-        console.log(data);
         var distanceResults = data.rows[0].elements;
         if (distanceResults.length !== zooDataList.length) {
             Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
@@ -109,7 +108,6 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         return Promise.all(promiseZooAddresses);
     }).then(function(failedZooData) {
         // Construct the request to google maps API
-        console.log(result.user_postcode);
         return promiseToGetDistancesFromGoogleMaps(result.user_postcode, failedZooData);
     }).then(function(newZooDistances) {
         console.log(newZooDistances);
