@@ -30,6 +30,7 @@ Zoos:
     };
 
     var speciesIdList = [];
+    var zooIdList = [];
 
     function load_species_list() {
         var getType = getUrlParameter("type");
@@ -43,6 +44,7 @@ Zoos:
     }
 
     function get_species_from_category(id) {
+        console.log("get species");
         $.get("http://localhost:3000/categories/"+id, function(data) {
             for(var a = 0; a < data.length; a++) {
                 var subcats = data[a].sub_categories;
@@ -54,6 +56,9 @@ Zoos:
                     get_species_from_category(subcats[c].category_id);
                 }
             }
+            // All species are added, now add the zoos
+            console.log("Species added");
+            get_zoo_distances();
         });
     }
 
@@ -62,13 +67,27 @@ Zoos:
         $.get("http://localhost:3000/species/"+species_id, function(data) {
             $("#species_list").append("<li>"+data[0].common_name+"</li>");
             for(var a = 0; a < data[0].zoos.length; a++ ) {
-                $("#zoo_list").append("<li>"+data[0].zoos[a].name+"</li>");
+                var zooData = data[0].zoos[a];
+                if(zooIdList.indexOf(zooData.zoo_id) === -1) {
+                    $("#zoo_list").append("<li id='zoo-"+zooData.zoo_id+"'>" + zooData.name + "</li>");
+                    zooIdList.push(zooData.zoo_id);
+                }
+            }
+        });
+    }
+
+    function get_zoo_distances() {
+        var userPostcode = getUrlParameter("postcode");
+        $.get("http://localhost:3000/zoo_distances/"+userPostcode+"/"+zooIdList.join(","), function(data) {
+            for(var a = 0; a < zooIdList.length; a++) {
+                $("li#zoo-"+zooIdList[a]).append(" Distance: "+data[a].metres);
             }
         });
     }
 
     $(document).ready(function() {
         load_species_list();
+        //get_zoo_distances();
     });
 </script>
 </body>
