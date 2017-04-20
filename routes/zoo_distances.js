@@ -122,8 +122,18 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         }
         return Promise.all(promiseZooAddresses);
     }).then(function(failedZooData) {
+        result.fail_zoo_data = failedZooData;
+        // Optimise failed zoo data, remove duplicates
+        var optimiseZooData = [];
+        var optimiseZooIds = [];
+        for(var e = 0; e < failedZooData.length; e++) {
+            if(optimiseZooIds.indexOf(failedZooData[e].zoo_id) === -1) {
+                optimiseZooData.push(failedZooData[e]);
+                optimiseZooIds.push(failedZooData[e].zoo_id);
+            }
+        }
         // Construct the request to google maps API
-        return promiseToGetDistancesFromGoogleMaps(result.user_postcode, failedZooData);
+        return promiseToGetDistancesFromGoogleMaps(result.user_postcode, optimiseZooData);
     }).then(function(newZooDistances) {
         result.new_distances = newZooDistances;
         // Save google api responses to database
@@ -133,18 +143,21 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         }
         return Promise.all(savePromises);
     }).then(function(data) {
+        var newDataDict = {};
+        for(var f = 0; f < result.new_distances.length; f++) {
+            result.new_distances[f].zoo_distance_id = data[f].insertId;
+            newDataDict[result.new_distances[f].zoo_id] = result.new_distances[f];
+        }
         // add api responses to overall response
-        var newDistancesAdded = 0;
+        var failCount = 0;
         for(var d = 0; d < result.zoo_distances.length; d++) {
             if(result.zoo_distances[d] === false) {
-                var newDistance = result.new_distances[newDistancesAdded];
-                newDistance.zoo_distance_id = data[newDistancesAdded].insertId;
-                result.zoo_distances[d] = newDistance;
-                newDistancesAdded++;
+                var zooId = result.fail_zoo_data[failCount].zoo_id;
+                result.zoo_distances[d] = newDataDict[zooId];
+                failCount++;
             }
         }
         // Respond
-        console.log(data);
         res.json(result.zoo_distances);
     }).catch(function(err) {
         res.status(500).json(err);
