@@ -113,6 +113,7 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         return Promise.all(distancePromises);
     }).then(function(storedDistances) {
         // Get promises for the addresses of failed zoos
+        result.zoo_distances = storedDistances;
         var promiseZooAddresses = [];
         for (var b = 0; b < zooIdList.length; b++) {
             if (storedDistances[b] === false) {
@@ -124,14 +125,29 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         // Construct the request to google maps API
         return promiseToGetDistancesFromGoogleMaps(result.user_postcode, failedZooData);
     }).then(function(newZooDistances) {
-        console.log(newZooDistances);
-        res.send("<br />New distances: "+newZooDistances);
-        return; //TODO from here
+        result.new_distances = newZooDistances;
         // Save google api responses to database
+        var savePromises = [];
+        for (var c = 0; c < newZooDistances.length; c++) {
+            savePromises.push(ZooDistances.addZooDistance(newZooDistances[c]));
+        }
+        return Promise.all(savePromises);
+    }).then(function(data) {
         // add api responses to overall response
+        var newDistancesAdded = 0;
+        for(var d = 0; d < result.zoo_distances.length; d++) {
+            if(result.zoo_distances[d] === false) {
+                var newDistance = result.new_distances[newDistancesAdded];
+                newDistance.zoo_distance_id = data[newDistancesAdded].insertId;
+                result.zoo_distances[d] = newDistance;
+                newDistancesAdded++;
+            }
+        }
         // Respond
-        res.json(storedDistances);
-
+        console.log(data);
+        res.json(result.zoo_distances);
+    }).catch(function(err) {
+        res.status(500).json(err);
     });
 });
 
