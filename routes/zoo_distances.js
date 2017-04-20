@@ -84,10 +84,12 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
     // Split up zoo id list
     var zooIdList = req.params.zooIdList.split(",");
     // Check for (or create) postcode id
+    var result = {};
     promiseGetPostcodeData(sector).catch(function(err) {
         console.log(err);
         res.status(500).send("Could not get postcode data.");
     }).then(function(postcodeData) {
+        result.user_postcode = postcodeData;
         // Get or create distances
         var distancePromises = [];
         for (var a = 0; a < zooIdList.length; a++) {
@@ -106,17 +108,16 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         return Promise.all(promiseZooAddresses);
     }).then(function(failedZooData) {
         // Construct the request to google maps API
-        return promiseToGetDistancesFromGoogleMaps(postcodeData, failedZooData);
-    }).then(function(data) {
-        console.log(failedZooAddresses);
-        res.send("<br />Failed addresses: "+failedZooAddresses);
+        return promiseToGetDistancesFromGoogleMaps(result.user_postcode, failedZooData);
+    }).then(function(newZooDistances) {
+        console.log(newZooDistances);
+        res.send("<br />New distances: "+newZooDistances);
         return; //TODO from here
         // Save google api responses to database
         // add api responses to overall response
         // Respond
         res.json(storedDistances);
 
-    });
     });
 });
 
