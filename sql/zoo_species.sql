@@ -100,6 +100,9 @@ CREATE TABLE `zoo_species`.`zoo_distances` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+ALTER TABLE `zoo_species`.`zoo_distances`
+ADD UNIQUE INDEX `index4` (`user_postcode_id` ASC, `zoo_id` ASC);
+
 
 -- Load up some data
 
