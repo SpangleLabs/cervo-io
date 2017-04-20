@@ -47,24 +47,38 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     for(var a = 0; a < zooDataList.length; a++) {
         zooPostcodeList.push(zooDataList[a].postcode);
     }
-    var zooPostcodeString = zooPostcodeList.join("|");
+    var zooPostcodeStrings = [];
+    var chunkSize = 25;
+    for (var b=0; b < zooPostcodeList.length; b+=chunkSize) {
+        zooPostcodeStrings.push(zooPostcodeList.slice(b,b+chunkSize).join("|"));
+    }
     var googleApiKey = ""; // TODO: add before running
-    // TODO: if no destinations, do nothing, if over 25, batch
-    var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + "&destinations=" + zooPostcodeString + "&key=" + googleApiKey;
-    var requestOptions = {};
-    requestOptions.uri = googleApiString;
-    requestOptions.json = true;
-    return RequestPromise(requestOptions).then(function(data) {
-        var distanceResults = data.rows[0].elements;
-        if (distanceResults.length !== zooDataList.length) {
-            Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
-        }
+    var requestPromises = [];
+    for (var c=0; c < zooPostcodeStrings.length; c++) {
+        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + "&destinations=" + zooPostcodeStrings[c] + "&key=" + googleApiKey;
+        var requestOptions = {};
+        requestOptions.uri = googleApiString;
+        requestOptions.json = true;
+        requestPromises.push(RequestPromise(requestOptions).then(function(data) {
+            var distanceResults = data.rows[0].elements;
+            if (distanceResults.length !== zooDataList.length) {
+                Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
+            }
+            var rawDistances = [];
+            for (var c = 0; c < distanceResults.length; c++) {
+                rawDistances.push(distanceResults[c].distance.value);
+            }
+            return rawDistances;
+        }));
+    }
+    return Promise.all(requestPromises).then(function(values) {
+        var allDistances = [].concat.apply([],values);
         var zooDistances = [];
-        for (var c = 0; c < distanceResults.length; c++) {
+        for(var e = 0; e < allDistances.length; e++) {
             var zooDistance = {};
             zooDistance.user_postcode_id = userPostcodeData.user_postcode_id;
-            zooDistance.zoo_id = zooDataList[c].zoo_id;
-            zooDistance.metres = distanceResults[c].distance.value;
+            zooDistance.zoo_id = zooDataList[e].zoo_id;
+            zooDistance.metres = allDistances[e];
             zooDistances.push(zooDistance);
         }
         return zooDistances;
