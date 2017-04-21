@@ -56,9 +56,6 @@ Zoos:
                     get_species_from_category(subcats[c].category_id);
                 }
             }
-            // All species are added, now add the zoos
-            console.log("Species added");
-            get_zoo_distances();
         });
     }
 
@@ -76,6 +73,52 @@ Zoos:
         });
     }
 
+    function promisegetSpecies(speciesId) {
+        //return a species promise which returns species data
+        return $.get("http://localhost:3000/species/"+speciesId)
+    }
+
+    function promiseGetCategory(categoryId) {
+        //return a category promise which returns species promises
+        return $.when($.get("http://localhost:3000/categories/"+categoryId).then(function(data) {
+            var categoryPromises = [];
+            var speciesPromises = [];
+            for (var a = 0; a < data.length; a++) {
+                var subcats = data[a].sub_categories;
+                var species = data[a].species;
+                for (var b = 0; b < species.length; b++) {
+                    speciesPromises.push(promisegetSpecies(species[b].species_id));
+                }
+                for (var c = 0; c < subcats.length; c++) {
+                    categoryPromises.push(promiseGetCategory(subcats[c].category_id));
+                }
+            }
+            $.when(categoryPromises).then(function (data) {
+                console.log("DATA" + categoryId);
+                console.log(data);
+                console.log(speciesPromises);
+                speciesPromises.concat(data);
+                return speciesPromises;
+            });
+        })).then(function(data) {
+            return data;
+        });/*
+
+        console.log("get species");
+        $.get("http://localhost:3000/categories/"+id, function(data) {
+            for(var a = 0; a < data.length; a++) {
+                var subcats = data[a].sub_categories;
+                var species = data[a].species;
+                for(var b = 0; b < species.length; b++) {
+                    add_species_to_list(species[b].species_id);
+                }
+                for(var c = 0; c < subcats.length; c++) {
+                    get_species_from_category(subcats[c].category_id);
+                }
+            }
+        });*/
+    }
+
     function get_zoo_distances() {
         var userPostcode = getUrlParameter("postcode");
         $.get("http://localhost:3000/zoo_distances/"+userPostcode+"/"+zooIdList.join(","), function(data) {
@@ -86,7 +129,14 @@ Zoos:
     }
 
     $(document).ready(function() {
-        load_species_list();
+        promiseGetCategory(18).then(function(data) {
+            console.log("final");
+            console.log(JSON.stringify(data));
+        }).then(console.log);
+        console.log("hey");
+        //console.log(data);
+        //load_species_list();
+        // TODO: $.get returns promises, so make the above return a list of promises
         //get_zoo_distances();
     });
 </script>
