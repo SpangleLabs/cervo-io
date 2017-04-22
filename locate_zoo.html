@@ -87,7 +87,7 @@ Zoos:
         console.log("Starting category "+categoryId);
         var categoryPromises = [];
         var speciesPromises = [];
-        return promiseRawGetCategory(categoryId).then(function(data) {
+        var result = promiseRawGetCategory(categoryId).then(function(data) {
             for (var a = 0; a < data.length; a++) {
                 var subcats = data[a].sub_categories;
                 var species = data[a].species;
@@ -107,10 +107,16 @@ Zoos:
             //console.log(data);
             console.log(speciesPromises);
             console.log(specPromises);
-            speciesPromises.concat(specPromises);
+            var specPromisesConcat = Array.prototype.concat.apply([],specPromises);
+            console.log(specPromisesConcat);
+            speciesPromises.concat(specPromisesConcat);
             console.log("CCC");
             return speciesPromises;
         });
+        console.log("Result - "+categoryId);
+        console.log(result);
+        console.log("---");
+        return result;
     }
 
     function get_zoo_distances() {
@@ -125,8 +131,14 @@ Zoos:
     $(document).ready(function() {
         promiseGetCategory(getUrlParameter("id")).then(function(data) {
             console.log("final");
+            console.log(data);
+            console.log("----");
+        });
+        console.log(result);
+        /*.then(function(data) {
+            console.log("final");
             console.log(JSON.stringify(data));
-        }).then(console.log);
+        }).then(console.log);*/
         console.log("hey");
         //console.log(data);
         //load_species_list();
