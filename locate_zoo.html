@@ -29,6 +29,37 @@ Zoos:
         }
     };
 
+    function get(url) {
+        // Return a new promise.
+        return new Promise(function (resolve, reject) {
+            // Do the usual XHR stuff
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+
+            req.onload = function () {
+                // This is called even on 404 etc
+                // so check the status
+                if (req.status === 200) {
+                    // Resolve the promise with the response text
+                    resolve(JSON.parse(req.response));
+                }
+                else {
+                    // Otherwise reject with the status text
+                    // which will hopefully be a meaningful error
+                    reject(Error(req.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function () {
+                reject(Error("Network Error"));
+            };
+
+            // Make the request
+            req.send();
+        });
+    }
+
     var speciesIdList = [];
     var zooIdList = [];
 
@@ -45,7 +76,7 @@ Zoos:
 
     function get_species_from_category(id) {
         console.log("get species");
-        $.get("http://localhost:3000/categories/"+id, function(data) {
+        get("http://localhost:3000/categories/"+id).then(function(data) {
             for(var a = 0; a < data.length; a++) {
                 var subcats = data[a].sub_categories;
                 var species = data[a].species;
@@ -61,7 +92,7 @@ Zoos:
 
     function add_species_to_list(species_id) {
         speciesIdList.push(species_id);
-        $.get("http://localhost:3000/species/"+species_id, function(data) {
+        get("http://localhost:3000/species/"+species_id).then(function(data) {
             $("#species_list").append("<li>"+data[0].common_name+"</li>");
             for(var a = 0; a < data[0].zoos.length; a++ ) {
                 var zooData = data[0].zoos[a];
@@ -75,11 +106,11 @@ Zoos:
 
     function promiseGetSpecies(speciesId) {
         //return a species promise which returns species data
-        return Promise.resolve($.get("http://localhost:3000/species/"+speciesId));
+        return get("http://localhost:3000/species/"+speciesId);
     }
 
     function promiseRawGetCategory(categoryId) {
-        return Promise.resolve($.get("http://localhost:3000/categories/"+categoryId));
+        return get("http://localhost:3000/categories/"+categoryId);
     }
 
     function promiseGetCategory(categoryId) {
@@ -88,7 +119,9 @@ Zoos:
         var categoryPromises = [];
         var speciesPromises = [];
         var result = promiseRawGetCategory(categoryId).then(function(data) {
+            console.log(data);
             for (var a = 0; a < data.length; a++) {
+                console.log(data[a]);
                 var subcats = data[a].sub_categories;
                 var species = data[a].species;
                 for (var b = 0; b < species.length; b++) {
@@ -134,7 +167,7 @@ Zoos:
             console.log(data);
             console.log("----");
         });
-        console.log(result);
+        //console.log(result);
         /*.then(function(data) {
             console.log("final");
             console.log(JSON.stringify(data));
