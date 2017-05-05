@@ -42,8 +42,7 @@ Zoos:
                 if (req.status === 200) {
                     // Resolve the promise with the response text
                     resolve(JSON.parse(req.response));
-                }
-                else {
+                } else {
                     // Otherwise reject with the status text
                     // which will hopefully be a meaningful error
                     reject(Error(req.statusText));
@@ -104,6 +103,22 @@ Zoos:
         });
     }*/
 
+    function domAddSpecies(speciesData) {
+        $("#species_list").append("<li>"+speciesData.common_name+"</li>");
+    }
+
+    function domAddZoo(zooData) {
+        var zooId = zooData.zoo_id;
+        var zooName = zooData.name;
+        $("#zoo_list").append("<li id='zoo-"+zooId+"'>"+zooName+"</li>");
+    }
+
+    function domAddZooDistance(zooDistanceData) {
+        var zooId = zooDistanceData.zoo_id;
+        var distance = zooDistanceData.metres/1000;
+        $("li#zoo-"+zooId).append(" - "+distance+"km");
+    }
+
     function promiseGetSpecies(speciesId) {
         //return a species promise which returns species data
         return get("http://localhost:3000/species/"+speciesId);
@@ -146,10 +161,30 @@ Zoos:
     }*/
 
     $(document).ready(function() {
+        var postcode = getUrlParameter("postcode");
         promiseGetCategory(getUrlParameter("id")).then(function(data) {
-            console.log("final");
-            console.log(data);
-            console.log("----");
+            return Promise.all(data);
+        }).then(function(speciesData) {
+            // Add species to the list
+            var speciesIdList = [];
+            var zoosData = {};
+            for(var a = 0; a < speciesData.length; a++) {
+                domAddSpecies(speciesData[a][0]);
+                speciesIdList.push(speciesData[a][0].species_id);
+                for(var b = 0; b < speciesData[a][0].zoos.length; b++) {
+                    var zooData = speciesData[a][0].zoos[b];
+                    var zooId = zooData.zoo_id;
+                    zoosData[zooId] = zooData;
+                    domAddZoo(zooData);
+                }
+            }
+            // Return promise to get zoo distances for the species
+            return get("http://localhost:3000/zoo_distances/"+postcode+"/"+Object.keys(zoosData).join());
+        }).then(function(zooDistanceData) {
+            // Add zoo distances to the list
+            for(var c = 0; c < zooDistanceData.length; c++) {
+                domAddZooDistance(zooDistanceData[c]);
+            }
         });
         //console.log(result);
         /*.then(function(data) {
