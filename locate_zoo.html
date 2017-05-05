@@ -63,7 +63,7 @@ Zoos:
     var speciesIdList = [];
     var zooIdList = [];
 
-    function load_species_list() {
+    /*function load_species_list() {
         var getType = getUrlParameter("type");
         if(getType === "species") {
             var speciesId = getUrlParameter("id");
@@ -72,9 +72,9 @@ Zoos:
             var categoryId = getUrlParameter("id");
             get_species_from_category(categoryId);
         }
-    }
+    }*/
 
-    function get_species_from_category(id) {
+    /*function get_species_from_category(id) {
         console.log("get species");
         get("http://localhost:3000/categories/"+id).then(function(data) {
             for(var a = 0; a < data.length; a++) {
@@ -88,9 +88,9 @@ Zoos:
                 }
             }
         });
-    }
+    }*/
 
-    function add_species_to_list(species_id) {
+    /*function add_species_to_list(species_id) {
         speciesIdList.push(species_id);
         get("http://localhost:3000/species/"+species_id).then(function(data) {
             $("#species_list").append("<li>"+data[0].common_name+"</li>");
@@ -102,7 +102,7 @@ Zoos:
                 }
             }
         });
-    }
+    }*/
 
     function promiseGetSpecies(speciesId) {
         //return a species promise which returns species data
@@ -115,13 +115,10 @@ Zoos:
 
     function promiseGetCategory(categoryId) {
         //return a category promise which returns species promises
-        console.log("Starting category "+categoryId);
         var categoryPromises = [];
         var speciesPromises = [];
         var result = promiseRawGetCategory(categoryId).then(function(data) {
-            console.log(data);
             for (var a = 0; a < data.length; a++) {
-                console.log(data[a]);
                 var subcats = data[a].sub_categories;
                 var species = data[a].species;
                 for (var b = 0; b < species.length; b++) {
@@ -130,36 +127,23 @@ Zoos:
                 for (var c = 0; c < subcats.length; c++) {
                     categoryPromises.push(promiseGetCategory(subcats[c].category_id));
                 }
-
-                console.log("AAA");
             }
             return Promise.all(categoryPromises);
         }).then(function(specPromises) {
-            console.log("BBB");
-            console.log("DATA" + categoryId);
-            //console.log(data);
-            console.log(speciesPromises);
-            console.log(specPromises);
             var specPromisesConcat = Array.prototype.concat.apply([],specPromises);
-            console.log(specPromisesConcat);
-            speciesPromises.concat(specPromisesConcat);
-            console.log("CCC");
-            return speciesPromises;
+            return speciesPromises.concat(specPromisesConcat);
         });
-        console.log("Result - "+categoryId);
-        console.log(result);
-        console.log("---");
         return result;
     }
 
-    function get_zoo_distances() {
+    /*function get_zoo_distances() {
         var userPostcode = getUrlParameter("postcode");
         $.get("http://localhost:3000/zoo_distances/"+userPostcode+"/"+zooIdList.join(","), function(data) {
             for(var a = 0; a < zooIdList.length; a++) {
                 $("li#zoo-"+zooIdList[a]).append(" Distance: "+data[a].metres);
             }
         });
-    }
+    }*/
 
     $(document).ready(function() {
         promiseGetCategory(getUrlParameter("id")).then(function(data) {
@@ -172,7 +156,6 @@ Zoos:
             console.log("final");
             console.log(JSON.stringify(data));
         }).then(console.log);*/
-        console.log("hey");
         //console.log(data);
         //load_species_list();
         // TODO: $.get returns promises, so make the above return a list of promises
