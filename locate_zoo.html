@@ -75,6 +75,14 @@ Zoos:
         $("li#zoo-"+zooId).append(" - "+distance+"km");
     }
 
+    function domReorderZoos(distanceMap) {
+        var distanceSort = Object.keys(distanceMap).sort(function(a, b){return b-a});
+        for(var a = 0; a < distanceSort.length; a++) {
+            var zooLi = $("li#zoo-"+distanceMap[distanceSort[a]]);
+            zooLi.parent().prepend(zooLi);
+        }
+    }
+
     function promiseGetSpecies(speciesId) {
         //return a species promise which returns species data
         return get("http://localhost:3000/species/"+speciesId);
@@ -129,9 +137,12 @@ Zoos:
             return get("http://localhost:3000/zoo_distances/"+postcode+"/"+Object.keys(zoosData).join());
         }).then(function(zooDistanceData) {
             // Add zoo distances to the list
+            var distanceMap = {};
             for(var c = 0; c < zooDistanceData.length; c++) {
                 domAddZooDistance(zooDistanceData[c]);
+                distanceMap[zooDistanceData[c].metres] = zooDistanceData[c].zoo_id;
             }
+            domReorderZoos(distanceMap);
         });
     });
 </script>
