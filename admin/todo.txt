@@ -1,0 +1,5 @@
+TODO list:
+
+- Allow entering postcode any time on species_select.html
+- Enable a better system to add species to zoos, perhaps with a grid of species and zoos and tickboxes
+- Remove duplicates from locate_zoo when a zoo has many of the species selected
