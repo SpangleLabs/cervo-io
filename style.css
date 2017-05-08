@@ -44,3 +44,9 @@ th > .species_name {
 th > .species_name:hover {
     width: auto;
 }
+li {
+    background-color: lightgrey;
+}
+li li {
+    background-color: darkgray;
+}
