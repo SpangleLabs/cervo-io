@@ -65,7 +65,11 @@
         //var tableElem = $("table#update_table");
         var zooRow = "<tr><td><a href='view_zoo.html?id="+zooData.zoo_id+"'>"+zooData.name+"</a></td>";
         for(var a = 0; a < listSpecies.length; a++) {
-            zooRow += "<td id='zoospecies-"+zooData.zoo_id+"-"+listSpecies[a]+"'><input type='checkbox' /></td>";
+            var zooId = zooData.zoo_id;
+            var speciesId = listSpecies[a].species_id;
+            zooRow += "<td id='zoospecies-"+zooId+"-"+speciesId+"'>" +
+                "<input type='checkbox' onchange='eventToggleCheckbox("+zooId+","+speciesId+")'/>" +
+                "</td>";
         }
         zooRow += "</tr>";
         tableElem.append(zooRow);
@@ -115,6 +119,23 @@
 
     function listZoos() {
         return get("http://localhost:3000/zoos/");
+    }
+
+    function sendAddSpecies(zooId, speciesId) {
+        var zooSpecies = {};
+        zooSpecies.zoo_id = zooId;
+        zooSpecies.species_id = speciesId;
+        console.log(zooSpecies);
+        $.post("http://localhost:3000/zoo_species/", zooSpecies);
+    }
+
+    function eventToggleCheckbox(zooId, speciesId) {
+        var checkboxElem = $("td#zoospecies-"+zooId+"-"+speciesId);
+        if(checkboxElem.is(":checked")) {
+            sendAddSpecies(zooId, speciesId);
+        } else {
+            console.log("//TODO"); //TODO
+        }
     }
 
     $(document).ready(function () {
