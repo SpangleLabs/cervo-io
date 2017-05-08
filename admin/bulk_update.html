@@ -82,7 +82,7 @@
     function domAddSpeciesColHeaders(speciesList) {
         var colHeaders = "<tr><td></td>";
         for(var a = 0; a < speciesList.length; a++) {
-            colHeaders += "<th>"+speciesList[a].common_name+"</th>";
+            colHeaders += "<th><div class='species_name'>"+speciesList[a].common_name+"</div></th>";
         }
         colHeaders += "</tr>";
         tableElem.append(colHeaders);

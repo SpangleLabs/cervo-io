@@ -3,7 +3,6 @@ TODO list:
 - Allow entering postcode any time on species_select.html
 - Remove duplicates from locate_zoo when a zoo has many of the species selected
 - Create a user front page to link things together
-- Deal with the long titles on bulk_update
 - Prevent duplicate zoo/species pairings in database
 
 MAJOR:
