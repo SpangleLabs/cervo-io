@@ -4,7 +4,6 @@ TODO list:
 - Remove duplicates from locate_zoo when a zoo has many of the species selected
 - Create a user front page to link things together
 - Deal with the long titles on bulk_update
-- Ability to remove zoo species links with bulk_update
 - Prevent duplicate zoo/species pairings in database
 
 MAJOR:
