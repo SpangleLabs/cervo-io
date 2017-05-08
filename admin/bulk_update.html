@@ -68,7 +68,11 @@
             var zooId = zooData.zoo_id;
             var speciesId = listSpecies[a].species_id;
             zooRow += "<td id='zoospecies-"+zooId+"-"+speciesId+"'>" +
-                "<input type='checkbox' onchange='eventToggleCheckbox("+zooId+","+speciesId+")'/>" +
+                "<input type='checkbox' onchange='eventToggleCheckbox("+zooId+","+speciesId+")'";
+            if(zooSpecies[zooId] && zooSpecies[zooId].indexOf(speciesId) !== -1) {
+                zooRow += "checked ";
+            }
+            zooRow += "/>" +
                 "</td>";
         }
         zooRow += "</tr>";
@@ -76,7 +80,6 @@
     }
 
     function domAddSpeciesColHeaders(speciesList) {
-        console.log(speciesList);
         var colHeaders = "<tr><td></td>";
         for(var a = 0; a < speciesList.length; a++) {
             colHeaders += "<th>"+speciesList[a].common_name+"</th>";
@@ -143,13 +146,12 @@
         promiseGetCategory(getUrlParameter("category_id")).then(function(data) {
             return Promise.all(data);
         }).then(function(speciesData) {
-            console.log(speciesData);
             // Add species to map
             for(var a = 0; a < speciesData.length; a++) {
                 var species = speciesData[a][0];
                 listSpecies.push(species);
                 var speciesId = species.species_id;
-                for(var b = 0; b < species.zoos; b++) {
+                for(var b = 0; b < species.zoos.length; b++) {
                     var zooId = species.zoos[b].zoo_id;
                     if(!(zooId in zooSpecies)) {
                         zooSpecies[zooId] = [];
