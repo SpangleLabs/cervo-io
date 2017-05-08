@@ -9,7 +9,7 @@
 <body>
 Animals list:
 <a href="index.html">Back to admin index</a><br />
-<ul id="animals"></ul>
+<ul id="animals" class="odd"></ul>
 </body>
 
 <script>
@@ -109,10 +109,11 @@ Animals list:
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
+            var isOdd = listElement.parent("ul").hasClass("odd");
             listElement.addClass("open");
             listElement.removeClass("closed");
             if(!listElement.has("ul").length) {
-                listElement.append("<ul></ul>");
+                listElement.append("<ul class='"+(isOdd?"even":"odd")+"'></ul>");
                 // Add subcategories and species
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);

@@ -1,6 +1,6 @@
 TODO list:
 
-- Alternating light and dark grey in nested lists in species selections
+- Alternating light and dark grey in nested lists in species selections for non admin
 - Create a user front page to link things together
 - Prevent duplicate zoo/species pairings in database
 

@@ -44,9 +44,9 @@ th > .species_name {
 th > .species_name:hover {
     width: auto;
 }
-li {
+ul.odd {
     background-color: lightgrey;
 }
-li li {
+ul.even {
     background-color: darkgray;
 }
