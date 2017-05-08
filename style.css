@@ -24,7 +24,7 @@ li.species:before {
     content: "🐶";
 }
 li.add:before {
-    content: "+";
+    content: "➕";
 }
 .add form {
     display: none;
