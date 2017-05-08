@@ -63,6 +63,7 @@ CREATE TABLE `zoo_species`.`zoo_species` (
   PRIMARY KEY (`zoo_species_id`)  COMMENT '',
   INDEX `zoo_id_idx` (`zoo_id` ASC)  COMMENT '',
   INDEX `species_id_idx` (`species_id` ASC)  COMMENT '',
+  UNIQUE INDEX `zoo_species` (`zoo_id` ASC, `species_id` ASC),
   CONSTRAINT `zoo_id`
     FOREIGN KEY (`zoo_id`)
     REFERENCES `zoo_species`.`zoos` (`zoo_id`)
