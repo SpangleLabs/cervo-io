@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<h1>Bulk update species select</h1>
+<a href="index.html">Back to admin index</a><br />
+Animals list:
+<ul id="animals"></ul>
+</body>
+
+<script>
+    var category_level_cache = [];
+    $.get("http://localhost:3000/category_levels/", function(data) {
+        category_level_cache = data;
+    });
+    function get_category_level(id) {
+        for ( var a = 0; a < category_level_cache.length; a++ ) {
+            if(category_level_cache[a].category_level_id === id) {
+                return category_level_cache[a];
+            }
+        }
+    }
+
+    function add_category(element, categoryData) {
+        var categoryId = categoryData.category_id;
+        var name = categoryData.name;
+        var categoryLevelId = categoryData.category_level_id;
+        var categoryLiId = "category-"+categoryId;
+        var categoryLevelName = get_category_level(categoryLevelId).name;
+        element.append("<li class='category closed' id='"+categoryLiId+"'>" +
+            "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
+            "<span class='category_level'>"+categoryLevelName+"</span>" +
+            "<a href='bulk_update.html?category_id="+categoryId+"'>🔍</a>" +
+            "</li>");
+    }
+
+    function add_species(element, speciesData) {
+        var speciesId = speciesData.species_id;
+        var name = speciesData.common_name;
+        var latinName = speciesData.latin_name;
+        element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span>" +
+            "</li>");
+    }
+
+    function load_category(id) {
+        var categoryLiId = "category-"+id;
+        $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
+            var listElement = $("#"+categoryLiId);
+            listElement.addClass("open");
+            listElement.removeClass("closed");
+            if(!listElement.has("ul").length) {
+                listElement.append("<ul></ul>");
+                // Add subcategories and species
+                $.each(data[0].sub_categories, function (index, itemData) {
+                    add_category(listElement.find("ul"), itemData);
+                });
+                $.each(data[0].species, function (index, itemData) {
+                    add_species(listElement.find("ul"), itemData);
+                });
+                // If category contains only 1 subcategory, open the subcategory.
+                if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
+                    load_category(data[0].sub_categories[0].category_id);
+                }
+            } else if(!listElement.find("ul").is(":visible")) {
+                listElement.find("ul").first().show();
+                listElement.addClass("open");
+                listElement.removeClass("closed");
+            } else {
+                listElement.find("ul").first().hide();
+                listElement.addClass("closed");
+                listElement.removeClass("open");
+            }
+        })
+    }
+
+    $(document).ready(function() {
+        $.get("http://localhost:3000/categories/", function(data) {
+            $.each(data, function(index, itemData) {
+                add_category($("#animals"), itemData);
+            });
+        });
+    });
+</script>
+</html>
