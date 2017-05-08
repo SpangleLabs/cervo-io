@@ -21,9 +21,13 @@ var ZooSpecies={
         });
     },
 
-    deleteZooSpecies:function(id){
+    deleteZooSpecies:function(ZooSpecies){
         return db.then(function(conn) {
-            return conn.query("delete from zoo_species where zoo_species_id=?",[id]);
+            return conn.query("delete from zoo_species where zoo_species_id=?",[ZooSpecies.zoo_species_id]);
+        }).catch(function(err) {
+            return db.then(function(conn) {
+                conn.query("delete from zoo_species where zoo_id=? and species_id=?",[ZooSpecies.zoo_id, ZooSpecies.species_id]);
+            });
         });
     }
 
