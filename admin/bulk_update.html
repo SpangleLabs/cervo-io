@@ -130,7 +130,7 @@
     }
 
     function eventToggleCheckbox(zooId, speciesId) {
-        var checkboxElem = $("td#zoospecies-"+zooId+"-"+speciesId);
+        var checkboxElem = $("td#zoospecies-"+zooId+"-"+speciesId+" input[type=checkbox]");
         if(checkboxElem.is(":checked")) {
             sendAddSpecies(zooId, speciesId);
         } else {
