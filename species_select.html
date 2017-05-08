@@ -7,9 +7,13 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-Your postcode: <input type="text" name="postcode"/>(Enter this before expanding)<br />
-Animals list:
-<ul id="animals"></ul>
+<h1>Select species to get distances</h1>
+<form onsubmit="return eventSubmitPostcode()">
+    <label>Postcode:
+        <input type="text" name="postcode" id="form-postcode"/>
+    </label>
+    <input type="submit" id="form-submit"/>
+</form><br />
 </body>
 
 <script>
@@ -78,12 +82,16 @@ Animals list:
         })
     }
 
-    $(document).ready(function() {
+    function eventSubmitPostcode() {
+        $("body").append("Animal list:<ul id='animals'></ul>");
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
                 add_category($("#animals"), itemData);
             });
         });
-    });
+        $("input#form-postcode").prop("disabled",true);
+        $("input#form-submit").prop("disabled",true);
+        return false;
+    }
 </script>
 </html>
