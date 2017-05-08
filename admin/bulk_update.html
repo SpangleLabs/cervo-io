@@ -132,12 +132,24 @@
         $.post("http://localhost:3000/zoo_species/", zooSpecies);
     }
 
+    function sendDelSpecies(zooId, speciesId) {
+        var zooSpecies = {};
+        zooSpecies.zoo_id = zooId;
+        zooSpecies.species_id = speciesId;
+        console.log(zooSpecies);
+        $.ajax({
+            url: "http://localhost:3000/zoo_species/",
+            type: "DELETE",
+            data: zooSpecies
+        });
+    }
+
     function eventToggleCheckbox(zooId, speciesId) {
         var checkboxElem = $("td#zoospecies-"+zooId+"-"+speciesId+" input[type=checkbox]");
         if(checkboxElem.is(":checked")) {
             sendAddSpecies(zooId, speciesId);
         } else {
-            console.log("//TODO"); //TODO
+            sendDelSpecies(zooId, speciesId);
         }
     }
 
