@@ -129,8 +129,10 @@ Zoos:
                 for(var b = 0; b < speciesData[a][0].zoos.length; b++) {
                     var zooData = speciesData[a][0].zoos[b];
                     var zooId = zooData.zoo_id;
-                    zoosData[zooId] = zooData;
-                    domAddZoo(zooData);
+                    if(!(zooId in zoosData)) {
+                        zoosData[zooId] = zooData;
+                        domAddZoo(zooData);
+                    }
                 }
             }
             // Return promise to get zoo distances for the species
