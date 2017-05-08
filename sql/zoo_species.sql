@@ -1,4 +1,5 @@
 CREATE DATABASE `zoo_species`;
+USE `zoo_species`;
 
 -- Create tables
 
