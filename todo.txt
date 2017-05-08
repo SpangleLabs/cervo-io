@@ -1,9 +1,9 @@
 TODO list:
 
-- Remove duplicates from locate_zoo when a zoo has many of the species selected
 - Create a user front page to link things together
 - Prevent duplicate zoo/species pairings in database
 
 MAJOR:
 - Some sort of website style
 - Add some security to the admin system
+- Some kind of code style
