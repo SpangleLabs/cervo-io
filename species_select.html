@@ -56,10 +56,11 @@
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
+            var isOdd = listElement.parent("ul").hasClass("odd");
             listElement.addClass("open");
             listElement.removeClass("closed");
             if(!listElement.has("ul").length) {
-                listElement.append("<ul></ul>");
+                listElement.append("<ul class='"+(isOdd?"even":"odd")+"'></ul>");
                 // Add subcategories and species
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);
@@ -84,7 +85,7 @@
     }
 
     function eventSubmitPostcode() {
-        $("body").append("Animal list:<ul id='animals'></ul>");
+        $("body").append("Animal list:<ul id='animals' class='odd'></ul>");
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
                 add_category($("#animals"), itemData);
