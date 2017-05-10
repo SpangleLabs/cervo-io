@@ -62,7 +62,7 @@
     tableElem = $("table#update_table");
 
     function domAddZooRow(zooData) {
-        var tableBodyElem = $("table#update_table tbody");
+        var tableBodyElem = $("table#update_table");//" tbody");
         var zooRow = "<tr><td><a href='view_zoo.html?id="+zooData.zoo_id+"'>"+zooData.name+"</a></td>";
         for(var a = 0; a < listSpecies.length; a++) {
             var zooId = zooData.zoo_id;
@@ -177,9 +177,12 @@
             return listZoos();
         }).then(function(zooData) {
             // Add zoo list
-            tableElem.append("<tbody></tbody>");
+            //tableElem.append("<tbody></tbody>");
             for(var a = 0; a < zooData.length; a++) {
                 domAddZooRow(zooData[a]);
+                if(a % 20 === 19) {
+                    domAddSpeciesColHeaders(listSpecies);
+                }
             }
         });
     });
