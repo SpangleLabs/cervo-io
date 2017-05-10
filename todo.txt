@@ -1,7 +1,6 @@
 TODO list:
 
 - Create a user front page to link things together
-- Prevent duplicate zoo/species pairings in database
 - More clarification which species are at which zoos on locate_zoo
 
 MAJOR:
