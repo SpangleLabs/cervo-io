@@ -2,19 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Select species</title>
+    <title>Title</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
-<h1>Select species to get distances</h1>
-<a href="index.html">Back to user index</a><br />
-<form onsubmit="return eventSubmitPostcode()">
-    <label>Postcode:
-        <input type="text" name="postcode" id="form-postcode"/>
-    </label>
-    <input type="submit" id="form-submit"/>
-</form><br />
+<h1>Bulk update species select</h1>
+<a href="index.html">Back to admin index</a><br />
+Animals list:
+<ul id="animals"></ul>
 </body>
 
 <script>
@@ -39,7 +35,7 @@
         element.append("<li class='category closed' id='"+categoryLiId+"'>" +
             "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
             "<span class='category_level'>"+categoryLevelName+"</span>" +
-            "<a href='locate_zoo.html?type=category&id="+categoryId+"&postcode="+$("input").first().val()+"'>🔍</a>" +
+            "<a href='bulk_update.html?category_id="+categoryId+"'>🔍</a>" +
             "</li>");
     }
 
@@ -48,7 +44,6 @@
         var name = speciesData.common_name;
         var latinName = speciesData.latin_name;
         element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span>" +
-            "<a href='locate_zoo.html?type=species&id="+speciesId+"&postcode="+$("input").first().val()+"'>🔍</a>" +
             "</li>");
     }
 
@@ -56,11 +51,10 @@
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
-            var isOdd = listElement.parent("ul").hasClass("odd");
             listElement.addClass("open");
             listElement.removeClass("closed");
             if(!listElement.has("ul").length) {
-                listElement.append("<ul class='"+(isOdd?"even":"odd")+"'></ul>");
+                listElement.append("<ul></ul>");
                 // Add subcategories and species
                 $.each(data[0].sub_categories, function (index, itemData) {
                     add_category(listElement.find("ul"), itemData);
@@ -84,16 +78,12 @@
         })
     }
 
-    function eventSubmitPostcode() {
-        $("body").append("Animal list:<ul id='animals' class='odd'></ul>");
+    $(document).ready(function() {
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
                 add_category($("#animals"), itemData);
             });
         });
-        $("input#form-postcode").prop("disabled",true);
-        $("input#form-submit").prop("disabled",true);
-        return false;
-    }
+    });
 </script>
 </html>

@@ -1,9 +1,8 @@
 TODO list:
 
-- Allow entering postcode any time on species_select.html
-- Enable a better system to add species to zoos, perhaps with a grid of species and zoos and tickboxes
-- Create a user front page to link things together
+- More clarification which species are at which zoos on locate_zoo
 
 MAJOR:
 - Some sort of website style
 - Add some security to the admin system
+- Some kind of code style

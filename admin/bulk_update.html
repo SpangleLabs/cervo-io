@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<h1>Bulk update zoo species</h1>
+<a href="index.html">Back to admin index</a><br />
+<table id="update_table"></table>
+</body>
+<script>
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
+    function get(url) {
+        // Return a new promise.
+        return new Promise(function (resolve, reject) {
+            // Do the usual XHR stuff
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+
+            req.onload = function () {
+                // This is called even on 404 etc
+                // so check the status
+                if (req.status === 200) {
+                    // Resolve the promise with the response text
+                    resolve(JSON.parse(req.response));
+                } else {
+                    // Otherwise reject with the status text
+                    // which will hopefully be a meaningful error
+                    reject(Error(req.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function () {
+                reject(Error("Network Error"));
+            };
+
+            // Make the request
+            req.send();
+        });
+    }
+
+    listSpecies = [];
+    zooSpecies = {};
+    tableElem = $("table#update_table");
+
+    function domAddZooRow(zooData) {
+        var tableBodyElem = $("table#update_table");//" tbody");
+        var zooRow = "<tr><td><a href='view_zoo.html?id="+zooData.zoo_id+"'>"+zooData.name+"</a></td>";
+        for(var a = 0; a < listSpecies.length; a++) {
+            var zooId = zooData.zoo_id;
+            var speciesId = listSpecies[a].species_id;
+            zooRow += "<td id='zoospecies-"+zooId+"-"+speciesId+"'>" +
+                "<input type='checkbox' onchange='eventToggleCheckbox("+zooId+","+speciesId+")'";
+            if(zooSpecies[zooId] && zooSpecies[zooId].indexOf(speciesId) !== -1) {
+                zooRow += "checked ";
+            }
+            zooRow += "/>" +
+                "</td>";
+        }
+        zooRow += "</tr>";
+        tableBodyElem.append(zooRow);
+    }
+
+    function domAddSpeciesColHeaders(speciesList) {
+        var colHeaders = "<thead><tr><td></td>";
+        for(var a = 0; a < speciesList.length; a++) {
+            colHeaders += "<th><div class='species_name'>"+speciesList[a].common_name+"</div></th>";
+        }
+        colHeaders += "</tr></thead>";
+        tableElem.append(colHeaders);
+    }
+
+    function promiseGetSpecies(speciesId) {
+        //return a species promise which returns species data
+        return get("http://localhost:3000/species/"+speciesId);
+    }
+
+    function promiseRawGetCategory(categoryId) {
+        return get("http://localhost:3000/categories/"+categoryId);
+    }
+
+    function promiseGetCategory(categoryId) {
+        //return a category promise which returns species promises
+        var categoryPromises = [];
+        var speciesPromises = [];
+        var result = promiseRawGetCategory(categoryId).then(function(data) {
+            for (var a = 0; a < data.length; a++) {
+                var subcats = data[a].sub_categories;
+                var species = data[a].species;
+                for (var b = 0; b < species.length; b++) {
+                    speciesPromises.push(promiseGetSpecies(species[b].species_id));
+                }
+                for (var c = 0; c < subcats.length; c++) {
+                    categoryPromises.push(promiseGetCategory(subcats[c].category_id));
+                }
+            }
+            return Promise.all(categoryPromises);
+        }).then(function(specPromises) {
+            var specPromisesConcat = Array.prototype.concat.apply([],specPromises);
+            return speciesPromises.concat(specPromisesConcat);
+        });
+        return result;
+    }
+
+    function listZoos() {
+        return get("http://localhost:3000/zoos/");
+    }
+
+    function sendAddSpecies(zooId, speciesId) {
+        var zooSpecies = {};
+        zooSpecies.zoo_id = zooId;
+        zooSpecies.species_id = speciesId;
+        console.log(zooSpecies);
+        $.post("http://localhost:3000/zoo_species/", zooSpecies);
+    }
+
+    function sendDelSpecies(zooId, speciesId) {
+        var zooSpecies = {};
+        zooSpecies.zoo_id = zooId;
+        zooSpecies.species_id = speciesId;
+        console.log(zooSpecies);
+        $.ajax({
+            url: "http://localhost:3000/zoo_species/",
+            type: "DELETE",
+            data: zooSpecies
+        });
+    }
+
+    function eventToggleCheckbox(zooId, speciesId) {
+        var checkboxElem = $("td#zoospecies-"+zooId+"-"+speciesId+" input[type=checkbox]");
+        if(checkboxElem.is(":checked")) {
+            sendAddSpecies(zooId, speciesId);
+        } else {
+            sendDelSpecies(zooId, speciesId);
+        }
+    }
+
+    $(document).ready(function () {
+        // Get list of species
+        promiseGetCategory(getUrlParameter("category_id")).then(function(data) {
+            return Promise.all(data);
+        }).then(function(speciesData) {
+            // Add species to map
+            for(var a = 0; a < speciesData.length; a++) {
+                var species = speciesData[a][0];
+                listSpecies.push(species);
+                var speciesId = species.species_id;
+                for(var b = 0; b < species.zoos.length; b++) {
+                    var zooId = species.zoos[b].zoo_id;
+                    if(!(zooId in zooSpecies)) {
+                        zooSpecies[zooId] = [];
+                    }
+                    zooSpecies[zooId].push(speciesId);
+                }
+            }
+            // Add species to dom
+            domAddSpeciesColHeaders(listSpecies);
+            // Get list of zoos
+            return listZoos();
+        }).then(function(zooData) {
+            // Add zoo list
+            //tableElem.append("<tbody></tbody>");
+            for(var a = 0; a < zooData.length; a++) {
+                domAddZooRow(zooData[a]);
+                if(a % 20 === 19) {
+                    domAddSpeciesColHeaders(listSpecies);
+                }
+            }
+        });
+    });
+</script>
+</html>
