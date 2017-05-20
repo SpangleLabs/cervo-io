@@ -18,32 +18,32 @@
 </body>
 
 <script>
-    var category_level_cache = [];
+    var categoryLevelCache = [];
     $.get("http://localhost:3000/category_levels/", function(data) {
-        category_level_cache = data;
+        categoryLevelCache = data;
     });
-    function get_category_level(id) {
-        for ( var a = 0; a < category_level_cache.length; a++ ) {
-            if(category_level_cache[a].category_level_id === id) {
-                return category_level_cache[a];
+    function getCategoryLevel(id) {
+        for ( var a = 0; a < categoryLevelCache.length; a++ ) {
+            if(categoryLevelCache[a].category_level_id === id) {
+                return categoryLevelCache[a];
             }
         }
     }
 
-    function add_category(element, categoryData) {
+    function addCategory(element, categoryData) {
         var categoryId = categoryData.category_id;
         var name = categoryData.name;
         var categoryLevelId = categoryData.category_level_id;
         var categoryLiId = "category-"+categoryId;
-        var categoryLevelName = get_category_level(categoryLevelId).name;
+        var categoryLevelName = getCategoryLevel(categoryLevelId).name;
         element.append("<li class='category closed' id='"+categoryLiId+"'>" +
-            "<span onclick='load_category("+categoryId+")'>"+name+"</span> " +
+            "<span onclick='loadCategory("+categoryId+")'>"+name+"</span> " +
             "<span class='category_level'>"+categoryLevelName+"</span>" +
             "<a href='locate_zoo.html?type=category&id="+categoryId+"&postcode="+$("input").first().val()+"'>🔍</a>" +
             "</li>");
     }
 
-    function add_species(element, speciesData) {
+    function addSpecies(element, speciesData) {
         var speciesId = speciesData.species_id;
         var name = speciesData.common_name;
         var latinName = speciesData.latin_name;
@@ -52,7 +52,7 @@
             "</li>");
     }
 
-    function load_category(id) {
+    function loadCategory(id) {
         var categoryLiId = "category-"+id;
         $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
@@ -63,14 +63,14 @@
                 listElement.append("<ul class='"+(isOdd?"even":"odd")+"'></ul>");
                 // Add subcategories and species
                 $.each(data[0].sub_categories, function (index, itemData) {
-                    add_category(listElement.find("ul"), itemData);
+                    addCategory(listElement.find("ul"), itemData);
                 });
                 $.each(data[0].species, function (index, itemData) {
-                    add_species(listElement.find("ul"), itemData);
+                    addSpecies(listElement.find("ul"), itemData);
                 });
                 // If category contains only 1 subcategory, open the subcategory.
                 if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
-                    load_category(data[0].sub_categories[0].category_id);
+                    loadCategory(data[0].sub_categories[0].category_id);
                 }
             } else if(!listElement.find("ul").is(":visible")) {
                 listElement.find("ul").first().show();
@@ -88,7 +88,7 @@
         $("body").append("Animal list:<ul id='animals' class='odd'></ul>");
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
-                add_category($("#animals"), itemData);
+                addCategory($("#animals"), itemData);
             });
         });
         $("input#form-postcode").prop("disabled",true);

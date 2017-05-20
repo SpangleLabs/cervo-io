@@ -18,7 +18,7 @@ Link: <span class="link"></span><br />
 Species list:<br />
 <ul id="species_list"></ul>
 
-<form onsubmit="send_add_species()">
+<form onsubmit="sendAddSpecies()">
     <input id="input-zoo_id" type="hidden" name="id" value="" />
     <select id="species_id" name="species_id"></select>
     <input type="submit"/>
@@ -39,7 +39,7 @@ Species list:<br />
         }
     };
 
-    function load_zoo_data() {
+    function loadZooData() {
         var zooId = getUrlParameter("id");
         $.get("http://localhost:3000/zoos/"+zooId, function(data) {
             $(".name").append(data[0].name);
@@ -52,7 +52,7 @@ Species list:<br />
         });
     }
 
-    function add_species_button() {
+    function addSpeciesButton() {
         $("input#input-zoo_id").val(getUrlParameter("id"));
         $.get("http://localhost:3000/species/", function(data) {
             for(var a = 0; a < data.length; a++ ) {
@@ -61,7 +61,7 @@ Species list:<br />
         });
     }
 
-    function send_add_species() {
+    function sendAddSpecies() {
         var zooId = getUrlParameter("id");
         var speciesId = $("select#species_id").find(":selected").val();
         var zooSpecies = {};
@@ -72,8 +72,8 @@ Species list:<br />
     }
 
     $(document).ready(function() {
-        load_zoo_data();
-        add_species_button();
+        loadZooData();
+        addSpeciesButton();
     });
 </script>
 </body>
