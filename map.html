@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple markers</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+</head>
+<body>
+<div style="width: 600px; height: 600px;">
+<div id="map"></div>
+</div>
+<input type="checkbox" name="toggleMarker" id="toggleMarker" />
+<script>
+
+    var marker = null;
+    var myLatLng = {lat: -25.363, lng: 131.044};
+    var map = null;
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 4,
+            center: myLatLng
+        });
+    }
+
+    $("#toggleMarker").change(function() {
+        if (!marker) {
+            marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: 'Hello World!'
+            });
+        }
+        if (this.checked) {
+            marker.setVisible(true);
+        } else {
+            marker.setVisible(false);
+        }
+    })
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"> //TODO add key
+</script>
+</body>
+</html>
