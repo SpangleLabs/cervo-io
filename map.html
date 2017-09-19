@@ -27,14 +27,16 @@
 <script>
 
     var marker = null;
-    var myLatLng = {lat: -25.363, lng: 131.044};
+    var myLatLng = {lat: -51.9831, lng: 0.5968};
     var map = null;
+    var markers = [];
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
-            center: myLatLng
+            zoom: 6,
+            center: {lat: 55, lng: -3}
         });
+        fillTable();
     }
 
     $("#toggleMarker").change(function() {
@@ -50,7 +52,29 @@
         } else {
             marker.setVisible(false);
         }
-    })
+    });
+
+    function fillTable() {
+        $.get("http://localhost:3000/zoos/", function(/*[ZooObj]*/data) {
+            var geocoder = new google.maps.Geocoder();
+            for(var a = 0; a < data.length; a++) {
+                var zooData = data[a];
+                (function(zooData) {
+                    geocoder.geocode({"address": data[a].postcode}, function (results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            markers += new google.maps.Marker({
+                                position: results[0].geometry.location,
+                                map: map,
+                                title: zooData.name
+                            });
+                        } else {
+                            console.log(status);
+                        }
+                    })
+                })(zooData);
+            }
+        });
+    }
 </script>
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"> //TODO add key
