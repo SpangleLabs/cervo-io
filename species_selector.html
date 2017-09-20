@@ -84,6 +84,7 @@ Animal list:<ul id='animals' class='odd'></ul>
                 if(categoryElem.children("ul").children("li.category").length === 1 || recursive) {
                     var subCategories = categoryObj.sub_categories;
                     $.each(subCategories, function(idx, subCategory) {
+                        //TODO expand should be false, but can't because this is not synchronous. This causes problems when closing an opened tree higher up the chain
                         loadCategory(subCategory.category_id, expand, recursive);
                     })
                 }
