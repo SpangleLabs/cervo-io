@@ -23,13 +23,11 @@
 <div style="width: 600px; height: 600px;">
 <div id="map"></div>
 </div>
-<input type="checkbox" name="toggleMarker" id="toggleMarker" />
+<div id="checkboxes"></div>
 <script>
 
-    var marker = null;
-    var myLatLng = {lat: -51.9831, lng: 0.5968};
     var map = null;
-    var markers = [];
+    var markers = {};
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -39,33 +37,28 @@
         fillTable();
     }
 
-    $("#toggleMarker").change(function() {
-        if (!marker) {
-            marker = new google.maps.Marker({
-                position: myLatLng,
-                map: map,
-                title: 'Hello World!'
-            });
-        }
-        if (this.checked) {
-            marker.setVisible(true);
-        } else {
-            marker.setVisible(false);
-        }
-    });
-
     function fillTable() {
         $.get("http://localhost:3000/zoos/", function(/*[ZooObj]*/data) {
             for(var a = 0; a < data.length; a++) {
                 var zooData = data[a];
                 if (zooData.latitude && zooData.longitude) {
-                    markers += new google.maps.Marker({
+                    markers[zooData.zoo_id] = new google.maps.Marker({
                         position: {lat: zooData.latitude, lng: zooData.longitude},
                         map: map,
                         title: zooData.name
-                    })
+                    });
+                    $("#checkboxes").append("<input type=\"checkbox\" class=\"toggleMarker\" value=\""+zooData.zoo_id+"\" checked />"+zooData.name+"<br />");
                 }
             }
+
+            $("input.toggleMarker").change(function() {
+                var marker = markers[this.value];
+                if (this.checked) {
+                    marker.setVisible(true);
+                } else {
+                    marker.setVisible(false);
+                }
+            });
         });
     }
 </script>
