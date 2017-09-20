@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Species selector</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>Just a test species selector</h1>
+<a href="index.html">Back to user index</a><br />
+Animal list:<ul id='animals' class='odd'></ul>
+<ul id="selected-animals"></ul>
+</body>
+
+<script>
+    var categoryLevelCache = [];
+    $.get("http://localhost:3000/category_levels/", function(data) {
+        categoryLevelCache = data;
+    });
+    function getCategoryLevel(id) {
+        for ( var a = 0; a < categoryLevelCache.length; a++ ) {
+            if(categoryLevelCache[a].category_level_id === id) {
+                return categoryLevelCache[a];
+            }
+        }
+    }
+
+    function addCategory(parentUlElement, categoryData) {
+        var categoryId = categoryData.category_id;
+        var name = categoryData.name;
+        var categoryLevelId = categoryData.category_level_id;
+        var categoryLiId = "category-"+categoryId;
+        var categoryLevelName = getCategoryLevel(categoryLevelId).name;
+        parentUlElement.append(
+            "<li class='category closed' id='"+categoryLiId+"'>" +
+                "<span onclick='loadCategory("+categoryId+", true, false)'>"+name+ " " +
+                    "<span class='category_level'>"+categoryLevelName+"</span>" +
+                "</span> " +
+                "<span onclick='selectCategory("+categoryId+")'>➕➖</span>" +
+            "</li>");
+        if(parentUlElement.parent().hasClass("selected")) {
+            $("#"+categoryLiId).addClass("selected");
+            updateSelected();
+        }
+    }
+
+    function addSpecies(parentUlElement, speciesData) {
+        var speciesId = speciesData.species_id;
+        var speciesLiId = "species-"+speciesId;
+        var name = speciesData.common_name;
+        var latinName = speciesData.latin_name;
+        parentUlElement.append(
+            "<li class='species' id='"+speciesLiId+"'>"+name+"" +
+                "<span class='latin_name'>"+latinName+"</span>" +
+                "<span onclick='selectSpecies("+speciesId+")'>➕➖</span>" +
+            "</li>");
+        if(parentUlElement.parent().hasClass("selected")) {
+            $("#"+speciesLiId).addClass("selected");
+            updateSelected();
+        }
+    }
+
+    function loadCategory(id, expand, recursive) {
+        var categoryLiId = "category-"+id;
+        var categoryElem = $("#"+categoryLiId);
+        var isOdd = categoryElem.parent("ul").hasClass("odd");
+        if(categoryNotPopulated(categoryElem)) {
+            $.get("http://localhost:3000/categories/"+id, function(/*[CategoryObj]*/categoryObjs) {
+                // If told to expand category also, do that.
+                var categoryObj = categoryObjs[0];
+                categoryElem.append("<ul class='"+(isOdd?"even":"odd")+"' style='display: none;'></ul>");
+                // Add subcategories
+                $.each(categoryObj.sub_categories, function (index, itemData) {
+                    addCategory(categoryElem.find("ul"), itemData);
+                });
+                // Add species in category
+                $.each(categoryObj.species, function (index, itemData) {
+                    addSpecies(categoryElem.find("ul"), itemData);
+                });
+                // If category contains only 1 subcategory, open the subcategory.
+                if((categoryObj.sub_categories.length === 1 && categoryObj.species.length === 0) || recursive) {
+                    var subCategories = categoryObj.sub_categories;
+                    console.log(subCategories);
+                    $.each(subCategories, function(idx, subCategory) {
+                        loadCategory(subCategory.category_id, expand, recursive);
+                    })
+                }
+                if (expand) {
+                    expandCategory(id);
+                }
+            });
+        } else if (expand) {
+            expandCategory(id);
+        }
+    }
+
+    function expandCategory(id) {
+        console.log("aaa");
+        var categoryLiId = "category-"+id;
+        var listElement = $("#"+categoryLiId);
+        if(!listElement.find("ul").is(":visible")) {
+            console.log("bbb");
+            listElement.find("ul").first().show();
+            listElement.addClass("open");
+            listElement.removeClass("closed");
+        } else {
+            console.log("ccc");
+            listElement.find("ul").first().hide();
+            listElement.addClass("closed");
+            listElement.removeClass("open");
+        }
+    }
+
+    function categoryNotPopulated(categoryElem) {
+        return !categoryElem.has("ul").length;
+    }
+
+    function selectCategory(categoryId) {
+        var categoryElem = $("li#category-"+categoryId);
+        categoryElem.toggleClass("selected");
+        categoryElem.find("li").toggleClass("selected");
+        loadCategory(categoryId, false, true);
+        updateSelected();
+    }
+
+    function selectSpecies(speciesId) {
+        $("li#species-"+speciesId).toggleClass("selected");
+        updateSelected();
+    }
+
+    function updateSelected() {
+        var selected = $("#selected-animals");
+        selected.empty();
+        $("li.species.selected").each(function(idx, elem) {
+            selected.append("<li>"+elem.id+"</li>");
+        });
+    }
+
+    function eventSubmitPostcode() {
+        $.get("http://localhost:3000/categories/", function(data) {
+            $.each(data, function(index, itemData) {
+                addCategory($("#animals"), itemData);
+            });
+        });
+    }
+
+    $(document).ready(function() {
+        eventSubmitPostcode();
+    });
+</script>
+</html>

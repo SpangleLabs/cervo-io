@@ -50,3 +50,9 @@ ul.odd {
 ul.even {
     background-color: darkgray;
 }
+li.selected {
+    background-color: red;
+}
+li.species.selected {
+    background-color: blue;
+}
