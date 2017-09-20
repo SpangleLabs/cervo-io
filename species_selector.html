@@ -34,7 +34,8 @@ Animal list:<ul id='animals' class='odd'></ul>
         var categoryLevelName = getCategoryLevel(categoryLevelId).name;
         parentUlElement.append(
             "<li class='category closed' id='"+categoryLiId+"'>" +
-                "<span onclick='loadCategory("+categoryId+", true, false)'>"+name+ " " +
+                "<span onclick='loadCategory("+categoryId+", true, false)'>" +
+                    "<span class='category_name'>" + name + "</span> " +
                     "<span class='category_level'>"+categoryLevelName+"</span>" +
                 "</span> " +
                 "<span onclick='selectCategory("+categoryId+")'>➕➖</span>" +
@@ -51,7 +52,8 @@ Animal list:<ul id='animals' class='odd'></ul>
         var name = speciesData.common_name;
         var latinName = speciesData.latin_name;
         parentUlElement.append(
-            "<li class='species' id='"+speciesLiId+"'>"+name+"" +
+            "<li class='species' id='"+speciesLiId+"'>" +
+                "<span class='species_name'>"+name+" </span>" +
                 "<span class='latin_name'>"+latinName+"</span>" +
                 "<span onclick='selectSpecies("+speciesId+")'>➕➖</span>" +
             "</li>");
@@ -95,9 +97,6 @@ Animal list:<ul id='animals' class='odd'></ul>
     }
 
     function expandCategory(categoryElem) {
-        //var categoryLiId = "category-"+id;
-        //var categoryElem = $("#"+categoryLiId);
-        console.log(categoryElem);
         if(categoryElem.children("ul").is(":visible")) {
             categoryElem.find("ul").first().hide();
             categoryElem.addClass("closed");
@@ -133,7 +132,8 @@ Animal list:<ul id='animals' class='odd'></ul>
         var selected = $("#selected-animals");
         selected.empty();
         $("li.species.selected").each(function(idx, elem) {
-            selected.append("<li>"+elem.id+"</li>");
+            var speciesName = $(this).children(".species_name").text();
+            selected.append("<li>"+speciesName+"</li>");
         });
     }
 
