@@ -78,10 +78,9 @@ Animal list:<ul id='animals' class='odd'></ul>
                 $.each(categoryObj.species, function (index, itemData) {
                     addSpecies(categoryElem.find("ul"), itemData);
                 });
-                // If category contains only 1 subcategory, open the subcategory.
+                // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                 if((categoryObj.sub_categories.length === 1 && categoryObj.species.length === 0) || recursive) {
                     var subCategories = categoryObj.sub_categories;
-                    console.log(subCategories);
                     $.each(subCategories, function(idx, subCategory) {
                         loadCategory(subCategory.category_id, expand, recursive);
                     })
@@ -96,16 +95,13 @@ Animal list:<ul id='animals' class='odd'></ul>
     }
 
     function expandCategory(id) {
-        console.log("aaa");
         var categoryLiId = "category-"+id;
         var listElement = $("#"+categoryLiId);
         if(!listElement.find("ul").is(":visible")) {
-            console.log("bbb");
             listElement.find("ul").first().show();
             listElement.addClass("open");
             listElement.removeClass("closed");
         } else {
-            console.log("ccc");
             listElement.find("ul").first().hide();
             listElement.addClass("closed");
             listElement.removeClass("open");
