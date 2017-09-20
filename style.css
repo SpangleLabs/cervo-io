@@ -56,3 +56,9 @@ li.selected {
 li.species.selected {
     background-color: blue;
 }
+.selected > .selector:after {
+    content: "➖";
+}
+:not(selected) > .selector:after {
+    content: "➕";
+}

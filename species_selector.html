@@ -38,7 +38,7 @@ Animal list:<ul id='animals' class='odd'></ul>
                     "<span class='category_name'>" + name + "</span> " +
                     "<span class='category_level'>"+categoryLevelName+"</span>" +
                 "</span> " +
-                "<span onclick='selectCategory("+categoryId+")'>➕➖</span>" +
+                "<span class='selector' onclick='selectCategory("+categoryId+")'></span>" +
             "</li>");
         if(parentUlElement.parent().hasClass("selected")) {
             $("#"+categoryLiId).addClass("selected");
@@ -55,7 +55,7 @@ Animal list:<ul id='animals' class='odd'></ul>
             "<li class='species' id='"+speciesLiId+"'>" +
                 "<span class='species_name'>"+name+" </span>" +
                 "<span class='latin_name'>"+latinName+"</span>" +
-                "<span onclick='selectSpecies("+speciesId+")'>➕➖</span>" +
+                "<span class='selector' onclick='selectSpecies("+speciesId+")'></span>" +
             "</li>");
         if(parentUlElement.parent().hasClass("selected")) {
             $("#"+speciesLiId).addClass("selected");
