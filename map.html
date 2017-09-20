@@ -56,22 +56,15 @@
 
     function fillTable() {
         $.get("http://localhost:3000/zoos/", function(/*[ZooObj]*/data) {
-            var geocoder = new google.maps.Geocoder();
             for(var a = 0; a < data.length; a++) {
                 var zooData = data[a];
-                (function(zooData) {
-                    geocoder.geocode({"address": data[a].postcode}, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            markers += new google.maps.Marker({
-                                position: results[0].geometry.location,
-                                map: map,
-                                title: zooData.name
-                            });
-                        } else {
-                            console.log(status);
-                        }
+                if (zooData.latitude && zooData.longitude) {
+                    markers += new google.maps.Marker({
+                        position: {lat: zooData.latitude, lng: zooData.longitude},
+                        map: map,
+                        title: zooData.name
                     })
-                })(zooData);
+                }
             }
         });
     }
