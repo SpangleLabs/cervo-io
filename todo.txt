@@ -6,3 +6,6 @@ MAJOR:
 - Some kind of code style
 - Some sort of website style
 - Add some security to the admin system
+
+minor:
+-remove clades/unranked?

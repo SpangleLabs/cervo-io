@@ -91,8 +91,16 @@ Animal list:<ul id='animals' class='odd'></ul>
                     expandCategory(categoryElem);
                 }
             });
-        } else if (expand) {
-            expandCategory(categoryElem);
+        } else {
+            if (expand) {
+                expandCategory(categoryElem);
+            }
+            if (recursive) {
+                var subCategoryElems = categoryElem.children("ul").children("li.category");
+                subCategoryElems.each(function(idx, elem) {
+                    loadCategory(elem.id.split("-")[1], expand, recursive);
+                });
+            }
         }
     }
 
