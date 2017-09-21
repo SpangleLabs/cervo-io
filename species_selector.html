@@ -36,7 +36,6 @@
     var map = null;
     var categoryLevelCache = [];
     var speciesCache = {};
-    var zoosCache = {};
     var selectedSpecies = [];
     var selectedZoos = [];
     var markers = [];
@@ -51,14 +50,51 @@
         }
     }
 
-    function getSpeciesFromCache(id, func) {
+    /**
+     * I pulled this method from somewhere else, tbh
+     * @param url
+     * @returns {Promise}
+     */
+    function promiseGet(url) {
+        // Return a new promise.
+        return new Promise(function (resolve, reject) {
+            // Do the usual XHR stuff
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+
+            req.onload = function () {
+                // This is called even on 404 etc
+                // so check the status
+                if (req.status === 200) {
+                    // Resolve the promise with the response text
+                    resolve(JSON.parse(req.response));
+                } else {
+                    // Otherwise reject with the status text
+                    // which will hopefully be a meaningful error
+                    reject(Error(req.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function () {
+                reject(Error("Network Error"));
+            };
+
+            // Make the request
+            req.send();
+        });
+    }
+
+    function getSpeciesFromCache(id) {
         //TODO: promisify
         if(speciesCache[id]) {
-            func(speciesCache[id]);
+            return new Promise(function(resolve, reject) {
+                resolve(speciesCache[id]);
+            });
         } else {
-            $.get("http://localhost:3000/species/"+id, function(speciesObjs) {
-                speciesCache[id] = speciesObjs[0];
-                func(speciesObjs[0]);
+            return promiseGet("http://localhost:3000/species/"+id).then(function(data) {
+                speciesCache[id] = data[0];
+                return data[0];
             });
         }
     }
@@ -71,17 +107,6 @@
         });
         markers.push(zooData.marker);
         return zooData;
-    }
-
-    function getZooFromCache(id) {
-        //TODO: promisify
-        if(zoosCache[id]) {
-            return zoosCache[id];
-        } else {
-            $.get("http://localhost:3000/zoos/"+id, function(/*[ZooObj]*/zooObjs) {
-                zoosCache[id] = zooObjs[0];
-            });
-        }
     }
 
     function addCategory(parentUlElement, categoryData) {
@@ -127,6 +152,7 @@
         var categoryElem = $("#"+categoryLiId);
         var isOdd = categoryElem.parent("ul").hasClass("odd");
         if(categoryNotPopulated(categoryElem)) {
+            //TODO promisify
             $.get("http://localhost:3000/categories/"+id, function(/*[CategoryObj]*/categoryObjs) {
                 // If told to expand category also, do that.
                 var categoryObj = categoryObjs[0];
@@ -197,7 +223,6 @@
     }
 
     function hideAllMarkers() {
-        console.log("hiding");
         $.each(markers, function(idx, marker) {
             marker.setVisible(false);
         });
@@ -208,30 +233,37 @@
         selected.empty();
         selectedSpecies = [];
         selectedZoos = {};
+        var speciesDataPromises = [];
         $("li.species.selected").each(function(idx, elem) {
             var speciesId = elem.id.split("-")[1];
             selectedSpecies.push(speciesId);
             var speciesName = $(this).children(".species_name").text();
             selected.append("<li>"+speciesName+" ("+speciesId+")</li>");
 
-            getSpeciesFromCache(speciesId, function(speciesData) {
+            speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(speciesData) {
+                var selectedZoos = {};
                 $.each(speciesData.zoos, function (zooIdx, zooElem) {
                     addMarkerToZoo(zooElem);
                     selectedZoos[zooElem.zoo_id] = zooElem;
                 });
-            });
+                return selectedZoos;
+            }));
         });
-        // Update zoos selected
-        var selectedZoosElem = $("#selected-zoos");
-        selectedZoosElem.empty();
-        hideAllMarkers();
-        $.each(selectedZoos, function(zooKey, zooVal) {
-            selectedZoosElem.append("<li>"+zooVal.name+"</li>");
-            zooVal.marker.setVisible(true);
+        Promise.all(speciesDataPromises).then(function(selectedZooList) {
+            var selectedZoos = Object.assign({}, ...selectedZooList);
+            // Update zoos selected
+            var selectedZoosElem = $("#selected-zoos");
+            selectedZoosElem.empty();
+            hideAllMarkers();
+            $.each(selectedZoos, function(zooKey, zooVal) {
+                selectedZoosElem.append("<li>"+zooVal.name+"</li>");
+                zooVal.marker.setVisible(true);
+            });
         });
     }
 
     $(document).ready(function() {
+        //TODO: promisify
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
