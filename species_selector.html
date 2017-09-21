@@ -82,6 +82,10 @@
         });
     }
 
+    /**
+     * Retrieves species data from the cache
+     * @param id species id to retrieve
+     */
     function getSpeciesFromCache(id) {
         if(speciesCache[id]) {
             return new Promise(function(resolve, reject) {
@@ -95,6 +99,10 @@
         }
     }
 
+    /**
+     * Adds a google maps marker to the zoo data
+     * @param zooData data object of the zoo
+     */
     function addMarkerToZoo(zooData) {
         zooData.marker = new google.maps.Marker({
             position: {lat: zooData.latitude, lng: zooData.longitude},
@@ -105,6 +113,11 @@
         return zooData;
     }
 
+    /**
+     * Adds a new category to the dom
+     * @param parentUlElement ul element of the parent category for the category
+     * @param categoryData data object for the new category
+     */
     function addCategory(parentUlElement, categoryData) {
         var categoryId = categoryData.category_id;
         var name = categoryData.name;
@@ -125,6 +138,11 @@
         }
     }
 
+    /**
+     * Adds a new species to the dom
+     * @param parentUlElement ul element of the parent category for the species
+     * @param speciesData data object for the new species
+     */
     function addSpecies(parentUlElement, speciesData) {
         var speciesId = speciesData.species_id;
         var speciesLiId = "species-"+speciesId;
@@ -201,6 +219,11 @@
         }
     }
 
+    /**
+     * Checks if a category has been populated with subcategory and species data
+     * @param categoryElem category element
+     * @returns {boolean}
+     */
     function categoryNotPopulated(categoryElem) {
         return !categoryElem.has("ul").length;
     }
