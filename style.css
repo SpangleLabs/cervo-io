@@ -21,7 +21,7 @@ li.open:before {
     content: "📂";
 }
 li.species:before {
-    content: "🐶";
+    content: "🦌";
 }
 li.add:before {
     content: "➕";
@@ -50,11 +50,17 @@ ul.odd {
 ul.even {
     background-color: darkgray;
 }
-li.selected {
-    background-color: red;
+ul.odd > li.selected {
+    background-color: palevioletred;
 }
-li.species.selected {
-    background-color: blue;
+ul.even > li.selected {
+    background-color: indianred;
+}
+ul.odd > li.species.selected {
+    background-color: cornflowerblue;
+}
+ul.even > li.species.selected {
+    background-color: royalblue;
 }
 .selected > .selector:after {
     content: "➖";
