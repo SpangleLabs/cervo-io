@@ -263,8 +263,7 @@
     }
 
     $(document).ready(function() {
-        //TODO: promisify
-        $.get("http://localhost:3000/categories/", function(data) {
+        promiseGet("http://localhost:3000/categories/").then(function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
             });
