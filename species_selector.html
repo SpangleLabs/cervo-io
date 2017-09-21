@@ -86,7 +86,6 @@
     }
 
     function getSpeciesFromCache(id) {
-        //TODO: promisify
         if(speciesCache[id]) {
             return new Promise(function(resolve, reject) {
                 resolve(speciesCache[id]);
