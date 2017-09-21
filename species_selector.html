@@ -5,16 +5,41 @@
     <title>Species selector</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
-<h1>Just a test species selector</h1>
-<a href="index.html">Back to user index</a><br />
-Animal list:<ul id='animals' class='odd'></ul>
-<ul id="selected-animals"></ul>
+<div style="width: 600px; height: 100%; float: left; position: fixed;">
+    <div id="map"></div>
+</div>
+<div id="selector" style="margin-left: 600px;">
+    <h1>Just a test species selector</h1>
+    <a href="index.html">Back to user index</a><br />
+    Animal list:<ul id='animals' class='odd'></ul>
+    <ul id="selected-animals"></ul>
+    <ul id="selected-zoos"></ul>
+</div>
 </body>
 
 <script>
+    var map = null;
     var categoryLevelCache = [];
+    var speciesCache = {};
+    var zoosCache = {};
+    var selectedSpecies = [];
+    var selectedZoos = [];
+    var markers = [];
     $.get("http://localhost:3000/category_levels/", function(data) {
         categoryLevelCache = data;
     });
@@ -23,6 +48,39 @@ Animal list:<ul id='animals' class='odd'></ul>
             if(categoryLevelCache[a].category_level_id === id) {
                 return categoryLevelCache[a];
             }
+        }
+    }
+
+    function getSpeciesFromCache(id, func) {
+        //TODO: promisify
+        if(speciesCache[id]) {
+            func(speciesCache[id]);
+        } else {
+            $.get("http://localhost:3000/species/"+id, function(speciesObjs) {
+                speciesCache[id] = speciesObjs[0];
+                func(speciesObjs[0]);
+            });
+        }
+    }
+
+    function addMarkerToZoo(zooData) {
+        zooData.marker = new google.maps.Marker({
+            position: {lat: zooData.latitude, lng: zooData.longitude},
+            map: map,
+            title: zooData.name
+        });
+        markers.push(zooData.marker);
+        return zooData;
+    }
+
+    function getZooFromCache(id) {
+        //TODO: promisify
+        if(zoosCache[id]) {
+            return zoosCache[id];
+        } else {
+            $.get("http://localhost:3000/zoos/"+id, function(/*[ZooObj]*/zooObjs) {
+                zoosCache[id] = zooObjs[0];
+            });
         }
     }
 
@@ -51,6 +109,7 @@ Animal list:<ul id='animals' class='odd'></ul>
         var speciesLiId = "species-"+speciesId;
         var name = speciesData.common_name;
         var latinName = speciesData.latin_name;
+        //speciesCache[speciesId] = speciesData;
         parentUlElement.append(
             "<li class='species' id='"+speciesLiId+"'>" +
                 "<span class='species_name'>"+name+" </span>" +
@@ -137,12 +196,38 @@ Animal list:<ul id='animals' class='odd'></ul>
         updateSelected();
     }
 
+    function hideAllMarkers() {
+        console.log("hiding");
+        $.each(markers, function(idx, marker) {
+            marker.setVisible(false);
+        });
+    }
+
     function updateSelected() {
         var selected = $("#selected-animals");
         selected.empty();
+        selectedSpecies = [];
+        selectedZoos = {};
         $("li.species.selected").each(function(idx, elem) {
+            var speciesId = elem.id.split("-")[1];
+            selectedSpecies.push(speciesId);
             var speciesName = $(this).children(".species_name").text();
-            selected.append("<li>"+speciesName+"</li>");
+            selected.append("<li>"+speciesName+" ("+speciesId+")</li>");
+
+            getSpeciesFromCache(speciesId, function(speciesData) {
+                $.each(speciesData.zoos, function (zooIdx, zooElem) {
+                    addMarkerToZoo(zooElem);
+                    selectedZoos[zooElem.zoo_id] = zooElem;
+                });
+            });
+        });
+        // Update zoos selected
+        var selectedZoosElem = $("#selected-zoos");
+        selectedZoosElem.empty();
+        hideAllMarkers();
+        $.each(selectedZoos, function(zooKey, zooVal) {
+            selectedZoosElem.append("<li>"+zooVal.name+"</li>");
+            zooVal.marker.setVisible(true);
         });
     }
 
@@ -157,5 +242,15 @@ Animal list:<ul id='animals' class='odd'></ul>
     $(document).ready(function() {
         eventSubmitPostcode();
     });
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 6,
+            center: {lat: 55, lng: -3}
+        });
+    }
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"> //TODO add key
 </script>
 </html>
