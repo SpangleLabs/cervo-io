@@ -24,8 +24,8 @@
     <div id="map"></div>
 </div>
 <div id="selector" style="margin-left: 600px;">
-    <h1>Just a test species selector</h1>
     <a href="index.html">Back to user index</a><br />
+    <h1>Just a test species selector</h1>
     Animal list:<ul id='animals' class='odd'></ul>
     <ul id="selected-animals"></ul>
     <ul id="selected-zoos"></ul>
@@ -231,16 +231,12 @@
         });
     }
 
-    function eventSubmitPostcode() {
+    $(document).ready(function() {
         $.get("http://localhost:3000/categories/", function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
             });
         });
-    }
-
-    $(document).ready(function() {
-        eventSubmitPostcode();
     });
 
     function initMap() {
