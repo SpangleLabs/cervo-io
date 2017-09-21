@@ -39,9 +39,6 @@
     var selectedSpecies = [];
     var selectedZoos = [];
     var markers = [];
-    $.get("http://localhost:3000/category_levels/", function(data) {
-        categoryLevelCache = data;
-    });
     function getCategoryLevel(id) {
         for ( var a = 0; a < categoryLevelCache.length; a++ ) {
             if(categoryLevelCache[a].category_level_id === id) {
@@ -262,7 +259,10 @@
     }
 
     $(document).ready(function() {
-        promiseGet("http://localhost:3000/categories/").then(function(data) {
+        promiseGet("http://localhost:3000/category_levels/").then(function(data) {
+            categoryLevelCache = data;
+            return promiseGet("http://localhost:3000/categories/");
+        }).then(function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
             });
