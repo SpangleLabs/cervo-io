@@ -36,6 +36,7 @@
     var map = null;
     var categoryLevelCache = [];
     var speciesCache = {};
+    var speciesPromiseCache = [];
     var selectedSpecies = [];
     var selectedZoos = [];
     var markers = [];
@@ -87,15 +88,17 @@
      * @param id species id to retrieve
      */
     function getSpeciesFromCache(id) {
-        if(speciesCache[id]) {
-            return new Promise(function(resolve, reject) {
-                resolve(speciesCache[id]);
-            });
+        if(speciesPromiseCache[id]) {
+            //console.log("got species from cache "+id);
+            return speciesPromiseCache[id];
         } else {
-            return promiseGet("http://localhost:3000/species/"+id).then(function(data) {
-                speciesCache[id] = data[0];
+            console.log("Had to re-get species "+id);
+            var promise = promiseGet("http://localhost:3000/species/"+id).then(function(data) {
+                console.log("Promise fulfilled for "+id);
                 return data[0];
             });
+            speciesPromiseCache[id] = promise;
+            return promise;
         }
     }
 
