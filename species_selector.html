@@ -165,12 +165,14 @@
         var categoryLiId = "category-"+id;
         var categoryElem = $("#"+categoryLiId);
         var isOdd = categoryElem.parent("ul").hasClass("odd");
+        var populatedCategoriesPromise = new Promise(function(resolve, reject) {
+            resolve([]);
+        });
         if(categoryNotPopulated(categoryElem)) {
-            //TODO promisify
-            $.get("http://localhost:3000/categories/"+id, function(/*[CategoryObj]*/categoryObjs) {
-                // If told to expand category also, do that.
+            populatedCategoriesPromise = promiseGet("http://localhost:3000/categories/"+id).then(function(/*[CategoryObj]*/categoryObjs) {
                 var categoryObj = categoryObjs[0];
-                categoryElem.append("<ul class='"+(isOdd?"even":"odd")+"' style='display: none;'></ul>");
+                // Add base list element
+                categoryElem.append("<ul class='" + (isOdd ? "even" : "odd") + "' style='display: none;'></ul>");
                 // Add subcategories
                 $.each(categoryObj.sub_categories, function (index, itemData) {
                     addCategory(categoryElem.find("ul"), itemData);
@@ -180,27 +182,28 @@
                     addSpecies(categoryElem.find("ul"), itemData);
                 });
                 // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
-                if(categoryElem.children("ul").children("li.category").length === 1 || recursive) {
+                var loadCategoryPromises = [];
+                if (categoryElem.children("ul").children("li.category").length === 1 || recursive) {
                     var subCategories = categoryObj.sub_categories;
-                    $.each(subCategories, function(idx, subCategory) {
-                        loadCategory(subCategory.category_id, expand, recursive);
+                    $.each(subCategories, function (idx, subCategory) {
+                        loadCategoryPromises.push(loadCategory(subCategory.category_id, expand, recursive));
                     })
                 }
-                if (expand) {
-                    expandCategory(categoryElem);
-                }
+                return Promise.all(loadCategoryPromises);
             });
-        } else {
+        } else if (recursive) {
+            var subCategoryElems = categoryElem.children("ul").children("li.category");
+            var loadCategoryPromises = [];
+            subCategoryElems.each(function(idx, elem) {
+                loadCategoryPromises.push(loadCategory(elem.id.split("-")[1], expand, recursive));
+            });
+            populatedCategoriesPromise = Promise.all(loadCategoryPromises);
+        }
+        return populatedCategoriesPromise.then(function(loadedCategories) {
             if (expand) {
                 expandCategory(categoryElem);
             }
-            if (recursive) {
-                var subCategoryElems = categoryElem.children("ul").children("li.category");
-                subCategoryElems.each(function(idx, elem) {
-                    loadCategory(elem.id.split("-")[1], expand, recursive);
-                });
-            }
-        }
+        });
     }
 
     function expandCategory(categoryElem) {
