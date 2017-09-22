@@ -235,8 +235,9 @@
         var categoryElem = $("li#category-"+categoryId);
         categoryElem.toggleClass("selected");
         categoryElem.find("li").toggleClass("selected");
-        loadCategory(categoryId, false, true);
-        updateSelected();
+        loadCategory(categoryId, false, true).then(function(data) {
+            updateSelected();
+        });
     }
 
     function selectSpecies(speciesId) {
