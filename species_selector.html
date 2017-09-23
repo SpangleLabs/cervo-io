@@ -113,7 +113,7 @@
                 title: zooData.name
             });
             getZooInfoWindow(zooId).then(function(infoWindow) {
-                zooMarkers[zooId].addListener("click", function (infoWindow2) {
+                zooMarkers[zooId].addListener("click", function () {
                     infoWindow.open(map, zooMarkers[zooId]);
                 });
             });
@@ -131,7 +131,7 @@
                     "<ul>";
             $.each(zooData.species, function(idx, zooSpecies) {
                 infoContent += "<li>"+zooSpecies.common_name+" <span class='latin_name'>"+zooSpecies.latin_name+"</span>";
-            })
+            });
             infoContent += "</ul>";
             return new google.maps.InfoWindow({
                 content: infoContent
