@@ -38,6 +38,7 @@
     let speciesPromiseCache = [];
     let selectedSpecies = [];
     let zooMarkers = {};
+    let zooInfoWindows = {};
     function getCategoryLevel(id) {
         return $.each(categoryLevelCache, function(idx, val) {
             if(val.category_level_id === id) {
@@ -104,10 +105,16 @@
     function getZooMarker(zooData) {
         const zooId = zooData.zoo_id;
         if (!zooMarkers[zooId]) {
+            zooInfoWindows[zooId] = new google.maps.InfoWindow({
+                content: "<h1>"+zooData.name+"</h1><br /><a href='"+zooData.link+"'>"+zooData.link+"</a><br />Postcode: "+zooData.postcode // TODO: add species listing
+            });
             zooMarkers[zooId] = new google.maps.Marker({
                 position: {lat: zooData.latitude, lng: zooData.longitude},
                 map: map,
                 title: zooData.name
+            });
+            zooMarkers[zooId].addListener("click", function () {
+                zooInfoWindows[zooId].open(map, zooMarkers[zooId]);
             });
         }
         return zooMarkers[zooId];
@@ -243,6 +250,9 @@
     }
 
     function hideAllMarkers() {
+        $.each(zooInfoWindows, function(zooId, infoWindow) {
+            infoWindow.close();
+        });
         $.each(zooMarkers, function(zooId, marker) {
             marker.setVisible(false);
         });
