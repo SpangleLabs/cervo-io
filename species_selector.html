@@ -37,7 +37,7 @@
     let categoryLevelCache = [];
     let speciesPromiseCache = [];
     let selectedSpecies = [];
-    let markers = [];
+    let zooMarkers = {};
     function getCategoryLevel(id) {
         return $.each(categoryLevelCache, function(idx, val) {
             if(val.category_level_id === id) {
@@ -98,17 +98,19 @@
     }
 
     /**
-     * Adds a google maps marker to the zoo data
+     * Creates a new google maps marker for a given zoo and saves to cache
      * @param zooData data object of the zoo
      */
-    function addMarkerToZoo(zooData) {
-        zooData.marker = new google.maps.Marker({
-            position: {lat: zooData.latitude, lng: zooData.longitude},
-            map: map,
-            title: zooData.name
-        });
-        markers.push(zooData.marker);
-        return zooData;
+    function getZooMarker(zooData) {
+        const zooId = zooData.zoo_id;
+        if (!zooMarkers[zooId]) {
+            zooMarkers[zooId] = new google.maps.Marker({
+                position: {lat: zooData.latitude, lng: zooData.longitude},
+                map: map,
+                title: zooData.name
+            });
+        }
+        return zooMarkers[zooId];
     }
 
     /**
@@ -241,7 +243,7 @@
     }
 
     function hideAllMarkers() {
-        $.each(markers, function(idx, marker) {
+        $.each(zooMarkers, function(zooId, marker) {
             marker.setVisible(false);
         });
     }
@@ -259,9 +261,8 @@
 
             speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
                 let selectedZoos = {};
-                $.each(speciesData.zoos, function (zooIdx, zooElem) {
-                    addMarkerToZoo(zooElem);
-                    selectedZoos[zooElem.zoo_id] = zooElem;
+                $.each(speciesData.zoos, function (zooIdx, zooData) {
+                    selectedZoos[zooData.zoo_id] = zooData;
                 });
                 return selectedZoos;
             }));
@@ -272,9 +273,10 @@
             let selectedZoosElem = $("#selected-zoos");
             selectedZoosElem.empty();
             hideAllMarkers();
-            $.each(selectedZoos, function(zooKey, zooVal) {
-                selectedZoosElem.append("<li>"+zooVal.name+"</li>");
-                zooVal.marker.setVisible(true);
+            $.each(selectedZoos, function(zooKey, zooData) {
+                selectedZoosElem.append("<li>"+zooData.name+"</li>");
+                const marker = getZooMarker(zooData);
+                marker.setVisible(true);
             });
         });
     }
