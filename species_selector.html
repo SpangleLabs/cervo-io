@@ -63,7 +63,7 @@
                 // so check the status
                 if (req.status === 200) {
                     // Resolve the promise with the response text
-                    resolve(JSON.parse(req.response));
+                    resolve(JSON.parse(req.responseText));
                 } else {
                     // Otherwise reject with the status text
                     // which will hopefully be a meaningful error
@@ -166,9 +166,7 @@
         const categoryLiId = "category-"+id;
         let categoryElem = $("#"+categoryLiId);
         const isOdd = categoryElem.parent("ul").hasClass("odd");
-        let populatedCategoriesPromise = new Promise(function(resolve, reject) {
-            resolve([]);
-        });
+        let populatedCategoriesPromise = Promise.resolve([]);
         if(categoryNotPopulated(categoryElem)) {
             populatedCategoriesPromise = promiseGet("http://localhost:3000/categories/"+id).then(function(/*[CategoryObj]*/categoryObjs) {
                 const categoryObj = categoryObjs[0];
@@ -262,7 +260,7 @@
             const speciesName = $(this).children(".species_name").text();
             selected.append("<li>"+speciesName+" ("+speciesId+")</li>");
 
-            speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(speciesData) {
+            speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
                 let selectedZoos = {};
                 $.each(speciesData.zoos, function (zooIdx, zooElem) {
                     addMarkerToZoo(zooElem);

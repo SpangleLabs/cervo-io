@@ -5,6 +5,7 @@ function SpeciesObj(){}
 SpeciesObj.prototype.species_id = 1;
 SpeciesObj.prototype.name = "name";
 SpeciesObj.prototype.category_id = 1;
+SpeciesObj.prototype.zoos = [];
 
 function CategoryObj(){}
 CategoryObj.prototype.category_id = 1;
