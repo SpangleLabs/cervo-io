@@ -40,11 +40,13 @@
     let zooMarkers = {};
     let zooInfoWindows = {};
     function getCategoryLevel(id) {
-        return $.each(categoryLevelCache, function(idx, val) {
+        let result = null;
+        $.each(categoryLevelCache, function(idx, val) {
             if(val.category_level_id === id) {
-                return val;
+                result = val;
             }
         });
+        return result;
     }
 
     /**
@@ -130,6 +132,7 @@
         const name = categoryData.name;
         const categoryLevelId = categoryData.category_level_id;
         const categoryLiId = "category-"+categoryId;
+        console.log(getCategoryLevel(categoryLevelId));
         const categoryLevelName = getCategoryLevel(categoryLevelId).name;
         parentUlElement.append(
             "<li class='category closed' id='"+categoryLiId+"'>" +
