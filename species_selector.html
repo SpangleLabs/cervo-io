@@ -33,18 +33,17 @@
 </body>
 
 <script>
-    var map = null;
-    var categoryLevelCache = [];
-    var speciesPromiseCache = [];
-    var selectedSpecies = [];
-    var selectedZoos = [];
-    var markers = [];
+    let map = null;
+    let categoryLevelCache = [];
+    let speciesPromiseCache = [];
+    let selectedSpecies = [];
+    let markers = [];
     function getCategoryLevel(id) {
-        for ( var a = 0; a < categoryLevelCache.length; a++ ) {
-            if(categoryLevelCache[a].category_level_id === id) {
-                return categoryLevelCache[a];
+        $.each(categoryLevelCache, function(idx, val) {
+            if(val.category_level_id === id) {
+                return val;
             }
-        }
+        });
     }
 
     /**
@@ -56,7 +55,7 @@
         // Return a new promise.
         return new Promise(function (resolve, reject) {
             // Do the usual XHR stuff
-            var req = new XMLHttpRequest();
+            let req = new XMLHttpRequest();
             req.open('GET', url);
 
             req.onload = function () {
@@ -92,7 +91,7 @@
             return speciesPromiseCache[id];
         } else {
             console.log("Had to re-get species "+id);
-            var promise = promiseGet("http://localhost:3000/species/"+id).then(function(data) {
+            const promise = promiseGet("http://localhost:3000/species/"+id).then(function(data) {
                 console.log("Promise fulfilled for "+id);
                 return data[0];
             });
@@ -121,11 +120,11 @@
      * @param categoryData data object for the new category
      */
     function addCategory(parentUlElement, categoryData) {
-        var categoryId = categoryData.category_id;
-        var name = categoryData.name;
-        var categoryLevelId = categoryData.category_level_id;
-        var categoryLiId = "category-"+categoryId;
-        var categoryLevelName = getCategoryLevel(categoryLevelId).name;
+        const categoryId = categoryData.category_id;
+        const name = categoryData.name;
+        const categoryLevelId = categoryData.category_level_id;
+        const categoryLiId = "category-"+categoryId;
+        const categoryLevelName = getCategoryLevel(categoryLevelId).name;
         parentUlElement.append(
             "<li class='category closed' id='"+categoryLiId+"'>" +
                 "<span onclick='loadCategory("+categoryId+", true, false)'>" +
@@ -146,10 +145,10 @@
      * @param speciesData data object for the new species
      */
     function addSpecies(parentUlElement, speciesData) {
-        var speciesId = speciesData.species_id;
-        var speciesLiId = "species-"+speciesId;
-        var name = speciesData.common_name;
-        var latinName = speciesData.latin_name;
+        const speciesId = speciesData.species_id;
+        const speciesLiId = "species-"+speciesId;
+        const name = speciesData.common_name;
+        const latinName = speciesData.latin_name;
         //speciesCache[speciesId] = speciesData;
         parentUlElement.append(
             "<li class='species' id='"+speciesLiId+"'>" +
@@ -164,15 +163,15 @@
     }
 
     function loadCategory(id, expand, recursive) {
-        var categoryLiId = "category-"+id;
-        var categoryElem = $("#"+categoryLiId);
-        var isOdd = categoryElem.parent("ul").hasClass("odd");
-        var populatedCategoriesPromise = new Promise(function(resolve, reject) {
+        const categoryLiId = "category-"+id;
+        let categoryElem = $("#"+categoryLiId);
+        const isOdd = categoryElem.parent("ul").hasClass("odd");
+        let populatedCategoriesPromise = new Promise(function(resolve, reject) {
             resolve([]);
         });
         if(categoryNotPopulated(categoryElem)) {
             populatedCategoriesPromise = promiseGet("http://localhost:3000/categories/"+id).then(function(/*[CategoryObj]*/categoryObjs) {
-                var categoryObj = categoryObjs[0];
+                const categoryObj = categoryObjs[0];
                 // Add base list element
                 categoryElem.append("<ul class='" + (isOdd ? "even" : "odd") + "' style='display: none;'></ul>");
                 // Add subcategories
@@ -184,18 +183,17 @@
                     addSpecies(categoryElem.find("ul"), itemData);
                 });
                 // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
-                var loadCategoryPromises = [];
+                let loadCategoryPromises = [];
                 if (categoryElem.children("ul").children("li.category").length === 1 || recursive) {
-                    var subCategories = categoryObj.sub_categories;
-                    $.each(subCategories, function (idx, subCategory) {
+                    $.each(categoryObj.sub_categories, function (idx, subCategory) {
                         loadCategoryPromises.push(loadCategory(subCategory.category_id, expand, recursive));
                     })
                 }
                 return Promise.all(loadCategoryPromises);
             });
         } else if (recursive) {
-            var subCategoryElems = categoryElem.children("ul").children("li.category");
-            var loadCategoryPromises = [];
+            const subCategoryElems = categoryElem.children("ul").children("li.category");
+            let loadCategoryPromises = [];
             subCategoryElems.each(function(idx, elem) {
                 loadCategoryPromises.push(loadCategory(elem.id.split("-")[1], expand, recursive));
             });
@@ -217,7 +215,7 @@
             categoryElem.find("ul").first().show();
             categoryElem.addClass("open");
             categoryElem.removeClass("closed");
-            var childCategoryElems = categoryElem.children("ul").children("li.category");
+            const childCategoryElems = categoryElem.children("ul").children("li.category");
             if(childCategoryElems.length === 1 && !childCategoryElems.children("ul").is(":visible")) {
                 expandCategory(categoryElem.children("ul").children("li.category"));
             }
@@ -234,7 +232,7 @@
     }
 
     function selectCategory(categoryId) {
-        var categoryElem = $("li#category-"+categoryId);
+        let categoryElem = $("li#category-"+categoryId);
         categoryElem.toggleClass("selected");
         categoryElem.find("li").toggleClass("selected");
         loadCategory(categoryId, false, true).then(function(data) {
@@ -254,19 +252,18 @@
     }
 
     function updateSelected() {
-        var selected = $("#selected-animals");
+        let selected = $("#selected-animals");
         selected.empty();
         selectedSpecies = [];
-        selectedZoos = {};
-        var speciesDataPromises = [];
+        let speciesDataPromises = [];
         $("li.species.selected").each(function(idx, elem) {
-            var speciesId = elem.id.split("-")[1];
+            const speciesId = elem.id.split("-")[1];
             selectedSpecies.push(speciesId);
-            var speciesName = $(this).children(".species_name").text();
+            const speciesName = $(this).children(".species_name").text();
             selected.append("<li>"+speciesName+" ("+speciesId+")</li>");
 
             speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(speciesData) {
-                var selectedZoos = {};
+                let selectedZoos = {};
                 $.each(speciesData.zoos, function (zooIdx, zooElem) {
                     addMarkerToZoo(zooElem);
                     selectedZoos[zooElem.zoo_id] = zooElem;
@@ -275,9 +272,9 @@
             }));
         });
         Promise.all(speciesDataPromises).then(function(selectedZooList) {
-            var selectedZoos = Object.assign({}, ...selectedZooList);
+            const selectedZoos = Object.assign({}, ...selectedZooList);
             // Update zoos selected
-            var selectedZoosElem = $("#selected-zoos");
+            let selectedZoosElem = $("#selected-zoos");
             selectedZoosElem.empty();
             hideAllMarkers();
             $.each(selectedZoos, function(zooKey, zooVal) {
