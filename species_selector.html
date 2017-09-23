@@ -87,12 +87,9 @@
      */
     function getSpeciesFromCache(id) {
         if(speciesPromiseCache[id]) {
-            //console.log("got species from cache "+id);
             return speciesPromiseCache[id];
         } else {
-            console.log("Had to re-get species "+id);
             const promise = promiseGet("http://localhost:3000/species/"+id).then(function(data) {
-                console.log("Promise fulfilled for "+id);
                 return data[0];
             });
             speciesPromiseCache[id] = promise;
