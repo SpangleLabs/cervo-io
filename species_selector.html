@@ -39,7 +39,7 @@
     let selectedSpecies = [];
     let markers = [];
     function getCategoryLevel(id) {
-        $.each(categoryLevelCache, function(idx, val) {
+        return $.each(categoryLevelCache, function(idx, val) {
             if(val.category_level_id === id) {
                 return val;
             }
@@ -303,6 +303,6 @@
     }
 </script>
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"> //TODO add key
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1S3l2eAj33FwoHuzpkvqpKDBOnGgKD4s&callback=initMap"> //TODO add key
 </script>
 </html>
