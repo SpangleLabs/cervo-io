@@ -128,7 +128,7 @@
                     "<a href='"+zooData.link+"'>"+zooData.link+"</a><br />" +
                     "<span style='font-weight: bold'>Postcode:</span> " + zooData.postcode + "<br />" +
                     "<h2>Species:</h2>" +
-                    "<ul>";
+                    "<ul class='zoo_species'>";
             $.each(zooData.species, function(idx, zooSpecies) {
                 infoContent += "<li>"+zooSpecies.common_name+" <span class='latin_name'>"+zooSpecies.latin_name+"</span>";
             });
