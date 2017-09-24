@@ -18,6 +18,7 @@
             padding: 0;
         }
     </style>
+    <style id="zoo_species_selected"></style>
 </head>
 <body>
 <div style="width: 50%; height: 100%; float: left; position: fixed;">
@@ -130,7 +131,7 @@
                     "<h2>Species:</h2>" +
                     "<ul class='zoo_species'>";
             $.each(zooData.species, function(idx, zooSpecies) {
-                infoContent += "<li>"+zooSpecies.common_name+" <span class='latin_name'>"+zooSpecies.latin_name+"</span>";
+                infoContent += "<li class='zoo_species zoo_species_"+zooSpecies.species_id+"'>"+zooSpecies.common_name+" <span class='latin_name'>"+zooSpecies.latin_name+"</span>";
             });
             infoContent += "</ul>";
             return new google.maps.InfoWindow({
@@ -275,15 +276,19 @@
         $.each(zooMarkers, function(zooId, marker) {
             marker.setVisible(false);
         });
+        $("li.zoo_species").removeClass("selected_species");
     }
 
     function updateSelected() {
         let selected = $("#selected-animals");
         selected.empty();
         selectedSpecies = [];
+        let zooSpeciesSelected = $("#zoo_species_selected");
+        zooSpeciesSelected.empty();
         let speciesDataPromises = [];
         $("li.species.selected").each(function(idx, elem) {
             const speciesId = elem.id.split("-")[1];
+            zooSpeciesSelected.append("li.zoo_species_"+speciesId+" { font-weight:bold; }");
             selectedSpecies.push(speciesId);
             const speciesName = $(this).children(".species_name").text();
             selected.append("<li>"+speciesName+" ("+speciesId+")</li>");
