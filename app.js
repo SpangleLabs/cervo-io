@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 var zoos = require('./routes/zoos');
 var categories = require('./routes/categories');
 var category_levels = require('./routes/category_levels');
@@ -31,7 +30,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/users', users);
 app.use('/zoos', zoos);
 app.use('/categories', categories);
 app.use('/category_levels', category_levels);

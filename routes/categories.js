@@ -9,20 +9,14 @@ function add_subcategories_and_return(res, rows) {
     var species_promises = [];
     for (var a = 0; a < rows.length; a++) {
         var category_id = rows[a].category_id;
-        subcategory_promises.push(Categories.getCategoriesByParentId(category_id).catch(function(err) {
-            res.json(err);
-        }).then(function(sub_rows) {
+        subcategory_promises.push(Categories.getCategoriesByParentId(category_id).then(function(sub_rows) {
             return sub_rows;
         }));
-        species_promises.push(Species.getSpeciesByCategoryId(category_id).catch(function(err) {
-            res.json(err);
-        }).then(function(species) {
+        species_promises.push(Species.getSpeciesByCategoryId(category_id).then(function(species) {
             return species;
         }));
     }
-    Promise.all(subcategory_promises.concat(species_promises)).catch(function(err) {
-        res.json(err)
-    }).then(function(values) {
+    Promise.all(subcategory_promises.concat(species_promises)).then(function(values) {
         var row_results = [];
         for (var b = 0; b < rows.length; b++) {
             var row_result = {};
@@ -35,31 +29,33 @@ function add_subcategories_and_return(res, rows) {
             row_results.push(row_result);
         }
         res.json(row_results);
+    }).catch(function(err) {
+        res.status(500).json(err);
     });
 }
 
 /* GET categories listing. */
 router.get('/:id?', function(req, res, next) {
     if(req.params.id) {
-        Categories.getCategoryById(req.params.id).catch(function(err) {
-            res.json(err);
-        }).then(function(rows) {
+        Categories.getCategoryById(req.params.id).then(function(rows) {
             add_subcategories_and_return(res, rows);
+        }).catch(function(err) {
+            res.status(500).json(err);
         });
     } else {
-        Categories.getBaseCategories().catch(function(err) {
-            res.json(err);
-        }).then(function(rows) {
+        Categories.getBaseCategories().then(function(rows) {
             add_subcategories_and_return(res, rows);
+        }).catch(function(err) {
+            res.status(500).json(err);
         });
     }
 });
 
 router.post('/', function(req, res, next) {
-    Categories.addCategory(req.body).catch(function(err) {
-        res.json(err);
-    }).then(function(count) {
+    Categories.addCategory(req.body).then(function(count) {
         res.json(req.body);
+    }).catch(function(err) {
+        res.status(500).json(err);
     });
 });
 

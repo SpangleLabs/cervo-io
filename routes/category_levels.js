@@ -5,16 +5,16 @@ var router = express.Router();
 /* GET category levels listing. */
 router.get('/:id?', function(req, res, next) {
     if(req.params.id) {
-        CategoryLevels.getCategoryLevelById(req.params.id).catch(function(err) {
-            res.json(err);
-        }).then(function(rows) {
+        CategoryLevels.getCategoryLevelById(req.params.id).then(function(rows) {
             res.json(rows);
+        }).catch(function(err) {
+            res.status(500).json(err);
         });
     } else {
-        CategoryLevels.getAllCategoryLevels().catch(function(err) {
-            res.json(err);
-        }).then(function(rows) {
+        CategoryLevels.getAllCategoryLevels().then(function(rows) {
             res.json(rows);
+        }).catch(function(err) {
+            res.status(500).json(err);
         });
     }
 });

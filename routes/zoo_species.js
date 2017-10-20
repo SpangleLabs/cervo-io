@@ -7,7 +7,7 @@ router.post('/', function(req, res, next) {
     ZooSpecies.addZooSpecies(req.body).then(function(count) {
         res.json(req.body);
     }).catch(function(err) {
-        res.json(err);
+        res.status(500).json(err);
     });
 });
 
@@ -15,7 +15,7 @@ router.delete('/', function(req, res, next) {
     ZooSpecies.deleteZooSpecies(req.body).then(function(count) {
         res.json(req.body);
     }).catch(function(err) {
-        res.json(err);
+        res.status(500).json(err);
     });
 });
 

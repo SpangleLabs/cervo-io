@@ -7,9 +7,7 @@ var router = express.Router();
 /* GET zoos listing. */
 router.get('/:id?', function(req, res, next) {
     if(req.params.id) {
-        Zoos.getZooById(req.params.id).catch(function(err) {
-            res.json(err);
-        }).then(function(rows) {
+        Zoos.getZooById(req.params.id).then(function(rows) {
             var zooSpecies = [];
             for(var a = 0; a < rows.length; a++) {
                 zooSpecies.push(Species.getSpeciesByZooId(rows[a].zoo_id));
@@ -30,21 +28,23 @@ router.get('/:id?', function(req, res, next) {
                 res.json(data);
             });
 
+        }).catch(function(err) {
+            res.status(500).json(err);
         });
     } else {
-        Zoos.getAllZoos().catch(function(err) {
-            res.json(err);
-        }).then(function(rows) {
+        Zoos.getAllZoos().then(function(rows) {
             res.json(rows);
+        }).catch(function(err) {
+            res.status(500).json(err);
         });
     }
 });
 
 router.post('/', function(req, res, next) {
-    Zoos.addZoo(req.body).catch(function(err) {
-        res.json(err);
-    }).then(function(count) {
+    Zoos.addZoo(req.body).then(function(count) {
         res.json(req.body);
+    }).catch(function(err) {
+        res.status(500).json(err);
     });
 });
 
