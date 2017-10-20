@@ -24,8 +24,8 @@ var Zoos={
 
     addZoo:function(Zoo){
         return db.then(function(conn) {
-            return conn.query("insert into zoos (`name`,`postcode`,`link`) " +
-                "values (?,?,?)",[Zoo.name,Zoo.postcode,Zoo.link]);
+            return conn.query("insert into zoos (`name`,`postcode`,`latitude`,`longitude`,`link`) " +
+                "values (?,?,?,?,?)",[Zoo.name,Zoo.postcode,Zoo.latitude,Zoo.longitude,Zoo.link]);
         });
     },
 
