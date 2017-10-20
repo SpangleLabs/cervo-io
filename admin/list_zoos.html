@@ -12,7 +12,7 @@
 <form onsubmit='addNewZoo()'>
     <table>
         <thead>
-            <tr><th>Name</th><th>Postcode</th><th>Link</th></tr>
+            <tr><th>Name</th><th>Postcode</th><th>Lat.</th><th>Long.</th><th>Link</th></tr>
         </thead>
         <tbody></tbody>
     </table>
@@ -25,6 +25,8 @@
             for(var a = 0; a < data.length; a++) {
                 tableElem.append("<tr><td><a href='view_zoo.html?id="+data[a].zoo_id+"'>"+data[a].name+"</a></td>" +
                     "<td>"+data[a].postcode+"</td>" +
+                    "<td>"+data[a].latitude+"</td>" +
+                    "<td>"+data[a].longitude+"</td>" +
                     "<td><a href='"+data[a].link+"'>"+data[a].link+"</a></td></tr>");
             }
         });
@@ -34,11 +36,15 @@
         var formElement = $("form");
         var inputName = formElement.find("input.input-name").val();
         var inputPostcode = formElement.find("input.input-postcode").val();
+        var inputLatitude = formElement.find("input.input-lat").val();
+        var inputLongitude = formElement.find("input.input-long").val();
         var inputLink = formElement.find("input.input-link").val();
         var inputObj = {};
         inputObj.name = inputName;
         inputObj.postcode = inputPostcode;
         inputObj.link = inputLink;
+        inputObj.latitude = inputLatitude;
+        inputObj.longitude = inputLongitude;
         console.log(inputObj);
         $.post("http://localhost:3000/zoos/", inputObj);
         formElement.first().reset();
@@ -51,6 +57,8 @@
             "<tr>" +
             "<td><input type='text' class='input-name' name='name' /></td>" +
             "<td><input type='text' class='input-postcode' name='postcode' /></td>" +
+            "<td><input type='text' class='input-lat' name='latitude' /></td>" +
+            "<td><input type='text' class='input-long' name='longitude' /></td>" +
             "<td><input type='text' class='input-link' name='link' />" +
             "<input type='submit' /></td>" +
             "</tr></tfoot>");

@@ -75,3 +75,6 @@ ul.zoo_species {
 ul.zoo_species > li {
     list-style-type: disc;
 }
+input.input-lat, input.input-long {
+    width: 5em;
+}
