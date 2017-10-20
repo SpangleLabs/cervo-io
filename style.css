@@ -78,3 +78,7 @@ ul.zoo_species > li {
 input.input-lat, input.input-long {
     width: 5em;
 }
+#invalid-postcode {
+    color: red;
+    font-weight: bold;
+}

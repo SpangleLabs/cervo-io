@@ -28,7 +28,10 @@
     <a href="index.html">Back to user index</a><br />
     <h1>Just a test species selector</h1>
     Animal list:<ul id='animals' class='odd'></ul>
+    Your postcode: <input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+    <h2>Selected species</h2>
     <ul id="selected-animals"></ul>
+    <h2>Zoos with selected species</h2>
     <ul id="selected-zoos"></ul>
 </div>
 </body>
@@ -37,7 +40,9 @@
     let map = null;
     let categoryLevelCache = [];
     let speciesPromiseCache = [];
-    let selectedSpecies = [];
+    let zooDistanceCache = {};
+    let currentSelectedSpeciesIds = [];
+    let currentSelectedZooIds = [];
     let zooMarkers = {};
     let zooInfoWindows = {};
     function getCategoryLevel(id) {
@@ -48,6 +53,14 @@
             }
         });
         return result;
+    }
+    function cacheAddZooDistances(postcode,zooDistanceData) {
+        if (!zooDistanceCache[postcode]) {
+            zooDistanceCache[postcode] = {};
+        }
+        $.each(zooDistanceData, function(idx, val) {
+            zooDistanceCache[postcode][val.zoo_id] = val.metres;
+        });
     }
 
     /**
@@ -153,11 +166,11 @@
         const categoryLevelName = getCategoryLevel(categoryLevelId).name;
         parentUlElement.append(
             "<li class='category closed' id='"+categoryLiId+"'>" +
-                "<span onclick='loadCategory("+categoryId+", true, false)'>" +
+                "<span onclick='userLoadCategory("+categoryId+")'>" +
                     "<span class='category_name'>" + name + "</span> " +
                     "<span class='category_level'>"+categoryLevelName+"</span>" +
                 "</span> " +
-                "<span class='selector' onclick='selectCategory("+categoryId+")'></span>" +
+                "<span class='selector' onclick='userSelectCategory("+categoryId+")'></span>" +
             "</li>");
         if(parentUlElement.parent().hasClass("selected")) {
             $("#"+categoryLiId).addClass("selected");
@@ -180,12 +193,16 @@
             "<li class='species' id='"+speciesLiId+"'>" +
                 "<span class='species_name'>"+name+" </span>" +
                 "<span class='latin_name'>"+latinName+"</span>" +
-                "<span class='selector' onclick='selectSpecies("+speciesId+")'></span>" +
+                "<span class='selector' onclick='userSelectSpecies("+speciesId+")'></span>" +
             "</li>");
         if(parentUlElement.parent().hasClass("selected")) {
             $("#"+speciesLiId).addClass("selected");
             updateSelected();
         }
+    }
+
+    function userLoadCategory(id) {
+        loadCategory(id, true, false);
     }
 
     function loadCategory(id, expand, recursive) {
@@ -255,7 +272,7 @@
         return !categoryElem.has("ul").length;
     }
 
-    function selectCategory(categoryId) {
+    function userSelectCategory(categoryId) {
         let categoryElem = $("li#category-"+categoryId);
         categoryElem.toggleClass("selected");
         categoryElem.find("li").toggleClass("selected");
@@ -264,9 +281,38 @@
         });
     }
 
-    function selectSpecies(speciesId) {
+    function userSelectSpecies(speciesId) {
         $("li#species-"+speciesId).toggleClass("selected");
         updateSelected();
+    }
+
+    function userUpdatePostcode() {
+        let postcode = $("input#postcode").val();
+        if (postcode.length >= 2) {
+            updateZooDistances();
+        }
+    }
+
+    function updateZooDistances() {
+        //get postcode
+        let postcode = $("input#postcode").val();
+        //get list of selected zoos
+        //// currentSelectedZooIds;
+        // TODO: check cache, only get non-cached stuff
+        //create url to request
+        let url = "http://localhost:3000/zoo_distances/"+postcode+"/"+currentSelectedZooIds.join(",");
+        //get response
+        promiseGet(url).then(function(distances) {
+            $("#invalid-postcode").hide();
+            cacheAddZooDistances(postcode, distances);
+            $.each(distances, function(idx, val) {
+                $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
+            });
+        }).catch(function(err) {
+            $("#invalid-postcode").show();
+        });
+        //if response is 500, "invalid postcode"
+        //else update distances
     }
 
     function hideAllMarkers() {
@@ -282,16 +328,17 @@
     function updateSelected() {
         let selected = $("#selected-animals");
         selected.empty();
-        selectedSpecies = [];
+        currentSelectedSpeciesIds = [];
+        currentSelectedZooIds = [];
         let zooSpeciesSelected = $("#zoo_species_selected");
         zooSpeciesSelected.empty();
         let speciesDataPromises = [];
         $("li.species.selected").each(function(idx, elem) {
             const speciesId = elem.id.split("-")[1];
             zooSpeciesSelected.append("li.zoo_species_"+speciesId+" { font-weight:bold; }");
-            selectedSpecies.push(speciesId);
+            currentSelectedSpeciesIds.push(speciesId);
             const speciesName = $(this).children(".species_name").text();
-            selected.append("<li>"+speciesName+" ("+speciesId+")</li>");
+            selected.append("<li id='selected-species-"+speciesId+"'>"+speciesName+" ("+speciesId+")</li>");
 
             speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
                 let selectedZoos = {};
@@ -308,10 +355,12 @@
             selectedZoosElem.empty();
             hideAllMarkers();
             $.each(selectedZoos, function(zooKey, zooData) {
-                selectedZoosElem.append("<li>"+zooData.name+"</li>");
+                currentSelectedZooIds.push(zooData.zoo_id);
+                selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"'>"+zooData.name+" <span class='distance'></span></li>");
                 const marker = getZooMarker(zooData);
                 marker.setVisible(true);
             });
+            updateZooDistances();
         });
     }
 
