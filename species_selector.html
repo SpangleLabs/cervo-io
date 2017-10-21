@@ -124,31 +124,33 @@
                 map: map,
                 title: zooData.name
             });
-            getZooInfoWindow(zooId).then(function(infoWindow) {
-                zooMarkers[zooId].addListener("click", function () {
-                    infoWindow.open(map, zooMarkers[zooId]);
-                });
+            zooMarkers[zooId].addListener("click", function () {
+                getZooInfoWindow(zooId).open(map, zooMarkers[zooId]);
             });
         }
         return zooMarkers[zooId];
     }
 
     function getZooInfoWindow(zooId) {
-        return promiseGet("http://localhost:3000/zoos/"+zooId).then(function(zoosData) {
-            const zooData = zoosData[0];
-            let infoContent = "<h1>"+zooData.name+"</h1>" +
-                    "<a href='"+zooData.link+"'>"+zooData.link+"</a><br />" +
+        if (!zooInfoWindows[zooId]) {
+            zooInfoWindows[zooId] = new google.maps.InfoWindow({
+                content: ""
+            });
+            promiseGet("http://localhost:3000/zoos/"+zooId).then(function(zoosData) {
+                const zooData = zoosData[0];
+                let infoContent = "<h1>" + zooData.name + "</h1>" +
+                    "<a href='" + zooData.link + "'>" + zooData.link + "</a><br />" +
                     "<span style='font-weight: bold'>Postcode:</span> " + zooData.postcode + "<br />" +
                     "<h2>Species:</h2>" +
                     "<ul class='zoo_species'>";
-            $.each(zooData.species, function(idx, zooSpecies) {
-                infoContent += "<li class='zoo_species zoo_species_"+zooSpecies.species_id+"'>"+zooSpecies.common_name+" <span class='latin_name'>"+zooSpecies.latin_name+"</span>";
+                $.each(zooData.species, function (idx, zooSpecies) {
+                    infoContent += "<li class='zoo_species zoo_species_" + zooSpecies.species_id + "'>" + zooSpecies.common_name + " <span class='latin_name'>" + zooSpecies.latin_name + "</span>";
+                });
+                infoContent += "</ul>";
+                zooInfoWindows[zooId].setContent(infoContent);
             });
-            infoContent += "</ul>";
-            return new google.maps.InfoWindow({
-                content: infoContent
-            });
-        });
+        }
+        return zooInfoWindows[zooId];
     }
 
     /**
