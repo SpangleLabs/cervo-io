@@ -291,6 +291,15 @@
         }
     }
 
+    function userToggleInfoWindow(zooId) {
+        $.each(zooInfoWindows, function(zooInfoWindowId, infoWindow) {
+            if (zooInfoWindowId !== zooId) {
+                infoWindow.close();
+            }
+        });
+        getZooInfoWindow(zooId).open(map, zooMarkers[zooId]);
+    }
+
     function updateZooDistances() {
         //get postcode
         let postcode = $("input#postcode").val();
@@ -359,7 +368,7 @@
             currentSelectedZooIds = Object.keys(selectedZoos);
             hideAllMarkers();
             $.each(selectedZoos, function(zooKey, zooData) {
-                selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"'>"+zooData.name+" <span class='distance'></span></li>");
+                selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"' onclick='userToggleInfoWindow("+zooData.zoo_id+")'>"+zooData.name+" <span class='distance'></span></li>");
                 const marker = getZooMarker(zooData);
                 marker.setVisible(true);
             });
