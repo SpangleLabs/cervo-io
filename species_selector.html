@@ -29,8 +29,6 @@
     <h1>Just a test species selector</h1>
     Animal list:<ul id='animals' class='odd'></ul>
     Your postcode: <input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
-    <h2>Selected species</h2>
-    <ul id="selected-animals"></ul>
     <h2>Zoos with selected species</h2>
     <ul id="selected-zoos"></ul>
 </div>
@@ -296,7 +294,15 @@
     function updateZooDistances() {
         //get postcode
         let postcode = $("input#postcode").val();
-        //get list of selected zoos
+        // Basic postcode sanity check
+        if (postcode.length <= 3) {
+            $("#invalid-postcode").show();
+            return;
+        }
+        // check selected zoo list isn't empty
+        if (currentSelectedZooIds.length === 0) {
+            return;
+        }
         //// currentSelectedZooIds;
         // TODO: check cache, only get non-cached stuff
         //create url to request
@@ -309,10 +315,9 @@
                 $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
             });
         }).catch(function(err) {
+            //if response is 500, "invalid postcode"
             $("#invalid-postcode").show();
         });
-        //if response is 500, "invalid postcode"
-        //else update distances
     }
 
     function hideAllMarkers() {
@@ -326,8 +331,6 @@
     }
 
     function updateSelected() {
-        let selected = $("#selected-animals");
-        selected.empty();
         currentSelectedSpeciesIds = [];
         currentSelectedZooIds = [];
         let zooSpeciesSelected = $("#zoo_species_selected");
@@ -337,8 +340,6 @@
             const speciesId = elem.id.split("-")[1];
             zooSpeciesSelected.append("li.zoo_species_"+speciesId+" { font-weight:bold; }");
             currentSelectedSpeciesIds.push(speciesId);
-            const speciesName = $(this).children(".species_name").text();
-            selected.append("<li id='selected-species-"+speciesId+"'>"+speciesName+" ("+speciesId+")</li>");
 
             speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
                 let selectedZoos = {};
