@@ -338,6 +338,7 @@
             });
         }
         if (zoosNeedingDistance.length === 0) {
+            $("#invalid-postcode").hide();
             return new Promise(function(resolve, reject) {
                 resolve(foundDistances);
             })
