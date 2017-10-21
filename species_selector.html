@@ -36,16 +36,16 @@
 
 <script>
     let map = null;
-    let categoryLevelCache = [];
-    let speciesPromiseCache = [];
-    let zooDistanceCache = {};
+    let cacheCategoryLevel = [];
+    let cacheSpeciesPromises = [];
+    let cacheZooDistances = {};
+    let cacheZooMarkers = {};
+    let cacheZooInfoWindows = {};
     let currentSelectedSpeciesIds = [];
     let currentSelectedZooIds = [];
-    let zooMarkers = {};
-    let zooInfoWindows = {};
     function getCategoryLevel(id) {
         let result = null;
-        $.each(categoryLevelCache, function(idx, val) {
+        $.each(cacheCategoryLevel, function(idx, val) {
             if(val.category_level_id === id) {
                 result = val;
             }
@@ -53,11 +53,11 @@
         return result;
     }
     function cacheAddZooDistances(postcode,zooDistanceData) {
-        if (!zooDistanceCache[postcode]) {
-            zooDistanceCache[postcode] = {};
+        if (!cacheZooDistances[postcode]) {
+            cacheZooDistances[postcode] = {};
         }
         $.each(zooDistanceData, function(idx, val) {
-            zooDistanceCache[postcode][val.zoo_id] = val.metres;
+            cacheZooDistances[postcode][val.zoo_id] = val.metres;
         });
     }
 
@@ -101,13 +101,13 @@
      * @param id species id to retrieve
      */
     function getSpeciesFromCache(id) {
-        if(speciesPromiseCache[id]) {
-            return speciesPromiseCache[id];
+        if(cacheSpeciesPromises[id]) {
+            return cacheSpeciesPromises[id];
         } else {
             const promise = promiseGet("http://localhost:3000/species/"+id).then(function(data) {
                 return data[0];
             });
-            speciesPromiseCache[id] = promise;
+            cacheSpeciesPromises[id] = promise;
             return promise;
         }
     }
@@ -118,22 +118,22 @@
      */
     function getZooMarker(zooData) {
         const zooId = zooData.zoo_id;
-        if (!zooMarkers[zooId]) {
-            zooMarkers[zooId] = new google.maps.Marker({
+        if (!cacheZooMarkers[zooId]) {
+            cacheZooMarkers[zooId] = new google.maps.Marker({
                 position: {lat: zooData.latitude, lng: zooData.longitude},
                 map: map,
                 title: zooData.name
             });
-            zooMarkers[zooId].addListener("click", function () {
-                getZooInfoWindow(zooId).open(map, zooMarkers[zooId]);
+            cacheZooMarkers[zooId].addListener("click", function () {
+                getZooInfoWindow(zooId).open(map, cacheZooMarkers[zooId]);
             });
         }
-        return zooMarkers[zooId];
+        return cacheZooMarkers[zooId];
     }
 
     function getZooInfoWindow(zooId) {
-        if (!zooInfoWindows[zooId]) {
-            zooInfoWindows[zooId] = new google.maps.InfoWindow({
+        if (!cacheZooInfoWindows[zooId]) {
+            cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
                 content: ""
             });
             promiseGet("http://localhost:3000/zoos/"+zooId).then(function(zoosData) {
@@ -147,10 +147,10 @@
                     infoContent += "<li class='zoo_species zoo_species_" + zooSpecies.species_id + "'>" + zooSpecies.common_name + " <span class='latin_name'>" + zooSpecies.latin_name + "</span>";
                 });
                 infoContent += "</ul>";
-                zooInfoWindows[zooId].setContent(infoContent);
+                cacheZooInfoWindows[zooId].setContent(infoContent);
             });
         }
-        return zooInfoWindows[zooId];
+        return cacheZooInfoWindows[zooId];
     }
 
     /**
@@ -292,12 +292,12 @@
     }
 
     function userToggleInfoWindow(zooId) {
-        $.each(zooInfoWindows, function(zooInfoWindowId, infoWindow) {
+        $.each(cacheZooInfoWindows, function(zooInfoWindowId, infoWindow) {
             if (zooInfoWindowId !== zooId) {
                 infoWindow.close();
             }
         });
-        getZooInfoWindow(zooId).open(map, zooMarkers[zooId]);
+        getZooInfoWindow(zooId).open(map, cacheZooMarkers[zooId]);
     }
 
     function updateZooDistances() {
@@ -323,19 +323,28 @@
             $.each(distances, function(idx, val) {
                 $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
             });
+            domReorderZoos(distances);
         }).catch(function(err) {
             //if response is 500, "invalid postcode"
             $("#invalid-postcode").show();
         });
     }
 
+    function domReorderZoos(distances) {
+        const distancesSorted = distances.sort(function(a, b) { return b.metres - a.metres});
+        $.each(distancesSorted, function(idx, distance) {
+            const zooLi = $("li#selected-zoo-"+distance.zoo_id);
+            zooLi.parent().prepend(zooLi);
+        });
+    }
+
     function hideAllMarkers() {
-        $.each(zooInfoWindows, function(zooId, infoWindow) {
+        $.each(cacheZooInfoWindows, function(zooId, infoWindow) {
             if (!currentSelectedZooIds.includes(zooId)) {
                 infoWindow.close();
             }
         });
-        $.each(zooMarkers, function(zooId, marker) {
+        $.each(cacheZooMarkers, function(zooId, marker) {
             marker.setVisible(false);
         });
         $("li.zoo_species").removeClass("selected_species");
@@ -378,7 +387,7 @@
 
     $(document).ready(function() {
         promiseGet("http://localhost:3000/category_levels/").then(function(data) {
-            categoryLevelCache = data;
+            cacheCategoryLevel = data;
             return promiseGet("http://localhost:3000/categories/");
         }).then(function(data) {
             $.each(data, function(index, itemData) {
