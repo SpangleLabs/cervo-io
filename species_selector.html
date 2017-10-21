@@ -28,7 +28,7 @@
     <a href="index.html">Back to user index</a><br />
     <h1>Just a test species selector</h1>
     Animal list:<ul id='animals' class='odd'></ul>
-    Your postcode: <input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+    <label for="postcode">Your postcode:</label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
     <h2>Zoos with selected species</h2>
     <ul id="selected-zoos"></ul>
 </div>
@@ -349,8 +349,7 @@
         return promiseGet(url).then(function(newDistances) {
             $("#invalid-postcode").hide();
             cacheAddZooDistances(postcode, newDistances);
-            const totalDistances = foundDistances.concat(newDistances);
-            return totalDistances;
+            return foundDistances.concat(newDistances);
         }).catch(function(err) {
             //if response is 500, "invalid postcode"
             $("#invalid-postcode").show();
