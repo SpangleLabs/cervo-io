@@ -174,7 +174,6 @@
             "</li>");
         if(parentUlElement.parent().hasClass("selected")) {
             $("#"+categoryLiId).addClass("selected");
-            updateSelected();
         }
     }
 
@@ -197,7 +196,6 @@
             "</li>");
         if(parentUlElement.parent().hasClass("selected")) {
             $("#"+speciesLiId).addClass("selected");
-            updateSelected();
         }
     }
 
@@ -324,7 +322,9 @@
 
     function hideAllMarkers() {
         $.each(zooInfoWindows, function(zooId, infoWindow) {
-            infoWindow.close();
+            if (!currentSelectedZooIds.includes(zooId)) {
+                infoWindow.close();
+            }
         });
         $.each(zooMarkers, function(zooId, marker) {
             marker.setVisible(false);
@@ -356,9 +356,9 @@
             // Update zoos selected
             let selectedZoosElem = $("#selected-zoos");
             selectedZoosElem.empty();
+            currentSelectedZooIds = Object.keys(selectedZoos);
             hideAllMarkers();
             $.each(selectedZoos, function(zooKey, zooData) {
-                currentSelectedZooIds.push(zooData.zoo_id);
                 selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"'>"+zooData.name+" <span class='distance'></span></li>");
                 const marker = getZooMarker(zooData);
                 marker.setVisible(true);
