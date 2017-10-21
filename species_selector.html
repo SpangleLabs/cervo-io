@@ -313,11 +313,20 @@
             return;
         }
         //// currentSelectedZooIds;
-        let zoosNeedingDistance = currentSelectedZooIds;
+        promiseGetZooDistances(postcode, currentSelectedZooIds).then(function(zooDistances) {
+            $.each(zooDistances, function(idx, val) {
+                $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
+            });
+            domReorderZoos(zooDistances);
+        })
+    }
+
+    function promiseGetZooDistances(postcode, zooIds) {
+        let zoosNeedingDistance = zooIds;
         let foundDistances = [];
         if (cacheZooDistances[postcode]) {
             zoosNeedingDistance = [];
-            $.each(currentSelectedZooIds, function(idx, zooId) {
+            $.each(zooIds, function(idx, zooId) {
                 if (cacheZooDistances[postcode][zooId]) {
                     foundDistances.push({
                         zoo_id: zooId,
@@ -328,17 +337,19 @@
                 }
             });
         }
+        if (zoosNeedingDistance.length === 0) {
+            return new Promise(function(resolve, reject) {
+                resolve(foundDistances);
+            })
+        }
         //create url to request
         let url = "http://localhost:3000/zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
         //get response
-        promiseGet(url).then(function(newDistances) {
+        return promiseGet(url).then(function(newDistances) {
             $("#invalid-postcode").hide();
             cacheAddZooDistances(postcode, newDistances);
             const totalDistances = foundDistances.concat(newDistances);
-            $.each(totalDistances, function(idx, val) {
-                $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
-            });
-            domReorderZoos(totalDistances);
+            return totalDistances;
         }).catch(function(err) {
             //if response is 500, "invalid postcode"
             $("#invalid-postcode").show();
