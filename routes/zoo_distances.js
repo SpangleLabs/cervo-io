@@ -90,7 +90,7 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
     var postcode = new Postcode(req.params.postcode);
     // Validate postcode
     if(!postcode.valid()) {
-        res.status(500).send("Invalid postcode");
+        res.status(404).send("Invalid postcode");
         return;
     }
     // Get postcode sector
