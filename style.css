@@ -82,3 +82,8 @@ input.input-lat, input.input-long {
     color: red;
     font-weight: bold;
 }
+#failed-login {
+    color: red;
+    font-weight: bold;
+    display: none;
+}
