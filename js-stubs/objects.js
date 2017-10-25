@@ -19,3 +19,8 @@ ZooObj.prototype.zoo_id = 1;
 ZooObj.prototype.name = "name";
 ZooObj.prototype.postcode = "postcode";
 ZooObj.prototype.link = "link";
+
+function SessionObj(){}
+SessionObj.prototype.auth_token = ""; //Random string
+SessionObj.prototype.expiry_date = ""; //ISO8601 date
+SessionObj.prototype.ip_addr = ""; //User IP address
