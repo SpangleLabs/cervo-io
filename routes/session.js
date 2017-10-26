@@ -1,5 +1,8 @@
 var express = require('express');
+var Session = require("../models/Session");
 var router = express.Router();
+var bcrypt = require("bcrypt");
+var Promise = require("promise");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -13,21 +16,34 @@ router.post('/', function(req, res, next) {
         "expiry_date": "2017-10-25T21:16:57",
         "ip_addr": "127.0.0.1"
     });
-    //TODO login
     // Get password from post data
-    // Hash password
+    const password = res.body.password;
     // Get hashed password from database, provided it's not locked
-    // Ensure hashes match
-    /// ***
-    // Generate auth token
-    // Store auth token in database
-    // Store auth token IP in database
-    // Store auth token expiry in database (1 day?)
-    // Set failed logins to 0
-
-    // ***If fail:
-    // Increment failed attempts
-    // If failed attempts is 3, set unlock time in a couple hours
+    Session.getValidPasswordHash().then(function(storeResult) {
+        if (storeResult.length !== 1 || !storeResult[0]["value"]) {
+            return Promise.reject();
+        }
+        // Check password against stored hash
+        return bcrypt.compare(password, storeResult);
+    }).then(function(compareResult) {
+        if (!compareResult) {
+            return Promise.reject();
+        } else {
+            return Promise.resolve(compareResult);
+        }
+    }).catch(function(err) {
+        //TODO fail stuff
+        // Increment failed attempts
+        // If failed attempts is 3, set unlock time in a couple hours
+        return Promise.reject();
+    }).then(function(compareResult) {
+        //TODO successful login stuff
+        // Generate auth token
+        // Store auth token in database
+        // Store auth token IP in database
+        // Store auth token expiry in database (1 day?)
+        // Set failed logins to 0
+    });
 });
 
 router.delete('/', function(req, res, next) {
