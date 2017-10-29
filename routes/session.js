@@ -3,6 +3,7 @@ var Session = require("../models/Session");
 var router = express.Router();
 var bcrypt = require("bcrypt");
 var Promise = require("promise");
+var uuidv4 = require("uuid/v4");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -36,15 +37,29 @@ router.post('/', function(req, res, next) {
         //TODO fail stuff
         // Increment failed attempts, and if failed attempts is 3, set unlock time in an hour.
         return Session.setFailedLogin(username).then(function(response) {
+            res.status(403);
             return Promise.reject();
         });
     }).then(function(compareResult) {
-        //TODO successful login stuff
-        // Generate auth token
-        // Store auth token in database
-        // Store auth token IP in database
-        // Store auth token expiry in database (1 day?)
         // Set failed logins to 0
+        return Session.resetFailedLogins(username);
+    }).then(function(result) {
+        // Generate auth token
+        const authToken = uuidv4();
+        // Get IP address
+        const ipAddr = req.headers["x-forwarded-for"] || req.connection._remoteAddress;
+        // Create expiry time
+        const expiryTime = new Date().getTime() + 86400;
+        // Store auth token, IP, etc in database
+        return Session.createSession(username, authToken, expiryTime, ipAddr).then(function(sessionResult) {
+            const sessionResponse = {
+                "auth_token": authToken,
+                "expiry_date": expiryTime,
+                "ip_addr": ipAddr,
+                "username": username
+            };
+            res.json(sessionResponse);
+        });
     });
 });
 
