@@ -17,9 +17,10 @@ router.post('/', function(req, res, next) {
         "ip_addr": "127.0.0.1"
     });
     // Get password from post data
+    const username = res.body.username;
     const password = res.body.password;
     // Get hashed password from database, provided it's not locked
-    Session.getValidPasswordHash().then(function(storeResult) {
+    Session.getValidPasswordHash(username).then(function(storeResult) {
         if (storeResult.length !== 1 || !storeResult[0]["value"]) {
             return Promise.reject();
         }

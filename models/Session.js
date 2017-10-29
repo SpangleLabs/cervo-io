@@ -2,12 +2,10 @@ var db=require('../dbconnection');
 
 var Species={
 
-    getValidPasswordHash:function(){
+    getValidPasswordHash:function(username){
         return db.then(function(conn) {
             const timestamp = new Date().getTime();
-            return conn.query("IF((select value from config where key = ADMIN_UNLOCK_TIME)< ?," +
-                "select value from config where key = ADMIN_PASSWORD," +
-                "NULL)",[timestamp]);
+            return conn.query("select password from users where username = ? and unlock_time > ?",[username, timestamp]);
         });
     }
 
