@@ -34,9 +34,10 @@ router.post('/', function(req, res, next) {
         }
     }).catch(function(err) {
         //TODO fail stuff
-        // Increment failed attempts
-        // If failed attempts is 3, set unlock time in a couple hours
-        return Promise.reject();
+        // Increment failed attempts, and if failed attempts is 3, set unlock time in an hour.
+        return Session.setFailedLogin(username).then(function(response) {
+            return Promise.reject();
+        });
     }).then(function(compareResult) {
         //TODO successful login stuff
         // Generate auth token
