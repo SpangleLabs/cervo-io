@@ -55,7 +55,10 @@
                 reject(Error("Network Error"));
             };
             // Make the request
-            const passObj = {"password": password};
+            const passObj = {
+                "username": "admin",
+                "password": password
+            };
             req.send(JSON.stringify(passObj));
         }).then(function(/*SessionObj*/resp) {
             // Get auth token

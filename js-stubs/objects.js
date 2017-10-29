@@ -24,3 +24,4 @@ function SessionObj(){}
 SessionObj.prototype.auth_token = ""; //Random string
 SessionObj.prototype.expiry_date = ""; //ISO8601 date
 SessionObj.prototype.ip_addr = ""; //User IP address
+SessionObj.prototype.username = ""; //Username
