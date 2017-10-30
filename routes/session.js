@@ -12,46 +12,35 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    res.json({
-        "auth_token": "ba3cb855-91f0-4025-9e13-2a35c7c6fc36",
-        "expiry_date": "2017-10-25T21:16:57",
-        "ip_addr": "127.0.0.1"
-    });
     // Get password from post data
-    const username = res.body.username;
-    const password = res.body.password;
+    const username = req.body.username;
+    const password = req.body.password;
     // Get hashed password from database, provided it's not locked
     Session.getValidPasswordHash(username).then(function(storeResult) {
-        if (storeResult.length !== 1 || !storeResult[0]["value"]) {
-            return Promise.reject();
+        if (storeResult.length !== 1 || !storeResult[0]["password"]) {
+            return Promise.reject("User not in database or locked out.");
         }
         // Check password against stored hash
-        return bcrypt.compare(password, storeResult);
+        return bcrypt.compare(password, storeResult[0]["password"]);
     }).then(function(compareResult) {
         if (!compareResult) {
-            return Promise.reject();
+            return Session.setFailedLogin(username).then(function(response) {
+                return Promise.reject("Password incorrect");
+            });
         } else {
-            return Promise.resolve(compareResult);
+            return Session.resetFailedLogins(username);
         }
-    }).catch(function(err) {
-        //TODO fail stuff
-        // Increment failed attempts, and if failed attempts is 3, set unlock time in an hour.
-        return Session.setFailedLogin(username).then(function(response) {
-            res.status(403);
-            return Promise.reject();
-        });
-    }).then(function(compareResult) {
-        // Set failed logins to 0
-        return Session.resetFailedLogins(username);
     }).then(function(result) {
         // Generate auth token
         const authToken = uuidv4();
         // Get IP address
-        const ipAddr = req.headers["x-forwarded-for"] || req.connection._remoteAddress;
+        const ipAddr = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
         // Create expiry time
-        const expiryTime = new Date().getTime() + 86400;
+        var expiryTime = new Date();
+        expiryTime.setDate(expiryTime.getDate());
+        var expiryTimeStr = expiryTime.toISOString().replace("Z","").replace("T"," ");
         // Store auth token, IP, etc in database
-        return Session.createSession(username, authToken, expiryTime, ipAddr).then(function(sessionResult) {
+        return Session.createSession(username, authToken, expiryTimeStr, ipAddr).then(function(sessionResult) {
             const sessionResponse = {
                 "auth_token": authToken,
                 "expiry_date": expiryTime,
@@ -60,6 +49,9 @@ router.post('/', function(req, res, next) {
             };
             res.json(sessionResponse);
         });
+    }).catch(function(err) {
+        console.log(err);
+        res.status(403).json({"status":"failed to log in", "error": err});
     });
 });
 

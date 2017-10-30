@@ -4,8 +4,8 @@ var Species={
 
     getValidPasswordHash:function(username){
         return db.then(function(conn) {
-            const timestamp = new Date().getTime();
-            return conn.query("select password from users where username = ? and unlock_time > ?",[username, timestamp]);
+            const timestamp = new Date().toISOString().replace("Z","").replace("T"," ");
+            return conn.query("select password from users where username = ? and unlock_time < ?",[username, timestamp]);
         });
     },
 
@@ -23,15 +23,17 @@ var Species={
 
     resetFailedLogins:function(username) {
         return db.then(function(conn) {
-            return conn.query("set failed_logins = 0 in users where username = ?", [username]);
+            return conn.query("update users set failed_logins = 0 where username = ?", [username]);
         });
     },
 
     createSession:function(username, authToken, expiryTime, ipAddr) {
         return db.then(function(conn) {
             return conn.query("insert into user_sessions (user_id, token, expiry_time, ip_addr) " +
-                "values ((select user_id from users where username = ?), ?, ?, ?)",
-                [username, authToken, expiryTime, ipAddr]);
+                "select users.user_id, ?, ?, ? " +
+                "from users " +
+                "where users.username = ?",
+                [authToken, expiryTime, ipAddr, username]);
         });
     }
 
