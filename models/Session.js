@@ -35,6 +35,14 @@ var Species={
                 "where users.username = ?",
                 [authToken, expiryTime, ipAddr, username]);
         });
+    },
+
+    getSessionToken:function(authToken, ipAddr) {
+        return db.then(function(conn) {
+            const currentTime = new Date().toISOString().replace("Z","").replace("T"," ");
+            return conn.query("SELECT user_id FROM user_sessions WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
+                [authToken, ipAddr, currentTime]);
+        })
     }
 
 };

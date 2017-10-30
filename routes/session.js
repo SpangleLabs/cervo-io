@@ -61,8 +61,22 @@ router.delete('/', function(req, res, next) {
 
 });
 
-//TODO: handy check login function?
-// Check auth header is provided
-// Check expiry isn't in the past
-// Check auth header token matches database token
+//Handy check login function?
+function checkLogin(req) {
+    const authToken = req.headers['Authorization'];
+    const ipAddr = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    // Check auth header is provided
+    if(!authToken) {
+        return Promise.reject(new Error("No auth token provided."));
+    }
+    // Check expiry isn't in the past
+    // Check auth header token matches database token
+    return Session.getSessionToken(authToken, ipAddr).then(function(result) {
+        if (storeResult.length !== 1 || !storeResult[0]["user_id"]) {
+            Promise.reject(new Error("User is not logged in."));
+        } else {
+            Promise.resolve(storeResult[0]["user_id"]);
+        }
+    });
+}
 module.exports = router;
