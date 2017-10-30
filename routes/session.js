@@ -56,9 +56,14 @@ router.post('/', function(req, res, next) {
 });
 
 router.delete('/', function(req, res, next) {
-    //TODO logout
     // Blank token, password in database
-
+    checkLogin(req).then(function(userId) {
+        return Session.deleteToken(userId)
+    }).then(function(data) {
+        res.status(204);
+    }).catch(function(err) {
+        res.status(403).json({"status":"failed to log in", "error": err});
+    })
 });
 
 //Handy check login function?

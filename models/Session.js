@@ -43,6 +43,12 @@ var Species={
             return conn.query("SELECT user_id FROM user_sessions WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
                 [authToken, ipAddr, currentTime]);
         })
+    },
+
+    deleteToken:function(userId) {
+        return db.then(function(conn) {
+            return conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId]);
+        })
     }
 
 };
