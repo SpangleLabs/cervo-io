@@ -11,12 +11,13 @@ var Species={
 
     setFailedLogin:function(username) {
         return db.then(function(conn) {
-            const unlockTime = new Date().getTime()+3600;
-            return conn.query("if (select failed_attempts from users where username = ?) then" +
-                "(update users set unlock_time = ? where username = ?)" +
-                "ELSE" +
-                "(update users set failed_attempts = failed_attempts + 1 where username = ?)" +
-                "end if", [username, unlockTime, username, username]);
+            var unlockTime = new Date();
+            unlockTime.setHours(unlockTime.getHours()+1);
+            var unlockTimeStr = unlockTime.toISOString().replace("Z","").replace("T"," ");
+            return conn.query("UPDATE users " +
+                "SET unlock_time = IF(failed_logins>=3, ?, unlock_time)," +
+                "failed_logins = IF(failed_logins>=3, 0, failed_logins + 1)" +
+                "WHERE username = ?", [unlockTimeStr, username]);
         });
     },
 
