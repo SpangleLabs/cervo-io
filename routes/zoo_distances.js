@@ -50,12 +50,12 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     var zooPostcodeStrings = [];
     var chunkSize = 25;
     for (var b=0; b < zooPostcodeList.length; b+=chunkSize) {
-        zooPostcodeStrings.push(zooPostcodeList.slice(b,b+chunkSize).join("|"));
+        zooPostcodeStrings.push(zooPostcodeList.slice(b,b+chunkSize).join(",UK|"));
     }
-    var googleApiKey = ""; // TODO: add before running
+    var googleApiKey = "AIzaSyDDRJjxehwEZJq1f9XLJL_96tvPvvjzIvk"; //Location locked,fine to commit
     var requestPromises = [];
     for (var c=0; c < zooPostcodeStrings.length; c++) {
-        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + "&destinations=" + zooPostcodeStrings[c] + "&key=" + googleApiKey;
+        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + ",UK&destinations=" + zooPostcodeStrings[c] + ",UK&key=" + googleApiKey;
         var requestOptions = {};
         requestOptions.uri = googleApiString;
         requestOptions.json = true;
@@ -160,6 +160,7 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         // Respond
         res.json(result.zoo_distances);
     }).catch(function(err) {
+        console.log(err);
         res.status(500).json(err);
     });
 });
