@@ -40,7 +40,10 @@ var Species={
     getSessionToken:function(authToken, ipAddr) {
         return db.then(function(conn) {
             const currentTime = new Date().toISOString().replace("Z","").replace("T"," ");
-            return conn.query("SELECT user_id FROM user_sessions WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
+            return conn.query("SELECT user_id, users.username, token, expiry_time, ip_addr " +
+                "FROM user_sessions " +
+                "LEFT JOIN users ON user_sessions.user_id = users.user_id " +
+                "WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
                 [authToken, ipAddr, currentTime]);
         })
     },

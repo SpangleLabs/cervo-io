@@ -8,7 +8,16 @@ var uuidv4 = require("uuid/v4");
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'Express' });
-    //TODO return the current session status? (Provided they give auth header, obviously)
+    // Return the current session status if logged in
+    checkLogin(req).then(function(tokenData) {
+        res.json({"status": "success",
+            "user_id": tokenData.user_id,
+            "username": tokenData.username,
+            "token": tokenData.token,
+            "expiry_date": tokenData.expiry_time});
+    }).catch(function(err) {
+        res.status(403).json({"status":"failure", "error": err});
+    });
 });
 
 router.post('/', function(req, res, next) {
@@ -42,6 +51,7 @@ router.post('/', function(req, res, next) {
         // Store auth token, IP, etc in database
         return Session.createSession(username, authToken, expiryTimeStr, ipAddr).then(function(sessionResult) {
             const sessionResponse = {
+                "status": "success",
                 "auth_token": authToken,
                 "expiry_date": expiryTime,
                 "ip_addr": ipAddr,
@@ -51,7 +61,7 @@ router.post('/', function(req, res, next) {
         });
     }).catch(function(err) {
         console.log(err);
-        res.status(403).json({"status":"failed to log in", "error": err});
+        res.status(403).json({"status":"failure", "error": err});
     });
 });
 
@@ -62,7 +72,7 @@ router.delete('/', function(req, res, next) {
     }).then(function(data) {
         res.status(204);
     }).catch(function(err) {
-        res.status(403).json({"status":"failed to log in", "error": err});
+        res.status(403).json({"status":"failure", "error": err});
     })
 });
 
@@ -76,11 +86,11 @@ function checkLogin(req) {
     }
     // Check expiry isn't in the past
     // Check auth header token matches database token
-    return Session.getSessionToken(authToken, ipAddr).then(function(result) {
+    return Session.getSessionToken(authToken, ipAddr).then(function(storeResult) {
         if (storeResult.length !== 1 || !storeResult[0]["user_id"]) {
             Promise.reject(new Error("User is not logged in."));
         } else {
-            Promise.resolve(storeResult[0]["user_id"]);
+            Promise.resolve(storeResult[0]);
         }
     });
 }
