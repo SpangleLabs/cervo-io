@@ -44,8 +44,8 @@ function promiseGetZooData(zooId) {
 function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     var userPostcode = userPostcodeData.postcode_sector + "AA";
     var zooPostcodeList = [];
-    for(var a = 0; a < zooDataList.length; a++) {
-        zooPostcodeList.push(zooDataList[a].postcode);
+    for (var zooData of zooDataList) {
+        zooPostcodeList.push(zooData.postcode);
     }
     var zooPostcodeStrings = [];
     var chunkSize = 25;
@@ -54,8 +54,8 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     }
     var googleApiKey = "AIzaSyDDRJjxehwEZJq1f9XLJL_96tvPvvjzIvk"; //Location locked,fine to commit
     var requestPromises = [];
-    for (var c=0; c < zooPostcodeStrings.length; c++) {
-        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + ",UK&destinations=" + zooPostcodeStrings[c] + ",UK&key=" + googleApiKey;
+    for (var postcodeString of zooPostcodeStrings) {
+        var googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + ",UK&destinations=" + zooPostcodeString + ",UK&key=" + googleApiKey;
         var requestOptions = {};
         requestOptions.uri = googleApiString;
         requestOptions.json = true;
@@ -65,8 +65,8 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
                 Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
             }
             var rawDistances = [];
-            for (var c = 0; c < distanceResults.length; c++) {
-                rawDistances.push(distanceResults[c].distance.value);
+            for (var distanceResult of distanceResults) {
+                rawDistances.push(distanceResult.distance.value);
             }
             return rawDistances;
         }));
@@ -106,8 +106,8 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         result.user_postcode = postcodeData;
         // Get or create distances
         var distancePromises = [];
-        for (var a = 0; a < zooIdList.length; a++) {
-            distancePromises.push(promiseGetCachedDistanceOrNot(postcodeData.user_postcode_id, zooIdList[a]));
+        for (var zooId of zooIdList) {
+            distancePromises.push(promiseGetCachedDistanceOrNot(postcodeData.user_postcode_id, zooId));
         }
         // Try and get distances from database
         return Promise.all(distancePromises);
@@ -126,10 +126,10 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         // Optimise failed zoo data, remove duplicates
         var optimiseZooData = [];
         var optimiseZooIds = [];
-        for(var e = 0; e < failedZooData.length; e++) {
-            if(optimiseZooIds.indexOf(failedZooData[e].zoo_id) === -1) {
-                optimiseZooData.push(failedZooData[e]);
-                optimiseZooIds.push(failedZooData[e].zoo_id);
+        for (var failedZooDatum of failedZooData) {
+            if(optimiseZooIds.indexOf(failedZooDatum.zoo_id) === -1) {
+                optimiseZooData.push(failedZooDatum);
+                optimiseZooIds.push(failedZooDatum.zoo_id);
             }
         }
         // Construct the request to google maps API
@@ -138,13 +138,13 @@ router.get('/:postcode/:zooIdList', function(req, res, next) {
         result.new_distances = newZooDistances;
         // Save google api responses to database
         var savePromises = [];
-        for (var c = 0; c < newZooDistances.length; c++) {
-            savePromises.push(ZooDistances.addZooDistance(newZooDistances[c]));
+        for (var newZooDistance of newZooDistances) {
+            savePromises.push(ZooDistances.addZooDistance(newZooDistance));
         }
         return Promise.all(savePromises);
     }).then(function(data) {
         var newDataDict = {};
-        for(var f = 0; f < result.new_distances.length; f++) {
+        for (var f = 0; f < result.new_distances.length; f++) {
             result.new_distances[f].zoo_distance_id = data[f].insertId;
             newDataDict[result.new_distances[f].zoo_id] = result.new_distances[f];
         }
