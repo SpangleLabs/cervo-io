@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "npm run test-unit-win",
+    "test-unit": "NODE_ENV=test mocha --require co-mocha '*.spec.js'",
+    "test-unit-win": "set NODE_ENV=test&&mocha --require co-mocha"
   },
   "dependencies": {
     "bcrypt": "^1.0.3",
@@ -21,5 +24,12 @@
     "request-promise": "^4.2.0",
     "serve-favicon": "~2.4.2",
     "uuid": "latest"
+  },
+  "devDependencies": {
+    "mocha": "^4.1.0",
+    "sinon": "^4.1.3",
+    "chai": "^4.1.2",
+    "co-mocha": "^1.2.1",
+    "sinon-chai": "^2.14.0"
   }
 }
