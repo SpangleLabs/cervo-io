@@ -7,6 +7,6 @@ chai.use(chaiAsPromised);
 
 describe("Base category listing", function() {
     it("Should return a list", function * () {
-        expect(RequestPromise({"url":"http://localhost:3000/categories/", "json":true})).to.eventually.be.a("Array");
+        return expect(RequestPromise({"url":"http://localhost:3000/categories/", "json":true})).to.eventually.be.a("Array");
     })
 })
