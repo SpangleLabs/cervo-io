@@ -1,21 +1,20 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var cors = require('cors');
+const express = require('express');
+const path = require('path');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
-var index = require('./routes/index');
-var zoos = require('./routes/zoos');
-var categories = require('./routes/categories');
-var category_levels = require('./routes/category_levels');
-var species = require('./routes/species');
-var zoo_species = require('./routes/zoo_species');
-var zoo_distances = require('./routes/zoo_distances');
-var session = require('./routes/session');
+const index = require('./routes/index');
+const zoos = require('./routes/zoos');
+const categories = require('./routes/categories');
+const category_levels = require('./routes/category_levels');
+const species = require('./routes/species');
+const zoo_species = require('./routes/zoo_species');
+const zoo_distances = require('./routes/zoo_distances');
+const session = require('./routes/session');
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -41,7 +40,7 @@ app.use('/session', session);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
