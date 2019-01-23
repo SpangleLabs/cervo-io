@@ -1,22 +1,22 @@
-var express = require('express');
-var Species = require("../models/Species.js");
-var Zoos = require("../models/Zoos.js");
-var router = express.Router();
+const express = require('express');
+const Species = require("../models/Species.js");
+const Zoos = require("../models/Zoos.js");
+const router = express.Router();
 
 /* GET species listing. */
-router.get('/:id?', function(req, res, next) {
-    if(req.params.id) {
-        Species.getSpeciesById(req.params.id).then(function(rows) {
-            var speciesZoos = [];
-            for(var a = 0; a < rows.length; a++) {
+router.get('/:id?', function (req, res, next) {
+    if (req.params.id) {
+        Species.getSpeciesById(req.params.id).then(function (rows) {
+            const speciesZoos = [];
+            for (let a = 0; a < rows.length; a++) {
                 speciesZoos.push(Zoos.getZoosBySpeciesId(rows[a].species_id));
             }
-            Promise.all(speciesZoos).catch(function(err) {
+            Promise.all(speciesZoos).catch(function (err) {
                 res.json(err);
-            }).then(function(values) {
-                var data = [];
-                for(var b = 0; b < rows.length; b++) {
-                    var row_result = {};
+            }).then(function (values) {
+                const data = [];
+                for (let b = 0; b < rows.length; b++) {
+                    const row_result = {};
                     row_result.species_id = rows[b].species_id;
                     row_result.common_name = rows[b].common_name;
                     row_result.latin_name = rows[b].latin_name;
@@ -26,22 +26,22 @@ router.get('/:id?', function(req, res, next) {
                 }
                 res.json(data);
             });
-        }).catch(function(err) {
+        }).catch(function (err) {
             res.status(500).json(err);
         });
     } else {
-        Species.getAllSpecies().then(function(rows) {
+        Species.getAllSpecies().then(function (rows) {
             res.json(rows);
-        }).catch(function(err) {
+        }).catch(function (err) {
             res.status(500).json(err);
         });
     }
 });
 
-router.post('/', function(req, res, next) {
-    Species.addSpecies(req.body).then(function(count) {
+router.post('/', function (req, res, next) {
+    Species.addSpecies(req.body).then(function (count) {
         res.json(req.body);
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.status(500).json(err);
     });
 });

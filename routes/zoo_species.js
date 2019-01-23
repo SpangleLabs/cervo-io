@@ -1,20 +1,20 @@
-var express = require('express');
-var ZooSpecies = require("../models/ZooSpecies.js");
-var router = express.Router();
+const express = require('express');
+const ZooSpecies = require("../models/ZooSpecies.js");
+const router = express.Router();
 
 
-router.post('/', function(req, res, next) {
-    ZooSpecies.addZooSpecies(req.body).then(function(count) {
+router.post('/', function (req, res, next) {
+    ZooSpecies.addZooSpecies(req.body).then(function (count) {
         res.json(req.body);
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.status(500).json(err);
     });
 });
 
-router.delete('/', function(req, res, next) {
-    ZooSpecies.deleteZooSpecies(req.body).then(function(count) {
+router.delete('/', function (req, res, next) {
+    ZooSpecies.deleteZooSpecies(req.body).then(function (count) {
         res.json(req.body);
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.status(500).json(err);
     });
 });
