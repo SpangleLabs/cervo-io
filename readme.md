@@ -17,6 +17,8 @@ Requirements:
   - Used in zoo distances to validate UK postcodes
 - "promise-mysql"
   - Interface with mysql database, with promises
+- "request"
+  - Required for request-promise
 - "request-promise"
   - Promise wrapper over HTTP requests, used when sending out external API queries
 - "uuid"

@@ -17,6 +17,7 @@
     "morgan": "^1.9.1",
     "postcode": "^0.2.5",
     "promise-mysql": "latest",
+    "request": "^2.88.0",
     "request-promise": "^4.2.0",
     "uuid": "latest"
   },
