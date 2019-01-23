@@ -9,7 +9,7 @@
     "test-unit-win": "set NODE_ENV=test&&mocha --require co-mocha test/*/*.spec.js"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^2.0.1",
     "body-parser": "^1.18.3",
     "cors": "~2.8.3",
     "debug": "~2.6.3",
