@@ -2,7 +2,6 @@ var express = require('express');
 var Session = require("../models/Session");
 var router = express.Router();
 var bcrypt = require("bcrypt");
-var Promise = require("promise");
 var uuidv4 = require("uuid/v4");
 
 /* GET home page. */

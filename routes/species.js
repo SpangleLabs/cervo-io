@@ -1,7 +1,6 @@
 var express = require('express');
 var Species = require("../models/Species.js");
 var Zoos = require("../models/Zoos.js");
-var Promise = require("promise");
 var router = express.Router();
 
 /* GET species listing. */

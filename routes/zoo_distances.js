@@ -1,7 +1,6 @@
 var express = require('express');
 var Zoos = require("../models/Zoos.js");
 var Species = require("../models/Species.js");
-var Promise = require("promise");
 var router = express.Router();
 var Postcode = require("postcode");
 var UserPostcodes = require("../models/UserPostcodes.js");

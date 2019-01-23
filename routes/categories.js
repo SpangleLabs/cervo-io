@@ -1,7 +1,6 @@
 var express = require('express');
 var Categories = require("../models/Categories.js");
 var Species = require("../models/Species.js");
-var Promise = require("promise");
 var router = express.Router();
 
 function add_subcategories_and_return(res, rows) {

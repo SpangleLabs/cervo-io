@@ -16,7 +16,6 @@
     "express": "^4.16.4",
     "morgan": "^1.9.1",
     "postcode": "^0.2.5",
-    "promise": "latest",
     "promise-mysql": "latest",
     "request": "latest",
     "request-promise": "^4.2.0",
