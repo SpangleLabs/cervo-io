@@ -16,7 +16,7 @@ Requirements:
 - "postcode": "^0.2.5",
   - Used in zoo distances to validate UK postcodes
 - "promise-mysql": "latest",
-- "request": "latest",
+  - Interface with mysql database, with promises
 - "request-promise": "^4.2.0",
 - "serve-favicon": "~2.4.2",
 - "uuid": "latest"
