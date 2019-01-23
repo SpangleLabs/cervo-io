@@ -2,7 +2,7 @@ API for the zoo/deer-park listing site.
 
 Requirements:
 - "bcrypt": "^1.0.3",
-  - For hashing passwords
+  - For hashing passwords, for admin accounting
 - "body-parser": "~1.17.1",
 - "cookie-parser": "~1.4.3",
 - "cors": "~2.8.3",
