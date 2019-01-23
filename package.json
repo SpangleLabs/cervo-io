@@ -18,7 +18,6 @@
     "postcode": "^0.2.5",
     "promise-mysql": "latest",
     "request-promise": "^4.2.0",
-    "serve-favicon": "^2.5.0",
     "uuid": "latest"
   },
   "devDependencies": {

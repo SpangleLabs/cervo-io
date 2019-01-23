@@ -18,5 +18,5 @@ Requirements:
 - "promise-mysql": "latest",
   - Interface with mysql database, with promises
 - "request-promise": "^4.2.0",
-- "serve-favicon": "~2.4.2",
+  - Promise wrapper over HTTP requests, used when sending out external API queries
 - "uuid": "latest"
