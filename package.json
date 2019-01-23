@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "npm run test-unit-win",
-    "test-unit": "NODE_ENV=test mocha --require co-mocha test/*/*.spec.js",
-    "test-unit-win": "set NODE_ENV=test&&mocha --require co-mocha test/*/*.spec.js"
+    "test": "npm run test-unit",
+    "test-unit": "mocha --require co-mocha test/*/*.spec.js"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
