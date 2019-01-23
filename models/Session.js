@@ -1,19 +1,19 @@
-var db=require('../dbconnection');
+const db = require('../dbconnection');
 
-var Species={
+const Species = {
 
-    getValidPasswordHash:function(username){
-        return db.then(function(conn) {
-            const timestamp = new Date().toISOString().replace("Z","").replace("T"," ");
-            return conn.query("select password from users where username = ? and unlock_time < ?",[username, timestamp]);
+    getValidPasswordHash: function (username) {
+        return db.connection.then(function (conn) {
+            const timestamp = new Date().toISOString().replace("Z", "").replace("T", " ");
+            return conn.query("select password from users where username = ? and unlock_time < ?", [username, timestamp]);
         });
     },
 
-    setFailedLogin:function(username) {
-        return db.then(function(conn) {
-            var unlockTime = new Date();
-            unlockTime.setHours(unlockTime.getHours()+1);
-            var unlockTimeStr = unlockTime.toISOString().replace("Z","").replace("T"," ");
+    setFailedLogin: function (username) {
+        return db.connection.then(function (conn) {
+            const unlockTime = new Date();
+            unlockTime.setHours(unlockTime.getHours() + 1);
+            const unlockTimeStr = unlockTime.toISOString().replace("Z", "").replace("T", " ");
             return conn.query("UPDATE users " +
                 "SET unlock_time = IF(failed_logins>=3, ?, unlock_time)," +
                 "failed_logins = IF(failed_logins>=3, 0, failed_logins + 1)" +
@@ -21,14 +21,14 @@ var Species={
         });
     },
 
-    resetFailedLogins:function(username) {
-        return db.then(function(conn) {
+    resetFailedLogins: function (username) {
+        return db.connection.then(function (conn) {
             return conn.query("update users set failed_logins = 0 where username = ?", [username]);
         });
     },
 
-    createSession:function(username, authToken, expiryTime, ipAddr) {
-        return db.then(function(conn) {
+    createSession: function (username, authToken, expiryTime, ipAddr) {
+        return db.connection.then(function (conn) {
             return conn.query("insert into user_sessions (user_id, token, expiry_time, ip_addr) " +
                 "select users.user_id, ?, ?, ? " +
                 "from users " +
@@ -37,9 +37,9 @@ var Species={
         });
     },
 
-    getSessionToken:function(authToken, ipAddr) {
-        return db.then(function(conn) {
-            const currentTime = new Date().toISOString().replace("Z","").replace("T"," ");
+    getSessionToken: function (authToken, ipAddr) {
+        return db.connection.then(function (conn) {
+            const currentTime = new Date().toISOString().replace("Z", "").replace("T", " ");
             return conn.query("SELECT user_id, users.username, token, expiry_time, ip_addr " +
                 "FROM user_sessions " +
                 "LEFT JOIN users ON user_sessions.user_id = users.user_id " +
@@ -48,11 +48,11 @@ var Species={
         })
     },
 
-    deleteToken:function(userId) {
-        return db.then(function(conn) {
+    deleteToken: function (userId) {
+        return db.connection.then(function (conn) {
             return conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId]);
         })
     }
 
 };
-module.exports=Species;
+module.exports = Species;

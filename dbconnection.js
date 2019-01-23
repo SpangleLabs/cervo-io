@@ -1,9 +1,9 @@
-var mysql=require('promise-mysql');
+const mysql = require('promise-mysql');
 //var connection;
 
-module.exports = mysql.createConnection({
+module.exports = {"connection": mysql.createConnection({
     host:'localhost',
     user:'root',
     password:'password', // Obviously not in production
     database:'zoo_species'
-});
+})};
