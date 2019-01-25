@@ -1,5 +1,5 @@
 const mysql = require('promise-mysql');
-const config = require("config.js");
+const config = require("./config.js");
 
 module.exports = {
     "connection": mysql.createConnection({
