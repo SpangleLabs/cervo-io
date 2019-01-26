@@ -4,68 +4,61 @@ const Species = {
 
     getAllSpecies: function () {
         return db.connection().then(function (conn) {
-            return conn.query("select * from species")
-                .finally(function () {
-                    conn.end();
-                });
+            const result = conn.query("select * from species");
+            conn.end();
+            return result;
         });
     },
 
     getSpeciesById: function (id) {
         return db.connection().then(function (conn) {
-            return conn.query("select * from species where species_id=?", [id])
-                .finally(function () {
-                    conn.end();
-                });
+            const result = conn.query("select * from species where species_id=?", [id]);
+            conn.end();
+            return result;
         });
     },
 
     getSpeciesByCategoryId: function (id) {
         return db.connection().then(function (conn) {
-            return conn.query("select * from species where category_id=?", [id])
-                .finally(function () {
-                    conn.end();
-                });
+            const result = conn.query("select * from species where category_id=?", [id]);
+            conn.end();
+            return result;
         });
     },
 
     getSpeciesByZooId: function (zoo_id) {
         return db.connection().then(function (conn) {
-            return conn.query("select * from zoo_species " +
+            const result = conn.query("select * from zoo_species " +
                 "left join species on zoo_species.species_id = species.species_id " +
-                "where zoo_species.zoo_id = ?", [zoo_id])
-                .finally(function () {
-                    conn.end();
-                });
+                "where zoo_species.zoo_id = ?", [zoo_id]);
+            conn.end();
+            return result;
         });
     },
 
     addSpecies: function (Species) {
         return db.connection().then(function (conn) {
-            return conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
-                "values (?,?,?)", [Species.common_name, Species.latin_name, Species.category_id])
-                .finally(function () {
-                    conn.end();
-                });
+            const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
+                "values (?,?,?)", [Species.common_name, Species.latin_name, Species.category_id]);
+            conn.end();
+            return result;
         });
     },
 
     deleteSpecies: function (id) {
         return db.connection().then(function (conn) {
-            return conn.query("delete from species where species_id=?", [id])
-                .finally(function () {
-                    conn.end();
-                });
+            const result = conn.query("delete from species where species_id=?", [id]);
+            conn.end();
+            return result;
         });
     },
 
     updateSpecies: function (id, Species) {
         return db.connection().then(function (conn) {
-            return conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",
-                [Species.common_name, Species.latin_name, Species.category_id, id])
-                .finally(function () {
-                    conn.end();
-                });
+            const result = conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",
+                [Species.common_name, Species.latin_name, Species.category_id, id]);
+            conn.end();
+            return result;
         });
     }
 
