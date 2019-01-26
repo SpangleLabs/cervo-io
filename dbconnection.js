@@ -3,11 +3,20 @@ const config = require("./config.js");
 
 module.exports = {
     "connection": function () {
-        return mysql.createConnection({
-            host: config['mysql']['host'],
+
+        const mysqlConfig = {
             user: config['mysql']['username'],
             password: config['mysql']['password'],
             database: config['mysql']['database']
-        });
+        }
+
+        if ("host" in config["mysql"]) {
+            mysqlConfig["host"] = config["mysql"]["host"];
+        }
+        if ("socketPath" in config["mysql"]) {
+            mysqlConfig["socketPath"] = config["mysql"]["socketPath"];
+        }
+
+        return mysql.createConnection(mysqlConfig);
     }
 };
