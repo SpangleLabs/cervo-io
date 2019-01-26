@@ -1,16 +1,26 @@
-const sinon = require('sinon')
-const chai = require('chai')
-const sinonChai = require('sinon-chai')
-const db = require("../dbconnection");
-const fs = require("fs");
+const sinon = require('sinon');
+const chai = require('chai');
+const sinonChai = require('sinon-chai');
+const db = require("../dbconnection.js");
+const config = require("../config.js");
 
 before(function () {
     chai.use(sinonChai);
-    const setupSQL = fs.readFileSync('../sql/zoo_species.sql').toString();
-    db.connection.catch(function(err) {
-        return db.connectionNoDatabase;
-    }).then(function (conn) {
-        return conn.query(setupSQL);
+    return db.connectionNoDatabase().then(function(conn) {
+        return conn.query("DROP DATABASE IF EXISTS `zoo_species_test`;");
+    }).then(function() {
+        return db.connectionNoDatabase();
+    }).then(function(conn) {
+        return conn.query("CREATE DATABASE `zoo_species_test`;");
+    }).then(function() {
+        return require("mysql-import").config({
+            host: config["mysql"]["host"],
+            user: config["mysql"]["username"],
+            password: config["mysql"]["password"],
+            database: "zoo_species_test"
+        }).import("sql/zoo_species_test.sql");
+    }).then(function () {
+        console.log("Imported test mysql database.");
     });
 })
 

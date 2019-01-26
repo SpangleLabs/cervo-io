@@ -3,14 +3,14 @@ const db = require('../dbconnection');
 const Species = {
 
     getValidPasswordHash: function (username) {
-        return db.connection.then(function (conn) {
+        return db.connection().then(function (conn) {
             const timestamp = new Date().toISOString().replace("Z", "").replace("T", " ");
             return conn.query("select password from users where username = ? and unlock_time < ?", [username, timestamp]);
         });
     },
 
     setFailedLogin: function (username) {
-        return db.connection.then(function (conn) {
+        return db.connection().then(function (conn) {
             const unlockTime = new Date();
             unlockTime.setHours(unlockTime.getHours() + 1);
             const unlockTimeStr = unlockTime.toISOString().replace("Z", "").replace("T", " ");
@@ -22,13 +22,13 @@ const Species = {
     },
 
     resetFailedLogins: function (username) {
-        return db.connection.then(function (conn) {
+        return db.connection().then(function (conn) {
             return conn.query("update users set failed_logins = 0 where username = ?", [username]);
         });
     },
 
     createSession: function (username, authToken, expiryTime, ipAddr) {
-        return db.connection.then(function (conn) {
+        return db.connection().then(function (conn) {
             return conn.query("insert into user_sessions (user_id, token, expiry_time, ip_addr) " +
                 "select users.user_id, ?, ?, ? " +
                 "from users " +
@@ -38,7 +38,7 @@ const Species = {
     },
 
     getSessionToken: function (authToken, ipAddr) {
-        return db.connection.then(function (conn) {
+        return db.connection().then(function (conn) {
             const currentTime = new Date().toISOString().replace("Z", "").replace("T", " ");
             return conn.query("SELECT user_id, users.username, token, expiry_time, ip_addr " +
                 "FROM user_sessions " +
@@ -49,7 +49,7 @@ const Species = {
     },
 
     deleteToken: function (userId) {
-        return db.connection.then(function (conn) {
+        return db.connection().then(function (conn) {
             return conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId]);
         })
     }

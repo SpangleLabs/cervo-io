@@ -3,6 +3,6 @@
     "host": "localhost",
     "username": "root",
     "password": "",
-    "database": "zoo_species"
+    "database": "zoo_species_test"
   }
 }
