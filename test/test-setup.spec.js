@@ -11,11 +11,9 @@ const config = require("../config.js");
 before(function () {
     chai.use(sinonChai);
     return db.connectionNoDatabase().then(function(conn) {
-        return conn.query("DROP DATABASE IF EXISTS `zoo_species_test`;");
-    }).then(function() {
-        return db.connectionNoDatabase();
-    }).then(function(conn) {
-        return conn.query("CREATE DATABASE `zoo_species_test`;");
+        conn.query("DROP DATABASE IF EXISTS `zoo_species_test`;");
+        conn.query("CREATE DATABASE `zoo_species_test`;");
+        return conn.end();
     }).then(function() {
         return require("mysql-import").config({
             host: config["mysql"]["host"],
@@ -26,12 +24,18 @@ before(function () {
     }).then(function () {
         console.log("Imported test mysql database.");
     });
-})
+});
 
-beforeEach(function () {
-    this.sandbox = sinon.sandbox.create();
-})
+after(function() {
+    db.connection().then(function(conn) {
+        conn.end();
+    });
+});
 
-afterEach(function () {
-    this.sandbox.restore();
-})
+// beforeEach(function () {
+//     this.sandbox = sinon.sandbox.create();
+// })
+//
+// afterEach(function () {
+//     this.sandbox.restore();
+// })
