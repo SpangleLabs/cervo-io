@@ -5,7 +5,6 @@ if (!process.env.CONFIG_FILE) {
 const sinon = require('sinon');
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
-const db = require("../dbconnection.js");
 const config = require("../config.js");
 const mysql = require("promise-mysql");
 
@@ -28,12 +27,6 @@ before(function () {
         }).import("sql/zoo_species_test.sql");
     }).then(function () {
         console.log("Imported test mysql database.");
-    });
-});
-
-after(function() {
-    db.connection().then(function(conn) {
-        conn.end();
     });
 });
 

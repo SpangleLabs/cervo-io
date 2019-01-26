@@ -5,10 +5,11 @@ chai.use(chaiHttp);
 require("../test-setup.spec");
 
 const server = require("../../app");
+const request = chai.request(server);
 
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
-        chai.request(server).get("/categories/").end(function(err, res) {
+        request.get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
@@ -36,4 +37,8 @@ describe("Base category listing", function() {
             done();
         })
     })
-})
+});
+
+after(function () {
+    request.close();
+});
