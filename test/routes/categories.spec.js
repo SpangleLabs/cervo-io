@@ -4,7 +4,7 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 require("../test-setup.spec");
 
-const server = require("../../app");
+const server = require("../../index");
 const request = chai.request(server);
 
 describe("Base category listing", function() {
