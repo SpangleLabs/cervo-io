@@ -5,8 +5,11 @@ const Species = {
     getValidPasswordHash: function (username) {
         return db.connection().then(function (conn) {
             const timestamp = new Date().toISOString().replace("Z", "").replace("T", " ");
-            return conn.query("select password from users where username = ? and unlock_time < ?", [username, timestamp]);
-        });
+            return conn.query("select password from users where username = ? and unlock_time < ?", [username, timestamp])
+                .finally(function () {
+                    conn.end();
+                });
+        })
     },
 
     setFailedLogin: function (username) {
@@ -17,15 +20,24 @@ const Species = {
             return conn.query("UPDATE users " +
                 "SET unlock_time = IF(failed_logins>=3, ?, unlock_time)," +
                 "failed_logins = IF(failed_logins>=3, 0, failed_logins + 1)" +
-                "WHERE username = ?", [unlockTimeStr, username]);
+                "WHERE username = ?", [unlockTimeStr, username])
+                .finally(function () {
+                    conn.end();
+                });
         });
-    },
+    }
+
+    ,
 
     resetFailedLogins: function (username) {
         return db.connection().then(function (conn) {
-            return conn.query("update users set failed_logins = 0 where username = ?", [username]);
+            return conn.query("update users set failed_logins = 0 where username = ?", [username])
+                .finally(function () {
+                    conn.end();
+                });
         });
-    },
+    }
+    ,
 
     createSession: function (username, authToken, expiryTime, ipAddr) {
         return db.connection().then(function (conn) {
@@ -33,9 +45,13 @@ const Species = {
                 "select users.user_id, ?, ?, ? " +
                 "from users " +
                 "where users.username = ?",
-                [authToken, expiryTime, ipAddr, username]);
+                [authToken, expiryTime, ipAddr, username])
+                .finally(function () {
+                    conn.end();
+                });
         });
-    },
+    }
+    ,
 
     getSessionToken: function (authToken, ipAddr) {
         return db.connection().then(function (conn) {
@@ -44,14 +60,21 @@ const Species = {
                 "FROM user_sessions " +
                 "LEFT JOIN users ON user_sessions.user_id = users.user_id " +
                 "WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
-                [authToken, ipAddr, currentTime]);
-        })
-    },
+                [authToken, ipAddr, currentTime])
+                .finally(function () {
+                    conn.end();
+                });
+        });
+    }
+    ,
 
     deleteToken: function (userId) {
         return db.connection().then(function (conn) {
-            return conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId]);
-        })
+            return conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId])
+                .finally(function () {
+                    conn.end();
+                });
+        });
     }
 
 };

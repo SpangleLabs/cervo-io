@@ -7,10 +7,15 @@ const chai = require('chai');
 const sinonChai = require('sinon-chai');
 const db = require("../dbconnection.js");
 const config = require("../config.js");
+const mysql = require("promise-mysql");
 
 before(function () {
     chai.use(sinonChai);
-    return db.connectionNoDatabase().then(function(conn) {
+    return mysql.createConnection({
+        host: config["mysql"]["host"],
+        user: config["mysql"]["username"],
+        password: config["mysql"]["password"]
+    }).then(function(conn) {
         conn.query("DROP DATABASE IF EXISTS `zoo_species_test`;");
         conn.query("CREATE DATABASE `zoo_species_test`;");
         return conn.end();
