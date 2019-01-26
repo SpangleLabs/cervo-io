@@ -1,3 +1,7 @@
+if (!process.env.CONFIG_FILE) {
+    process.env.CONFIG_FILE = "config-test.json";
+}
+
 const sinon = require('sinon');
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
