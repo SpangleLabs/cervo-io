@@ -19,16 +19,23 @@ before(function () {
         conn.query("CREATE DATABASE `zoo_species_test`;");
         return conn.end();
     }).then(function() {
-        return require("mysql-import").config({
+        const importer = require("mysql-import").config({
             host: config["mysql"]["host"],
             user: config["mysql"]["username"],
             password: config["mysql"]["password"],
             database: "zoo_species_test"
-        }).import("sql/zoo_species_test.sql");
-    }).then(function () {
+        });
+        return importer.import("sql/zoo_species_test.sql").then(function() { return importer; })
+    }).then(function (importer) {
+        importer.conn.end();
         console.log("Imported test mysql database.");
     });
 });
+
+
+after(function () {
+    console.log("All tests complete");
+})
 
 // beforeEach(function () {
 //     this.sandbox = sinon.sandbox.create();

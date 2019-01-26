@@ -40,5 +40,10 @@ describe("Base category listing", function() {
 });
 
 after(function () {
-    request.close();
+    return new Promise(function (resolve) {
+        request.close(function() {
+            console.log("Closed server");
+            resolve();
+        })
+    });
 });
