@@ -36,12 +36,83 @@
 </body>
 
 <script>
-    let map = null;
+    let map;
+    let googleMap;
+
+    /**
+     * Wrapper around the google maps Map class, having handy methods
+     */
+    class Map {
+
+        constructor(googleMap) {
+            this.googleMap = googleMap;
+            this.cacheZooMarkers = {};
+            this.cacheZooInfoWindows = {};
+        }
+
+        /**
+         * Creates a new google maps marker for a given zoo and saves to cache
+         * @param zooData data object of the zoo
+         */
+        getZooMarker(zooData) {
+            const zooId = zooData.zoo_id;
+            if (!this.cacheZooMarkers[zooId]) {
+                this.cacheZooMarkers[zooId] = new google.maps.Marker({
+                    position: {lat: zooData.latitude, lng: zooData.longitude},
+                    map: this.googleMap,
+                    title: zooData.name
+                });
+                this.cacheZooMarkers[zooId].addListener("click", function () {
+                    const self = this;
+                    self.getZooInfoWindow(zooId).open(self.googleMap, self.cacheZooMarkers[zooId]);
+                });
+            }
+            return this.cacheZooMarkers[zooId];
+        }
+
+        getZooInfoWindow(zooId) {
+            if (!this.cacheZooInfoWindows[zooId]) {
+                this.cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
+                    content: ""
+                });
+                promiseGet(config["api_url"]+"zoos/"+zooId).then(function(zoosData) {
+                    const self = this;
+                    const zooData = zoosData[0];
+                    let infoContent = "<h1>" + zooData.name + "</h1>" +
+                        "<a href='" + zooData.link + "'>" + zooData.link + "</a><br />" +
+                        "<span style='font-weight: bold'>Postcode:</span> " + zooData.postcode + "<br />" +
+                        "<h2>Species:</h2>" +
+                        "<ul class='zoo_species'>";
+                    $.each(zooData.species, function (idx, zooSpecies) {
+                        infoContent += "<li class='zoo_species zoo_species_" + zooSpecies.species_id + "'>" + zooSpecies.common_name + " <span class='latin_name'>" + zooSpecies.latin_name + "</span>";
+                    });
+                    infoContent += "</ul>";
+                    self.cacheZooInfoWindows[zooId].setContent(infoContent);
+                });
+            }
+            return this.cacheZooInfoWindows[zooId];
+        }
+
+        userToggleInfoWindow(zooId) {
+            $.each(this.cacheZooInfoWindows, function(zooInfoWindowId, infoWindow) {
+                if (zooInfoWindowId !== zooId) {
+                    infoWindow.close();
+                }
+            });
+            this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooId]);
+        }
+    }
+
+    class AnimalList {
+        constructor() {
+
+        }
+    }
+
+
     let cacheCategoryLevel = [];
     let cacheSpeciesPromises = [];
     let cacheZooDistances = {};
-    let cacheZooMarkers = {};
-    let cacheZooInfoWindows = {};
     let currentSelectedSpeciesIds = [];
     let currentSelectedZooIds = [];
     function getCategoryLevel(id) {
@@ -111,47 +182,6 @@
             cacheSpeciesPromises[id] = promise;
             return promise;
         }
-    }
-
-    /**
-     * Creates a new google maps marker for a given zoo and saves to cache
-     * @param zooData data object of the zoo
-     */
-    function getZooMarker(zooData) {
-        const zooId = zooData.zoo_id;
-        if (!cacheZooMarkers[zooId]) {
-            cacheZooMarkers[zooId] = new google.maps.Marker({
-                position: {lat: zooData.latitude, lng: zooData.longitude},
-                map: map,
-                title: zooData.name
-            });
-            cacheZooMarkers[zooId].addListener("click", function () {
-                getZooInfoWindow(zooId).open(map, cacheZooMarkers[zooId]);
-            });
-        }
-        return cacheZooMarkers[zooId];
-    }
-
-    function getZooInfoWindow(zooId) {
-        if (!cacheZooInfoWindows[zooId]) {
-            cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
-                content: ""
-            });
-            promiseGet(config["api_url"]+"zoos/"+zooId).then(function(zoosData) {
-                const zooData = zoosData[0];
-                let infoContent = "<h1>" + zooData.name + "</h1>" +
-                    "<a href='" + zooData.link + "'>" + zooData.link + "</a><br />" +
-                    "<span style='font-weight: bold'>Postcode:</span> " + zooData.postcode + "<br />" +
-                    "<h2>Species:</h2>" +
-                    "<ul class='zoo_species'>";
-                $.each(zooData.species, function (idx, zooSpecies) {
-                    infoContent += "<li class='zoo_species zoo_species_" + zooSpecies.species_id + "'>" + zooSpecies.common_name + " <span class='latin_name'>" + zooSpecies.latin_name + "</span>";
-                });
-                infoContent += "</ul>";
-                cacheZooInfoWindows[zooId].setContent(infoContent);
-            });
-        }
-        return cacheZooInfoWindows[zooId];
     }
 
     /**
@@ -292,15 +322,6 @@
         }
     }
 
-    function userToggleInfoWindow(zooId) {
-        $.each(cacheZooInfoWindows, function(zooInfoWindowId, infoWindow) {
-            if (zooInfoWindowId !== zooId) {
-                infoWindow.close();
-            }
-        });
-        getZooInfoWindow(zooId).open(map, cacheZooMarkers[zooId]);
-    }
-
     function updateZooDistances() {
         //get postcode
         let postcode = $("input#postcode").val();
@@ -404,8 +425,8 @@
             currentSelectedZooIds = Object.keys(selectedZoos);
             hideAllMarkers();
             $.each(selectedZoos, function(zooKey, zooData) {
-                selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"' onclick='userToggleInfoWindow("+zooData.zoo_id+")'>"+zooData.name+" <span class='distance'></span></li>");
-                const marker = getZooMarker(zooData);
+                selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"' onclick='map.userToggleInfoWindow("+zooData.zoo_id+")'>"+zooData.name+" <span class='distance'></span></li>");
+                const marker = map.getZooMarker(zooData);
                 marker.setVisible(true);
             });
             updateZooDistances();
@@ -425,10 +446,11 @@
     });
 
     function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
+        googleMap = new google.maps.Map(document.getElementById('map'), {
             zoom: 6,
             center: {lat: 55, lng: -3}
         });
+        map = new Map(googleMap);
     }
 </script>
 <script async defer
