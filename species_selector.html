@@ -38,6 +38,7 @@
 <script>
     let map;
     let googleMap;
+    let animalList;
 
     /**
      * Wrapper around the google maps Map class, having handy methods
@@ -105,25 +106,37 @@
 
     class AnimalList {
         constructor() {
+            this.cacheCategoryLevel = [];
 
+            const categoryLevelsPromise = promiseGet(config["api_url"]+"category_levels/");
+            const firstCategoryPromise = promiseGet(config["api_url"]+"categories/");
+            //const self = this;
+            Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function(data) {
+                this.cacheCategoryLevel = data[0];
+                const categoryData = data[1];
+                $.each(categoryData, function(index, itemData) {
+                    addCategory($("#animals"), itemData);
+                    userLoadCategory(itemData.category_id);
+                });
+            });
+        }
+
+        getCategoryLevel(id) {
+            let result = null;
+            $.each(this.cacheCategoryLevel, function(idx, val) {
+                if(val.category_level_id === id) {
+                    result = val;
+                }
+            });
+            return result;
         }
     }
 
 
-    let cacheCategoryLevel = [];
     let cacheSpeciesPromises = [];
     let cacheZooDistances = {};
     let currentSelectedSpeciesIds = [];
     let currentSelectedZooIds = [];
-    function getCategoryLevel(id) {
-        let result = null;
-        $.each(cacheCategoryLevel, function(idx, val) {
-            if(val.category_level_id === id) {
-                result = val;
-            }
-        });
-        return result;
-    }
     function cacheAddZooDistances(postcode,zooDistanceData) {
         if (!cacheZooDistances[postcode]) {
             cacheZooDistances[postcode] = {};
@@ -136,7 +149,7 @@
     /**
      * I pulled this method from somewhere else, tbh
      * @param url
-     * @returns {Promise}
+     * @returns {Promise<object>}
      */
     function promiseGet(url) {
         // Return a new promise.
@@ -194,7 +207,7 @@
         const name = categoryData.name;
         const categoryLevelId = categoryData.category_level_id;
         const categoryLiId = "category-"+categoryId;
-        const categoryLevelName = getCategoryLevel(categoryLevelId).name;
+        const categoryLevelName = animalList.getCategoryLevel(categoryLevelId).name;
         parentUlElement.append(
             "<li class='category closed' id='"+categoryLiId+"'>" +
                 "<span onclick='userLoadCategory("+categoryId+")'>" +
@@ -434,19 +447,7 @@
     }
 
     $(document).ready(function() {
-        const categoryLevelsPromise = promiseGet(config["api_url"]+"category_levels/").then(function(data) {
-            cacheCategoryLevel = data;
-            return data;
-        });
-        const firstCategoryPromise = promiseGet(config["api_url"]+"categories/");
-        // noinspection JSCheckFunctionSignatures
-        Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function(data) {
-            const categoryData = data[1];
-            $.each(categoryData, function(index, itemData) {
-                addCategory($("#animals"), itemData);
-                userLoadCategory(itemData.category_id);
-            });
-        });
+        animalList = new AnimalList();
     });
 
     function initMap() {
