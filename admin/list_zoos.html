@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Zoo list</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="../config.js"></script>
     <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
@@ -21,7 +22,7 @@
 <script>
     function fillTable() {
         var tableElem = $("table tbody");
-        $.get("http://localhost:3000/zoos/", function(/*[ZooObj]*/data) {
+        $.get(config["api_url"]+"zoos/", function(/*[ZooObj]*/data) {
             for(var a = 0; a < data.length; a++) {
                 tableElem.append("<tr><td><a href='view_zoo.html?id="+data[a].zoo_id+"'>"+data[a].name+"</a></td>" +
                     "<td>"+data[a].postcode+"</td>" +
@@ -46,7 +47,7 @@
         inputObj.latitude = inputLatitude;
         inputObj.longitude = inputLongitude;
         console.log(inputObj);
-        $.post("http://localhost:3000/zoos/", inputObj);
+        $.post(config["api_url"]+"zoos/", inputObj);
         formElement.first().reset();
         return false;
     }

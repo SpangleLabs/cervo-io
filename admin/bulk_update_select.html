@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="../config.js"></script>
     <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
@@ -15,7 +16,7 @@ Animals list:
 
 <script>
     var categoryLevelCache = [];
-    $.get("http://localhost:3000/category_levels/", function(data) {
+    $.get(config["api_url"]+"category_levels/", function(data) {
         categoryLevelCache = data;
     });
     function getCategoryLevel(id) {
@@ -49,7 +50,7 @@ Animals list:
 
     function loadCategory(id) {
         var categoryLiId = "category-"+id;
-        $.get("http://localhost:3000/categories/"+id, function(/*CategoryObj*/data) {
+        $.get(config["api_url"]+"categories/"+id, function(/*CategoryObj*/data) {
             var listElement = $("#"+categoryLiId);
             listElement.addClass("open");
             listElement.removeClass("closed");
@@ -79,7 +80,7 @@ Animals list:
     }
 
     $(document).ready(function() {
-        $.get("http://localhost:3000/categories/", function(data) {
+        $.get(config["api_url"]+"categories/", function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
             });

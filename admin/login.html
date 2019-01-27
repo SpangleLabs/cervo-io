@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Login to admin panel</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="../config.js"></script>
     <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
@@ -36,7 +37,7 @@
         new Promise(function (resolve, reject) {
             // Do the usual XHR stuff
             let req = new XMLHttpRequest();
-            req.open('POST', "http://localhost:3000/session");
+            req.open('POST', config["api_url"]+"session");
             req.setRequestHeader("Content-type", "application/json");
             req.onload = function () {
                 // This is called even on 404 etc

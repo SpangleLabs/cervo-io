@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Species selector</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="config.js"></script>
     <link rel="stylesheet" href="style.css" />
     <style>
         /* Always set the map height explicitly to define the size of the div
@@ -104,7 +105,7 @@
         if(cacheSpeciesPromises[id]) {
             return cacheSpeciesPromises[id];
         } else {
-            const promise = promiseGet("http://localhost:3000/species/"+id).then(function(data) {
+            const promise = promiseGet(config["api_url"]+"species/"+id).then(function(data) {
                 return data[0];
             });
             cacheSpeciesPromises[id] = promise;
@@ -136,7 +137,7 @@
             cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
                 content: ""
             });
-            promiseGet("http://localhost:3000/zoos/"+zooId).then(function(zoosData) {
+            promiseGet(config["api_url"]+"zoos/"+zooId).then(function(zoosData) {
                 const zooData = zoosData[0];
                 let infoContent = "<h1>" + zooData.name + "</h1>" +
                     "<a href='" + zooData.link + "'>" + zooData.link + "</a><br />" +
@@ -209,7 +210,7 @@
         const isOdd = categoryElem.parent("ul").hasClass("odd");
         let populatedCategoriesPromise = Promise.resolve([]);
         if(categoryNotPopulated(categoryElem)) {
-            populatedCategoriesPromise = promiseGet("http://localhost:3000/categories/"+id).then(function(/*[CategoryObj]*/categoryObjs) {
+            populatedCategoriesPromise = promiseGet(config["api_url"]+"categories/"+id).then(function(/*[CategoryObj]*/categoryObjs) {
                 const categoryObj = categoryObjs[0];
                 // Add base list element
                 categoryElem.append("<ul class='" + (isOdd ? "even" : "odd") + "' style='display: none;'></ul>");
@@ -344,7 +345,7 @@
             })
         }
         //create url to request
-        let url = "http://localhost:3000/zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
+        let url = config["api_url"]+"zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
         //get response
         return promiseGet(url).then(function(newDistances) {
             $("#invalid-postcode").hide();
@@ -412,9 +413,9 @@
     }
 
     $(document).ready(function() {
-        promiseGet("http://localhost:3000/category_levels/").then(function(data) {
+        promiseGet(config["api_url"]+"category_levels/").then(function(data) {
             cacheCategoryLevel = data;
-            return promiseGet("http://localhost:3000/categories/");
+            return promiseGet(config["api_url"]+"categories/");
         }).then(function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
