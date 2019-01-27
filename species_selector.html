@@ -419,6 +419,7 @@
         }).then(function(data) {
             $.each(data, function(index, itemData) {
                 addCategory($("#animals"), itemData);
+                userLoadCategory(itemData.category_id);
             });
         });
     });
