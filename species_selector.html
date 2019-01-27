@@ -434,11 +434,15 @@
     }
 
     $(document).ready(function() {
-        promiseGet(config["api_url"]+"category_levels/").then(function(data) {
+        const categoryLevelsPromise = promiseGet(config["api_url"]+"category_levels/").then(function(data) {
             cacheCategoryLevel = data;
-            return promiseGet(config["api_url"]+"categories/");
-        }).then(function(data) {
-            $.each(data, function(index, itemData) {
+            return data;
+        });
+        const firstCategoryPromise = promiseGet(config["api_url"]+"categories/");
+        // noinspection JSCheckFunctionSignatures
+        Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function(data) {
+            const categoryData = data[1];
+            $.each(categoryData, function(index, itemData) {
                 addCategory($("#animals"), itemData);
                 userLoadCategory(itemData.category_id);
             });
