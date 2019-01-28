@@ -102,6 +102,21 @@
             });
             this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooId]);
         }
+
+        hideAllMarkers() {
+            // Hide all info windows, except those for zoos currently selected. TODO: check
+            $.each(this.cacheZooInfoWindows, function(zooId, infoWindow) {
+                if (!currentSelectedZooIds.includes(zooId)) {
+                    infoWindow.close();
+                }
+            });
+            // Hide all markers
+            $.each(map.cacheZooMarkers, function(zooId, marker) {
+                marker.setVisible(false);
+            });
+            // Unbold species in any zoo marker info windows?
+            $("li.zoo_species").removeClass("selected_species");
+        }
     }
 
     /**
@@ -121,8 +136,7 @@
                 $.each(categoryData, function (index, itemData) {
                     const newCategory = new Category(itemData);
                     self.categories[newCategory.id] = newCategory;
-
-                    userLoadCategory(itemData.category_id);
+                    newCategory.loadSubElements(true, false);
                 });
             });
         }
@@ -163,7 +177,7 @@
             const parentUI = this.parentCategory == null ? $("#animals") : this.parentCategory.uiElement.find("ul");
             parentUI.append(
                 `<li class='category closed ${this.selected ? "selected" : ""}' id='${categoryLiId}'>
-                <span onclick='userLoadCategory(${this.id})'>
+                <span onclick='userExpandCategory(${this.id})'>
                 <span class='category_name'>${this.name}</span>
                 <span class='category_level'>${this.levelName}</span>
                 </span>
@@ -249,6 +263,11 @@
             }
         }
     }
+
+    /**
+     * Stores which species are currently selected, and stuff.
+     */
+    class Selection {}
 
 
     let cacheSpeciesPromises = [];
@@ -337,17 +356,8 @@
         }
     }
 
-    function userLoadCategory(id) {
+    function userExpandCategory(id) {
         animalList.categories[id].loadSubElements(true, false);
-    }
-
-    /**
-     * Checks if a category has been populated with subcategory and species data
-     * @param categoryElem category element
-     * @returns {boolean}
-     */
-    function categoryNotPopulated(categoryElem) {
-        return !categoryElem.has("ul").length;
     }
 
     function userSelectCategory(categoryId) {
@@ -367,7 +377,7 @@
 
     function userUpdatePostcode() {
         let postcode = $("input#postcode").val();
-        if (postcode.length >= 2) {
+        if (postcode.length >= 3) {
             updateZooDistances();
         }
     }
@@ -436,18 +446,6 @@
         });
     }
 
-    function hideAllMarkers() {
-        $.each(map.cacheZooInfoWindows, function(zooId, infoWindow) {
-            if (!currentSelectedZooIds.includes(zooId)) {
-                infoWindow.close();
-            }
-        });
-        $.each(map.cacheZooMarkers, function(zooId, marker) {
-            marker.setVisible(false);
-        });
-        $("li.zoo_species").removeClass("selected_species");
-    }
-
     function updateSelected() {
         currentSelectedSpeciesIds = [];
         currentSelectedZooIds = [];
@@ -474,7 +472,7 @@
             let selectedZoosElem = $("#selected-zoos");
             selectedZoosElem.empty();
             currentSelectedZooIds = Object.keys(selectedZoos);
-            hideAllMarkers();
+            map.hideAllMarkers();
             $.each(selectedZoos, function(zooKey, zooData) {
                 selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"' onclick='map.userToggleInfoWindow("+zooData.zoo_id+")'>"+zooData.name+" <span class='distance'></span></li>");
                 const marker = map.getZooMarker(zooData);
