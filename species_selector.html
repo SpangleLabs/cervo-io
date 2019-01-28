@@ -309,8 +309,8 @@
      */
     class Selection {
         constructor() {
-            this.selectedSpecies = [];
-            this.selectedZoos = [];
+            this.selectedSpeciesIds = [];
+            this.selectedZooIds = [];
         }
 
         update() {
@@ -342,7 +342,7 @@
                 // Update zoos selected
                 let selectedZoosElem = $("#selected-zoos");
                 selectedZoosElem.empty();
-                this.selectedZooIds = Object.keys(selectedZoos);
+                self.selectedZooIds = Object.keys(selectedZoos);
                 map.hideAllMarkers();
                 $.each(selectedZoos, function(zooKey, zooData) {
                     selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
