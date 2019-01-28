@@ -149,6 +149,7 @@
             }
             this.uiElement = this.render();
             this.isOdd = this.uiElement.parent("ul").hasClass("odd");
+            this.childCategories = [];
         }
 
         render() {
@@ -172,10 +173,9 @@
          * @returns {Promise<Array>}
          */
         loadSubElements(expand, recursive) {
-            let categoryElem = this.uiElement;
             let populatedCategoriesPromise = Promise.resolve([]);
+            const self = this;
             if(!this.isPopulated()) {
-                const self = this;
                 populatedCategoriesPromise = promiseGet(config["api_url"]+"categories/"+this.id).then(function(/*[CategoryObj]*/categoryObjs) {
                     const categoryObj = categoryObjs[0];
                     // Add base list element
@@ -184,6 +184,7 @@
                     $.each(categoryObj.sub_categories, function (index, itemData) {
                         const newCategory = new Category(itemData);
                         animalList.categories[newCategory.id] = newCategory;
+                        self.childCategories.push(newCategory);
                     });
                     // Add species in category
                     $.each(categoryObj.species, function (index, itemData) {
@@ -211,7 +212,7 @@
             }
             return populatedCategoriesPromise.then(function() {
                 if (expand) {
-                    expandCategory(categoryElem);
+                    self.expand();
                 }
             });
         }
@@ -222,6 +223,21 @@
          */
         isPopulated() {
             return Boolean(this.uiElement.has("ul").length);
+        }
+
+        expand() {
+            if(this.uiElement.children("ul").is(":visible")) {
+                this.uiElement.find("ul").first().hide();
+                this.uiElement.addClass("closed");
+                this.uiElement.removeClass("open");
+            } else {
+                this.uiElement.find("ul").first().show();
+                this.uiElement.addClass("open");
+                this.uiElement.removeClass("closed");
+                if(this.childCategories.length ===1 && !this.childCategories[0].uiElement.children("ul").is(":visible")) {
+                    this.childCategories[0].expand();
+                }
+            }
         }
     }
 
@@ -314,22 +330,6 @@
 
     function userLoadCategory(id) {
         animalList.categories[id].loadSubElements(true, false);
-    }
-
-    function expandCategory(categoryElem) {
-        if(categoryElem.children("ul").is(":visible")) {
-            categoryElem.find("ul").first().hide();
-            categoryElem.addClass("closed");
-            categoryElem.removeClass("open");
-        } else {
-            categoryElem.find("ul").first().show();
-            categoryElem.addClass("open");
-            categoryElem.removeClass("closed");
-            const childCategoryElems = categoryElem.children("ul").children("li.category");
-            if(childCategoryElems.length === 1 && !childCategoryElems.children("ul").is(":visible")) {
-                expandCategory(categoryElem.children("ul").children("li.category"));
-            }
-        }
     }
 
     /**
