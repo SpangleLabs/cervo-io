@@ -39,6 +39,7 @@
     let map;
     let googleMap;
     let animalList;
+    let selection = new Selection();
 
     /**
      * Wrapper around the google maps Map class, having handy methods and caches
@@ -106,7 +107,7 @@
         hideAllMarkers() {
             // Hide all info windows, except those for zoos currently selected. TODO: check
             $.each(this.cacheZooInfoWindows, function(zooId, infoWindow) {
-                if (!currentSelectedZooIds.includes(zooId)) {
+                if (!selection.selectedZooIds.includes(zooId)) {
                     infoWindow.close();
                 }
             });
@@ -297,17 +298,65 @@
             }
             return speciesElem;
         }
+
+        getZoos() {
+            // TODO: replace getSpeciesFromCache
+        }
     }
 
     /**
      * Stores which species are currently selected, and stuff.
      */
-    class Selection {}
+    class Selection {
+        constructor() {
+            this.selectedSpecies = [];
+            this.selectedZoos = [];
+        }
+
+        update() {
+            this.selectedSpeciesIds = [];
+            this.selectedZooIds = [];
+            // This is for styling selected species in zoo info windows.
+            let zooSpeciesSelected = $("#zoo_species_selected");
+            zooSpeciesSelected.empty();
+            let speciesDataPromises = [];
+            // Find all selected species on page
+            const self = this;
+            $("li.species.selected").each(function(idx, elem) {
+                const speciesId = elem.id.split("-")[1];
+                zooSpeciesSelected.append(`li.zoo_species_${speciesId} { font-weight:bold; }`);
+                self.selectedSpeciesIds.push(speciesId);
+                // Generate promises returning dict of zoo id to zoos
+                speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
+                    let selectedZoos = {};
+                    $.each(speciesData.zoos, function (zooIdx, zooData) {
+                        selectedZoos[zooData.zoo_id] = zooData;
+                    });
+                    return selectedZoos;
+                }));
+            });
+            // Wait for all species data to have been retrieved
+            Promise.all(speciesDataPromises).then(function(selectedZooList) {
+                // Merge the list of zoo lists into one object
+                const selectedZoos = Object.assign({}, ...selectedZooList);
+                // Update zoos selected
+                let selectedZoosElem = $("#selected-zoos");
+                selectedZoosElem.empty();
+                this.selectedZooIds = Object.keys(selectedZoos);
+                map.hideAllMarkers();
+                $.each(selectedZoos, function(zooKey, zooData) {
+                    selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
+                    const marker = map.getZooMarker(zooData);
+                    marker.setVisible(true);
+                });
+                updateZooDistances();
+            });
+        }
+    }
 
 
     let cacheSpeciesPromises = [];
     let cacheZooDistances = {};
-    let currentSelectedSpeciesIds = [];
     let currentSelectedZooIds = [];
     function cacheAddZooDistances(postcode,zooDistanceData) {
         if (!cacheZooDistances[postcode]) {
@@ -379,13 +428,13 @@
         categoryElem.toggleClass("selected");
         categoryElem.find("li").toggleClass("selected");
         category.loadSubElements(false, true).then(function() {
-            updateSelected();
+            selection.update();
         });
     }
 
     function userSelectSpecies(speciesId) {
         $("li#species-"+speciesId).toggleClass("selected");
-        updateSelected();
+        selection.update();
     }
 
     function userUpdatePostcode() {
@@ -404,11 +453,11 @@
             return;
         }
         // check selected zoo list isn't empty
-        if (currentSelectedZooIds.length === 0) {
+        if (selection.selectedZooIds.length === 0) {
             return;
         }
         //// currentSelectedZooIds;
-        promiseGetZooDistances(postcode, currentSelectedZooIds).then(function(zooDistances) {
+        promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
             $.each(zooDistances, function(idx, val) {
                 $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
             });
@@ -456,42 +505,6 @@
         $.each(distancesSorted, function(idx, distance) {
             const zooLi = $("li#selected-zoo-"+distance.zoo_id);
             zooLi.parent().prepend(zooLi);
-        });
-    }
-
-    function updateSelected() {
-        currentSelectedSpeciesIds = [];
-        currentSelectedZooIds = [];
-        let zooSpeciesSelected = $("#zoo_species_selected");
-        zooSpeciesSelected.empty();
-        let speciesDataPromises = [];
-        $("li.species.selected").each(function(idx, elem) {
-            const speciesId = elem.id.split("-")[1];
-            zooSpeciesSelected.append("li.zoo_species_"+speciesId+" { font-weight:bold; }");
-            currentSelectedSpeciesIds.push(speciesId);
-
-            speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
-                let selectedZoos = {};
-                $.each(speciesData.zoos, function (zooIdx, zooData) {
-                    selectedZoos[zooData.zoo_id] = zooData;
-                });
-                return selectedZoos;
-            }));
-        });
-        Promise.all(speciesDataPromises).then(function(selectedZooList) {
-            // Merge the list of zoo lists into one object
-            const selectedZoos = Object.assign({}, ...selectedZooList);
-            // Update zoos selected
-            let selectedZoosElem = $("#selected-zoos");
-            selectedZoosElem.empty();
-            currentSelectedZooIds = Object.keys(selectedZoos);
-            map.hideAllMarkers();
-            $.each(selectedZoos, function(zooKey, zooData) {
-                selectedZoosElem.append("<li id='selected-zoo-"+zooData.zoo_id+"' onclick='map.userToggleInfoWindow("+zooData.zoo_id+")'>"+zooData.name+" <span class='distance'></span></li>");
-                const marker = map.getZooMarker(zooData);
-                marker.setVisible(true);
-            });
-            updateZooDistances();
         });
     }
 
