@@ -149,7 +149,7 @@
             }
             this.uiElement = this.render();
             this.isOdd = this.uiElement.parent("ul").hasClass("odd");
-            this.childCategories = [];
+            this.childCategories = null;
         }
 
         render() {
@@ -176,6 +176,7 @@
             let populatedCategoriesPromise = Promise.resolve([]);
             const self = this;
             if(!this.isPopulated()) {
+                self.childCategories = [];
                 populatedCategoriesPromise = promiseGet(config["api_url"]+"categories/"+this.id).then(function(/*[CategoryObj]*/categoryObjs) {
                     const categoryObj = categoryObjs[0];
                     // Add base list element
@@ -222,7 +223,7 @@
          * @returns {boolean}
          */
         isPopulated() {
-            return Boolean(this.uiElement.has("ul").length);
+            return this.childCategories != null;
         }
 
         expand() {
@@ -234,7 +235,9 @@
                 this.uiElement.find("ul").first().show();
                 this.uiElement.addClass("open");
                 this.uiElement.removeClass("closed");
-                if(this.childCategories.length ===1 && !this.childCategories[0].uiElement.children("ul").is(":visible")) {
+                if(this.childCategories != null
+                    && this.childCategories.length ===1
+                    && !this.childCategories[0].uiElement.children("ul").is(":visible")) {
                     this.childCategories[0].expand();
                 }
             }
