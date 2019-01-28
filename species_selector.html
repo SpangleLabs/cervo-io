@@ -170,6 +170,7 @@
             this.uiElement = this.render();
             this.isOdd = this.uiElement.parent("ul").hasClass("odd");
             this.childCategories = null;
+            this.childSpecies = null;
         }
 
         render() {
@@ -197,6 +198,7 @@
             const self = this;
             if (!this.isPopulated()) {
                 self.childCategories = [];
+                self.childSpecies = [];
                 populatedCategoriesPromise = promiseGet(config["api_url"] + "categories/" + this.id).then(function (/*[CategoryObj]*/categoryObjs) {
                     const categoryObj = categoryObjs[0];
                     // Add base list element
@@ -209,7 +211,8 @@
                     });
                     // Add species in category
                     $.each(categoryObj.species, function (index, itemData) {
-                        addSpecies(self.uiElement.find("ul"), itemData);
+                        const newSpecies = new Species(itemData);
+                        self.childSpecies.push(newSpecies);
                     });
                     // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                     let loadCategoryPromises = [];
@@ -261,6 +264,35 @@
                     this.childCategories[0].expand();
                 }
             }
+        }
+    }
+
+    /**
+     * An actual species
+     */
+    class Species {
+        constructor(speciesData) {
+            this.id = speciesData.species_id;
+            this.name = speciesData.common_name;
+            this.latinName = speciesData.latin_name;
+            this.parentCategoryId = speciesData.category_id;
+            this.parentCategory = animalList.categories[this.parentCategoryId];
+            this.uiElement = this.render();
+        }
+
+        render() {
+            const speciesLiId = "species-"+this.id;
+            const parentUlElement = this.parentCategory.uiElement.find("ul");
+            parentUlElement.append(`<li class='species' id='${speciesLiId}'>
+                <span class='species_name'>${this.name} </span>
+                <span class='latin_name'>${this.latinName}</span>
+                <span class='selector' onclick='userSelectSpecies(${this.id})'></span>
+                </li>`);
+            const speciesElem = $("#"+speciesLiId);
+            if(this.parentCategory.uiElement.hasClass("selected")) {
+                speciesElem.addClass("selected");
+            }
+            return speciesElem;
         }
     }
 
@@ -331,28 +363,6 @@
             });
             cacheSpeciesPromises[id] = promise;
             return promise;
-        }
-    }
-
-    /**
-     * Adds a new species to the dom
-     * @param parentUlElement ul element of the parent category for the species
-     * @param speciesData data object for the new species
-     */
-    function addSpecies(parentUlElement, speciesData) {
-        const speciesId = speciesData.species_id;
-        const speciesLiId = "species-"+speciesId;
-        const name = speciesData.common_name;
-        const latinName = speciesData.latin_name;
-        //speciesCache[speciesId] = speciesData;
-        parentUlElement.append(
-            "<li class='species' id='"+speciesLiId+"'>" +
-                "<span class='species_name'>"+name+" </span>" +
-                "<span class='latin_name'>"+latinName+"</span>" +
-                "<span class='selector' onclick='userSelectSpecies("+speciesId+")'></span>" +
-            "</li>");
-        if(parentUlElement.parent().hasClass("selected")) {
-            $("#"+speciesLiId).addClass("selected");
         }
     }
 
