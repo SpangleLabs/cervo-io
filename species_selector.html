@@ -107,15 +107,18 @@
     class AnimalList {
         constructor() {
             this.cacheCategoryLevel = [];
+            this.categories = {};
 
             const categoryLevelsPromise = promiseGet(config["api_url"]+"category_levels/");
             const firstCategoryPromise = promiseGet(config["api_url"]+"categories/");
-            //const self = this;
+            const self = this;
             Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function(data) {
-                this.cacheCategoryLevel = data[0];
+                self.cacheCategoryLevel = data[0];
                 const categoryData = data[1];
                 $.each(categoryData, function(index, itemData) {
-                    addCategory($("#animals"), itemData);
+                    const newCategory = new Category(itemData);
+                    self.categories[newCategory.id] = newCategory;
+
                     userLoadCategory(itemData.category_id);
                 });
             });
@@ -129,6 +132,60 @@
                 }
             });
             return result;
+        }
+    }
+
+    class Category {
+        constructor(categoryData) {
+            this.id = categoryData.category_id;
+            this.name = categoryData.name;
+            this.levelName = animalList.getCategoryLevel(categoryData.category_level_id).name;
+            this.parentCategoryId = categoryData.parent_category_id;
+            this.parentCategory = null;
+            this.selected = false;
+            if(this.parentCategoryId != null) {
+                this.parentCategory = animalList.categories[this.parentCategoryId];
+                this.selected = this.parentCategory.uiElement.parent().hasClass("selected");
+            }
+            this.uiElement = this.render();
+        }
+
+        render() {
+            const categoryLiId = "category-"+this.id;
+            const parentUI = this.parentCategory == null ? $("#animals") : this.parentCategory.uiElement;
+            parentUI.append(
+                `<li class='category closed ${ this.selected ? "selected" : ""}' id='${ categoryLiId }'>
+                <span onclick='userLoadCategory(${ this.id })'>
+                <span class='category_name'>${ this.name }</span>
+                <span class='category_level'>${ this.levelName }</span>
+                </span>
+                <span class='selector' onclick='userSelectCategory(${ this.id })'></span>
+                </li>`);
+            return $("#"+categoryLiId);
+        }
+    }
+
+    /**
+     * Adds a new category to the dom
+     * @param parentUlElement ul element of the parent category for the category
+     * @param categoryData data object for the new category
+     */
+    function addCategory(parentUlElement, categoryData) {
+        const categoryId = categoryData.category_id;
+        const name = categoryData.name;
+        const categoryLevelId = categoryData.category_level_id;
+        const categoryLiId = "category-"+categoryId;
+        const categoryLevelName = animalList.getCategoryLevel(categoryLevelId).name;
+        parentUlElement.append(
+            "<li class='category closed' id='"+categoryLiId+"'>" +
+            "<span onclick='userLoadCategory("+categoryId+")'>" +
+            "<span class='category_name'>" + name + "</span> " +
+            "<span class='category_level'>"+categoryLevelName+"</span>" +
+            "</span> " +
+            "<span class='selector' onclick='userSelectCategory("+categoryId+")'></span>" +
+            "</li>");
+        if(parentUlElement.parent().hasClass("selected")) {
+            $("#"+categoryLiId).addClass("selected");
         }
     }
 
@@ -194,30 +251,6 @@
             });
             cacheSpeciesPromises[id] = promise;
             return promise;
-        }
-    }
-
-    /**
-     * Adds a new category to the dom
-     * @param parentUlElement ul element of the parent category for the category
-     * @param categoryData data object for the new category
-     */
-    function addCategory(parentUlElement, categoryData) {
-        const categoryId = categoryData.category_id;
-        const name = categoryData.name;
-        const categoryLevelId = categoryData.category_level_id;
-        const categoryLiId = "category-"+categoryId;
-        const categoryLevelName = animalList.getCategoryLevel(categoryLevelId).name;
-        parentUlElement.append(
-            "<li class='category closed' id='"+categoryLiId+"'>" +
-                "<span onclick='userLoadCategory("+categoryId+")'>" +
-                    "<span class='category_name'>" + name + "</span> " +
-                    "<span class='category_level'>"+categoryLevelName+"</span>" +
-                "</span> " +
-                "<span class='selector' onclick='userSelectCategory("+categoryId+")'></span>" +
-            "</li>");
-        if(parentUlElement.parent().hasClass("selected")) {
-            $("#"+categoryLiId).addClass("selected");
         }
     }
 
