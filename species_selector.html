@@ -124,6 +124,8 @@
             this.categories = {};
             this.species = {};
 
+            $("#animals").append(spinner);
+
             const categoryLevelsPromise = promiseGet(config["api_url"] + "category_levels/");
             const firstCategoryPromise = promiseGet(config["api_url"] + "categories/");
             const self = this;
@@ -132,6 +134,7 @@
                 const categoryData = data[1];
                 $.each(categoryData, function (index, itemData) {
                     const newCategory = new Category(itemData);
+                    $("#animals").find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
                 });
             });
@@ -193,6 +196,7 @@
          * @returns {Promise<Array>}
          */
         loadSubElements(expand, recursive) {
+            this.uiElement.append(spinner);
             let populatedCategoriesPromise = Promise.resolve([]);
             const self = this;
             if (!this.isPopulated()) {
@@ -234,6 +238,7 @@
                 if (expand) {
                     self.expand();
                 }
+                self.uiElement.find("img.spinner").remove();
             });
         }
 
@@ -359,6 +364,7 @@
     let googleMap;
     let animalList;
     let selection = new Selection();
+    const spinner = `<img class="spinner" src="images/spinner.svg" alt="..."/>`;
 
 
     let cacheZooDistances = {};
