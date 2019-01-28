@@ -175,25 +175,25 @@
             let categoryElem = this.uiElement;
             let populatedCategoriesPromise = Promise.resolve([]);
             if(!this.isPopulated()) {
+                const self = this;
                 populatedCategoriesPromise = promiseGet(config["api_url"]+"categories/"+this.id).then(function(/*[CategoryObj]*/categoryObjs) {
                     const categoryObj = categoryObjs[0];
                     // Add base list element
-                    this.uiElement.append(`<ul class='${ this.isOdd ? "even" : "odd" }' style='display: none;'></ul>`);
+                    self.uiElement.append(`<ul class='${ self.isOdd ? "even" : "odd" }' style='display: none;'></ul>`);
                     // Add subcategories
                     $.each(categoryObj.sub_categories, function (index, itemData) {
                         const newCategory = new Category(itemData);
                         animalList.categories[newCategory.id] = newCategory;
                     });
                     // Add species in category
-                    self = this;
                     $.each(categoryObj.species, function (index, itemData) {
                         addSpecies(self.uiElement.find("ul"), itemData);
                     });
                     // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                     let loadCategoryPromises = [];
-                    if (this.uiElement.children("ul").children("li.category").length === 1 || recursive) {
+                    if (self.uiElement.children("ul").children("li.category").length === 1 || recursive) {
                         $.each(categoryObj.sub_categories, function (idx, subCategoryData) {
-                            const subCategory = animalList.categories[subCategoryData];
+                            const subCategory = animalList.categories[subCategoryData.category_id];
                             loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
                         })
                     }
