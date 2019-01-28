@@ -43,7 +43,7 @@
     /**
      * Wrapper around the google maps Map class, having handy methods and caches
      */
-    class Map {
+    class PageMap {
 
         constructor(googleMap) {
             this.googleMap = googleMap;
@@ -492,7 +492,7 @@
             zoom: 6,
             center: {lat: 55, lng: -3}
         });
-        map = new Map(googleMap);
+        map = new PageMap(map);
     }
 </script>
 <script async defer
