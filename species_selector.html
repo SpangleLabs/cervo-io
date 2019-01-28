@@ -148,11 +148,12 @@
                 this.selected = this.parentCategory.uiElement.parent().hasClass("selected");
             }
             this.uiElement = this.render();
+            this.isOdd = this.uiElement.parent("ul").hasClass("odd");
         }
 
         render() {
             const categoryLiId = "category-"+this.id;
-            const parentUI = this.parentCategory == null ? $("#animals") : this.parentCategory.uiElement;
+            const parentUI = this.parentCategory == null ? $("#animals") : this.parentCategory.uiElement.find("ul");
             parentUI.append(
                 `<li class='category closed ${ this.selected ? "selected" : ""}' id='${ categoryLiId }'>
                 <span onclick='userLoadCategory(${ this.id })'>
@@ -163,29 +164,64 @@
                 </li>`);
             return $("#"+categoryLiId);
         }
-    }
 
-    /**
-     * Adds a new category to the dom
-     * @param parentUlElement ul element of the parent category for the category
-     * @param categoryData data object for the new category
-     */ //TODO: remove this method
-    function addCategory(parentUlElement, categoryData) {
-        const categoryId = categoryData.category_id;
-        const name = categoryData.name;
-        const categoryLevelId = categoryData.category_level_id;
-        const categoryLiId = "category-"+categoryId;
-        const categoryLevelName = animalList.getCategoryLevel(categoryLevelId).name;
-        parentUlElement.append(
-            "<li class='category closed' id='"+categoryLiId+"'>" +
-            "<span onclick='userLoadCategory("+categoryId+")'>" +
-            "<span class='category_name'>" + name + "</span> " +
-            "<span class='category_level'>"+categoryLevelName+"</span>" +
-            "</span> " +
-            "<span class='selector' onclick='userSelectCategory("+categoryId+")'></span>" +
-            "</li>");
-        if(parentUlElement.parent().hasClass("selected")) {
-            $("#"+categoryLiId).addClass("selected");
+        /**
+         * Returns a promise to expand this category
+         * @param expand
+         * @param recursive
+         * @returns {Promise<Array>}
+         */
+        loadSubElements(expand, recursive) {
+            let categoryElem = this.uiElement;
+            let populatedCategoriesPromise = Promise.resolve([]);
+            if(!this.isPopulated()) {
+                populatedCategoriesPromise = promiseGet(config["api_url"]+"categories/"+this.id).then(function(/*[CategoryObj]*/categoryObjs) {
+                    const categoryObj = categoryObjs[0];
+                    // Add base list element
+                    this.uiElement.append(`<ul class='${ this.isOdd ? "even" : "odd" }' style='display: none;'></ul>`);
+                    // Add subcategories
+                    $.each(categoryObj.sub_categories, function (index, itemData) {
+                        const newCategory = new Category(itemData);
+                        animalList.categories[newCategory.id] = newCategory;
+                    });
+                    // Add species in category
+                    self = this;
+                    $.each(categoryObj.species, function (index, itemData) {
+                        addSpecies(self.uiElement.find("ul"), itemData);
+                    });
+                    // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
+                    let loadCategoryPromises = [];
+                    if (this.uiElement.children("ul").children("li.category").length === 1 || recursive) {
+                        $.each(categoryObj.sub_categories, function (idx, subCategoryData) {
+                            const subCategory = animalList.categories[subCategoryData];
+                            loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
+                        })
+                    }
+                    return Promise.all(loadCategoryPromises);
+                });
+            } else if (recursive) {
+                const subCategoryElems = this.uiElement.children("ul").children("li.category");
+                let loadCategoryPromises = [];
+                subCategoryElems.each(function(idx, elem) {
+                    const subCategoryId = elem.id.split("-")[1];
+                    const subCategory = animalList.categories[subCategoryId];
+                    loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
+                });
+                populatedCategoriesPromise = Promise.all(loadCategoryPromises);
+            }
+            return populatedCategoriesPromise.then(function() {
+                if (expand) {
+                    expandCategory(categoryElem);
+                }
+            });
+        }
+
+        /**
+         * Checks if a category has been populated with subcategory and species data
+         * @returns {boolean}
+         */
+        isPopulated() {
+            return Boolean(this.uiElement.has("ul").length);
         }
     }
 
@@ -277,49 +313,7 @@
     }
 
     function userLoadCategory(id) {
-        loadCategory(id, true, false);
-    }
-
-    function loadCategory(id, expand, recursive) {
-        const categoryLiId = "category-"+id;
-        let categoryElem = $("#"+categoryLiId);
-        const isOdd = categoryElem.parent("ul").hasClass("odd");
-        let populatedCategoriesPromise = Promise.resolve([]);
-        if(categoryNotPopulated(categoryElem)) {
-            populatedCategoriesPromise = promiseGet(config["api_url"]+"categories/"+id).then(function(/*[CategoryObj]*/categoryObjs) {
-                const categoryObj = categoryObjs[0];
-                // Add base list element
-                categoryElem.append("<ul class='" + (isOdd ? "even" : "odd") + "' style='display: none;'></ul>");
-                // Add subcategories
-                $.each(categoryObj.sub_categories, function (index, itemData) {
-                    addCategory(categoryElem.find("ul"), itemData);
-                });
-                // Add species in category
-                $.each(categoryObj.species, function (index, itemData) {
-                    addSpecies(categoryElem.find("ul"), itemData);
-                });
-                // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
-                let loadCategoryPromises = [];
-                if (categoryElem.children("ul").children("li.category").length === 1 || recursive) {
-                    $.each(categoryObj.sub_categories, function (idx, subCategory) {
-                        loadCategoryPromises.push(loadCategory(subCategory.category_id, expand, recursive));
-                    })
-                }
-                return Promise.all(loadCategoryPromises);
-            });
-        } else if (recursive) {
-            const subCategoryElems = categoryElem.children("ul").children("li.category");
-            let loadCategoryPromises = [];
-            subCategoryElems.each(function(idx, elem) {
-                loadCategoryPromises.push(loadCategory(elem.id.split("-")[1], expand, recursive));
-            });
-            populatedCategoriesPromise = Promise.all(loadCategoryPromises);
-        }
-        return populatedCategoriesPromise.then(function(loadedCategories) {
-            if (expand) {
-                expandCategory(categoryElem);
-            }
-        });
+        animalList.categories[id].loadSubElements(true, false);
     }
 
     function expandCategory(categoryElem) {
@@ -348,10 +342,11 @@
     }
 
     function userSelectCategory(categoryId) {
-        let categoryElem = $("li#category-"+categoryId);
+        const category = animalList.categories[categoryId];
+        let categoryElem = category.uiElement;
         categoryElem.toggleClass("selected");
         categoryElem.find("li").toggleClass("selected");
-        loadCategory(categoryId, false, true).then(function(data) {
+        category.loadSubElements(false, true).then(function(data) {
             updateSelected();
         });
     }
