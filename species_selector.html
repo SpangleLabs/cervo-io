@@ -59,12 +59,12 @@
             const zooId = zooData.zoo_id;
             if (!this.cacheZooMarkers[zooId]) {
                 this.cacheZooMarkers[zooId] = new google.maps.Marker({
-                    position: {lat: zooData.latitude, lng: zooData.longitude},
+                    position: new google.maps.LatLng(zooData.latitude, zooData.longitude),
                     map: this.googleMap,
                     title: zooData.name
                 });
+                const self = this;
                 this.cacheZooMarkers[zooId].addListener("click", function () {
-                    const self = this;
                     self.getZooInfoWindow(zooId).open(self.googleMap, self.cacheZooMarkers[zooId]);
                 });
             }
@@ -74,18 +74,18 @@
         getZooInfoWindow(zooId) {
             if (!this.cacheZooInfoWindows[zooId]) {
                 this.cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
-                    content: ""
+                    content: "⏳"
                 });
+                const self = this;
                 promiseGet(config["api_url"] + "zoos/" + zooId).then(function (zoosData) {
-                    const self = this;
                     const zooData = zoosData[0];
-                    let infoContent = "<h1>" + zooData.name + "</h1>" +
-                        "<a href='" + zooData.link + "'>" + zooData.link + "</a><br />" +
-                        "<span style='font-weight: bold'>Postcode:</span> " + zooData.postcode + "<br />" +
-                        "<h2>Species:</h2>" +
-                        "<ul class='zoo_species'>";
+                    let infoContent = `<h1>${zooData.name}</h1>
+                        <a href='${zooData.link}'>${zooData.link}</a><br />
+                        <span style='font-weight: bold'>Postcode:</span> ${zooData.postcode}<br />
+                        <h2>Species:</h2>
+                        <ul class='zoo_species'>`;
                     $.each(zooData.species, function (idx, zooSpecies) {
-                        infoContent += "<li class='zoo_species zoo_species_" + zooSpecies.species_id + "'>" + zooSpecies.common_name + " <span class='latin_name'>" + zooSpecies.latin_name + "</span>";
+                        infoContent += `<li class='zoo_species zoo_species_${zooSpecies.species_id}'>${zooSpecies.common_name} <span class='latin_name'>${zooSpecies.latin_name}</span>`;
                     });
                     infoContent += "</ul>";
                     self.cacheZooInfoWindows[zooId].setContent(infoContent);
@@ -355,7 +355,7 @@
         let categoryElem = category.uiElement;
         categoryElem.toggleClass("selected");
         categoryElem.find("li").toggleClass("selected");
-        category.loadSubElements(false, true).then(function(data) {
+        category.loadSubElements(false, true).then(function() {
             updateSelected();
         });
     }
@@ -437,12 +437,12 @@
     }
 
     function hideAllMarkers() {
-        $.each(cacheZooInfoWindows, function(zooId, infoWindow) {
+        $.each(map.cacheZooInfoWindows, function(zooId, infoWindow) {
             if (!currentSelectedZooIds.includes(zooId)) {
                 infoWindow.close();
             }
         });
-        $.each(cacheZooMarkers, function(zooId, marker) {
+        $.each(map.cacheZooMarkers, function(zooId, marker) {
             marker.setVisible(false);
         });
         $("li.zoo_species").removeClass("selected_species");
@@ -468,6 +468,7 @@
             }));
         });
         Promise.all(speciesDataPromises).then(function(selectedZooList) {
+            // Merge the list of zoo lists into one object
             const selectedZoos = Object.assign({}, ...selectedZooList);
             // Update zoos selected
             let selectedZoosElem = $("#selected-zoos");
@@ -492,7 +493,7 @@
             zoom: 6,
             center: {lat: 55, lng: -3}
         });
-        map = new PageMap(map);
+        map = new PageMap(googleMap);
     }
 </script>
 <script async defer
