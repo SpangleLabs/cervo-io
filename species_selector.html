@@ -279,6 +279,7 @@
             this.parentCategoryId = speciesData.category_id;
             this.parentCategory = animalList.categories[this.parentCategoryId];
             this.uiElement = this.render();
+            this.zooList = null;
             // Add self to parent category and animalList dict
             animalList.species[this.id] = this;
             this.parentCategory.childSpecies.push(this);
@@ -299,8 +300,13 @@
             return speciesElem;
         }
 
-        getZoos() {
-            // TODO: replace getSpeciesFromCache
+        getZooList() {
+            if(this.zooList == null) {
+                this.zooList = promiseGet(config["api_url"] + "species/" + this.id).then(function (data) {
+                    return data[0].zoos;
+                });
+            }
+            return this.zooList;
         }
     }
 
@@ -324,12 +330,13 @@
             const self = this;
             $("li.species.selected").each(function(idx, elem) {
                 const speciesId = elem.id.split("-")[1];
+                const species = animalList.species[speciesId];
                 zooSpeciesSelected.append(`li.zoo_species_${speciesId} { font-weight:bold; }`);
                 self.selectedSpeciesIds.push(speciesId);
                 // Generate promises returning dict of zoo id to zoos
-                speciesDataPromises.push(getSpeciesFromCache(speciesId).then(function(/*SpeciesObj*/speciesData) {
+                speciesDataPromises.push(species.getZooList().then(function(/*SpeciesObj*/zooList) {
                     let selectedZoos = {};
-                    $.each(speciesData.zoos, function (zooIdx, zooData) {
+                    $.each(zooList, function (zooIdx, zooData) {
                         selectedZoos[zooData.zoo_id] = zooData;
                     });
                     return selectedZoos;
@@ -355,9 +362,7 @@
     }
 
 
-    let cacheSpeciesPromises = [];
     let cacheZooDistances = {};
-    let currentSelectedZooIds = [];
     function cacheAddZooDistances(postcode,zooDistanceData) {
         if (!cacheZooDistances[postcode]) {
             cacheZooDistances[postcode] = {};
@@ -400,22 +405,6 @@
             // Make the request
             req.send();
         });
-    }
-
-    /**
-     * Retrieves species data from the cache
-     * @param id species id to retrieve
-     */
-    function getSpeciesFromCache(id) {
-        if(cacheSpeciesPromises[id]) {
-            return cacheSpeciesPromises[id];
-        } else {
-            const promise = promiseGet(config["api_url"]+"species/"+id).then(function(data) {
-                return data[0];
-            });
-            cacheSpeciesPromises[id] = promise;
-            return promise;
-        }
     }
 
     function userExpandCategory(id) {
