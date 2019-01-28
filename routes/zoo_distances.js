@@ -52,12 +52,15 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     }
     const googleApiKey = "AIzaSyDDRJjxehwEZJq1f9XLJL_96tvPvvjzIvk"; //Location locked,fine to commit
     const requestPromises = [];
-    for (let postcodeString of zooPostcodeStrings) {
+    for (let zooPostcodeString of zooPostcodeStrings) {
         const googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + ",UK&destinations=" + zooPostcodeString + ",UK&key=" + googleApiKey;
         const requestOptions = {};
         requestOptions.uri = googleApiString;
         requestOptions.json = true;
         requestPromises.push(RequestPromise(requestOptions).then(function (data) {
+            if(data.status !== "OK") {
+                throw new Error("Distance metrics API failed, response: " + JSON.stringify(data));
+            }
             const distanceResults = data.rows[0].elements;
             if (distanceResults.length !== zooDataList.length) {
                 Promise.reject(new Error("Incorrect amount of distances returned from google maps API"));
@@ -88,7 +91,7 @@ router.get('/:postcode/:zooIdList', function (req, res, next) {
     const postcode = new Postcode(req.params.postcode);
     // Validate postcode
     if (!postcode.valid()) {
-        res.status(404).send("Invalid postcode");
+        res.status(404).json({"error": "Invalid postcode"});
         return;
     }
     // Get postcode sector
@@ -159,7 +162,7 @@ router.get('/:postcode/:zooIdList', function (req, res, next) {
         res.json(result.zoo_distances);
     }).catch(function (err) {
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": "Failure to determine distances.", "more_detail": err.toLocaleString()});
     });
 });
 
