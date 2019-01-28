@@ -36,11 +36,6 @@
 </body>
 
 <script>
-    let map;
-    let googleMap;
-    let animalList;
-    let selection = new Selection();
-
     /**
      * Wrapper around the google maps Map class, having handy methods and caches
      */
@@ -360,6 +355,10 @@
             });
         }
     }
+    let map;
+    let googleMap;
+    let animalList;
+    let selection = new Selection();
 
 
     let cacheZooDistances = {};
@@ -422,6 +421,7 @@
     }
 
     function userSelectSpecies(speciesId) {
+        const species = animalList.species[speciesId];
         $("li#species-"+speciesId).toggleClass("selected");
         selection.update();
     }
@@ -498,6 +498,7 @@
     }
 
     $(document).ready(function() {
+        console.log("hey");
         animalList = new AnimalList();
     });
 
