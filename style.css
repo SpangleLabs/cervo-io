@@ -87,3 +87,6 @@ input.input-lat, input.input-long {
     font-weight: bold;
     display: none;
 }
+span[onclick], li[onclick] {
+    cursor: pointer;
+}
