@@ -4,7 +4,7 @@ const Categories = {
 
     getBaseCategories: function () {
         return db.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id is null");
+            const result = conn.query("select * from categories where parent_category_id is null and hidden is false");
             conn.end();
             return result;
         });
@@ -20,7 +20,7 @@ const Categories = {
 
     getCategoriesByParentId: function (id) {
         return db.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id=?", [id]);
+            const result = conn.query("select * from categories where parent_category_id=? and hidden is false", [id]);
             conn.end();
             return result;
         });

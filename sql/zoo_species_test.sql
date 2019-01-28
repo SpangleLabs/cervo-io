@@ -23,6 +23,7 @@ CREATE TABLE `categories` (
   `name` varchar(100) NOT NULL,
   `category_level_id` int(11) NOT NULL,
   `parent_category_id` int(11) DEFAULT NULL,
+  `hidden` tinyint(1) DEFAULT 0 NOT NULL,
   PRIMARY KEY (`category_id`),
   KEY `category_level_id_idx` (`category_level_id`),
   KEY `parent_category_id_idx` (`parent_category_id`),
