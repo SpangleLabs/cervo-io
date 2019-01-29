@@ -5,6 +5,7 @@ const Postcode = require("postcode");
 const UserPostcodes = require("../models/UserPostcodes.js");
 const ZooDistances = require("../models/ZooDistances.js");
 const RequestPromise = require("request-promise");
+const config = require("../config.js");
 
 function promiseGetPostcodeData(postcodeSector) {
     return UserPostcodes.getUserPostcodeByPostcodeSector(postcodeSector).then(function (data) {
@@ -50,7 +51,7 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList) {
     for (let b = 0; b < zooPostcodeList.length; b += chunkSize) {
         zooPostcodeStrings.push(zooPostcodeList.slice(b, b + chunkSize).join(",UK|"));
     }
-    const googleApiKey = "AIzaSyDDRJjxehwEZJq1f9XLJL_96tvPvvjzIvk"; //Location locked,fine to commit
+    const googleApiKey = config["google_distance_api_key"]; //Location locked,fine to commit
     const requestPromises = [];
     for (let zooPostcodeString of zooPostcodeStrings) {
         const googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userPostcode + ",UK&destinations=" + zooPostcodeString + ",UK&key=" + googleApiKey;
