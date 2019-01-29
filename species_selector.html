@@ -166,7 +166,7 @@
             this.selected = false;
             if (this.parentCategoryId != null) {
                 this.parentCategory = animalList.categories[this.parentCategoryId];
-                this.selected = this.parentCategory.uiElement.parent().hasClass("selected");
+                this.selected = this.parentCategory.uiElement.hasClass("selected");
                 this.parentCategory.childCategories.push(this);
             }
             this.uiElement = this.render();
@@ -280,6 +280,7 @@
             this.latinName = speciesData.latin_name;
             this.parentCategoryId = speciesData.category_id;
             this.parentCategory = animalList.categories[this.parentCategoryId];
+            this.selected = this.parentCategory.uiElement.hasClass("selected");
             this.uiElement = this.render();
             this.zooList = null;
             // Add self to parent category and animalList dict
@@ -290,7 +291,7 @@
         render() {
             const speciesLiId = "species-"+this.id;
             const parentUlElement = this.parentCategory.uiElement.find("ul");
-            parentUlElement.append(`<li class='species' id='${speciesLiId}'>
+            parentUlElement.append(`<li class='species ${this.selected ? "selected" : ""}' id='${speciesLiId}'>
                 <span class='species_name'>${this.name} </span>
                 <span class='latin_name'>${this.latinName}</span>
                 <span class='selector' onclick='userSelectSpecies(${this.id})'></span>
