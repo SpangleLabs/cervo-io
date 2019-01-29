@@ -419,8 +419,14 @@
     function userSelectCategory(categoryId) {
         const category = animalList.categories[categoryId];
         let categoryElem = category.uiElement;
-        categoryElem.toggleClass("selected");
-        categoryElem.find("li").toggleClass("selected");
+        const isBeingSelected = !categoryElem.hasClass("selected");
+        if (isBeingSelected) {
+            categoryElem.addClass("selected");
+            categoryElem.find("li").addClass("selected");
+        } else {
+            categoryElem.removeClass("selected");
+            categoryElem.find("li").removeClass("selected");
+        }
         category.loadSubElements(false, true).then(function() {
             selection.update();
         });
