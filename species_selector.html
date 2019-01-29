@@ -30,6 +30,8 @@
     <h1>Just a test species selector</h1>
     Animal list:<ul id='animals' class='odd'></ul>
     <label for="postcode">Your postcode:</label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+    <h2>Selected species</h2>
+    <ul id="selected-species"></ul>
     <h2>Zoos with selected species</h2>
     <ul id="selected-zoos"></ul>
 </div>
@@ -300,7 +302,7 @@
             return speciesElem;
         }
 
-        getZooList() {
+        async getZooList() {
             if(this.zooList == null) {
                 this.zooList = promiseGet(config["api_url"] + "species/" + this.id).then(function (data) {
                     return data[0].zoos;
@@ -342,7 +344,14 @@
                     return selectedZoos;
                 }));
             });
-            // Wait for all species data to have been retrieved
+            // Update the selected species list
+            const selectedSpeciesElem = $("#selected-species");
+            selectedSpeciesElem.empty();
+            for(const speciesId of this.selectedSpeciesIds) {
+                const species = animalList.species[speciesId];
+                selectedSpeciesElem.append(`<li><span class="species_name">${species.name}</span> <span class="latin_name">${species.latinName}</span></li>`);
+            }
+            // Wait for all species zoo lists to have been retrieved
             Promise.all(speciesDataPromises).then(function(selectedZooList) {
                 // Merge the list of zoo lists into one object
                 const selectedZoos = Object.assign({}, ...selectedZooList);
