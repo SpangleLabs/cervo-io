@@ -186,7 +186,9 @@
                 <span class='category_name'>${this.name}</span>
                 <span class='category_level'>${this.levelName}</span>
                 </span>
-                <span class='selector' onclick='userSelectCategory(${this.id})'></span>
+                <span class='selector' onclick='userSelectCategory(${this.id})'>
+                    <img src="images/box_${this.selected ? "checked" : "unchecked"}.svg" alt="${this.selected ? "✔" : "➕"}️"/>
+                </span>
                 </li>`);
             return $("#" + categoryLiId);
         }
@@ -218,22 +220,18 @@
                     });
                     // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                     let loadCategoryPromises = [];
-                    if (self.uiElement.children("ul").children("li.category").length === 1 || recursive) {
-                        $.each(categoryObj.sub_categories, function (idx, subCategoryData) {
-                            const subCategory = animalList.categories[subCategoryData.category_id];
+                    if (self.childCategories.length === 1 || recursive) {
+                        for(const subCategory of self.childCategories) {
                             loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
-                        })
+                        }
                     }
                     return Promise.all(loadCategoryPromises);
                 });
             } else if (recursive) {
-                const subCategoryElems = this.uiElement.children("ul").children("li.category");
                 let loadCategoryPromises = [];
-                subCategoryElems.each(function (idx, elem) {
-                    const subCategoryId = elem.id.split("-")[1];
-                    const subCategory = animalList.categories[subCategoryId];
+                for(const subCategory of self.childCategories) {
                     loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
-                });
+                }
                 populatedCategoriesPromise = Promise.all(loadCategoryPromises);
             }
             return populatedCategoriesPromise.then(function () {
@@ -268,6 +266,26 @@
                 }
             }
         }
+
+        select(isBeingSelected) {
+            this.selected = typeof isBeingSelected === "undefined" ? !this.selected : isBeingSelected;
+            const checkbox = this.uiElement.find("span.selector img");
+            checkbox.attr("src", this.selected ? "images/box_checked.svg" : "images/box_unchecked.svg");
+            checkbox.attr("alt", this.selected ? "✔" : "➕");
+            if (this.selected) {
+                this.uiElement.addClass("selected");
+            } else {
+                this.uiElement.removeClass("selected");
+            }
+            if (this.isPopulated()) {
+                for (const childCategory of this.childCategories) {
+                    childCategory.select(this.selected);
+                }
+                for (const childSpecies of this.childSpecies) {
+                    childSpecies.select(this.selected);
+                }
+            }
+        }
     }
 
     /**
@@ -294,13 +312,11 @@
             parentUlElement.append(`<li class='species ${this.selected ? "selected" : ""}' id='${speciesLiId}'>
                 <span class='species_name'>${this.name} </span>
                 <span class='latin_name'>${this.latinName}</span>
-                <span class='selector' onclick='userSelectSpecies(${this.id})'></span>
+                <span class='selector' onclick='userSelectSpecies(${this.id})'>
+                    <img src="images/box_${this.selected ? "checked" : "unchecked"}.svg" alt="${this.selected ? "✔" : "➕"}️"/>
+                </span>
                 </li>`);
-            const speciesElem = $("#"+speciesLiId);
-            if(this.parentCategory.uiElement.hasClass("selected")) {
-                speciesElem.addClass("selected");
-            }
-            return speciesElem;
+            return $("#" + speciesLiId);
         }
 
         async getZooList() {
@@ -310,6 +326,18 @@
                 });
             }
             return this.zooList;
+        }
+
+        select(isBeingSelected) {
+            this.selected = typeof isBeingSelected === "undefined" ? !this.selected : isBeingSelected;
+            const checkbox = this.uiElement.find("span.selector img");
+            checkbox.attr("src", this.selected ? "images/box_checked.svg" : "images/box_unchecked.svg");
+            checkbox.attr("alt", this.selected ? "✔" : "➕");
+            if (this.selected) {
+                this.uiElement.addClass("selected");
+            } else {
+                this.uiElement.removeClass("selected");
+            }
         }
     }
 
@@ -428,15 +456,7 @@
 
     function userSelectCategory(categoryId) {
         const category = animalList.categories[categoryId];
-        let categoryElem = category.uiElement;
-        const isBeingSelected = !categoryElem.hasClass("selected");
-        if (isBeingSelected) {
-            categoryElem.addClass("selected");
-            categoryElem.find("li").addClass("selected");
-        } else {
-            categoryElem.removeClass("selected");
-            categoryElem.find("li").removeClass("selected");
-        }
+        category.select();
         category.loadSubElements(false, true).then(function() {
             selection.update();
         });
@@ -444,7 +464,7 @@
 
     function userSelectSpecies(speciesId) {
         const species = animalList.species[speciesId];
-        $("li#species-"+speciesId).toggleClass("selected");
+        species.select();
         selection.update();
     }
 

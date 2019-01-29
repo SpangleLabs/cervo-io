@@ -62,12 +62,6 @@ ul.odd > li.species.selected {
 ul.even > li.species.selected {
     background-color: royalblue;
 }
-.selected > .selector:after {
-    content: "➖";
-}
-:not(selected) > .selector:after {
-    content: "➕";
-}
 ul.zoo_species {
     border-left: none;
     padding-left: 20px;
