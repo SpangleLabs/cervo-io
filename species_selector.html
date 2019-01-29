@@ -348,9 +348,28 @@
         constructor() {
             this.selectedSpeciesIds = [];
             this.selectedZooIds = [];
+            this.updating = false;
+            this.triedAgain = false;
+        }
+
+        findSelectedSpecies() {
+            const speciesList = [];
+            $("li.species.selected").each(function(idx, elem) {
+                const speciesId = elem.id.split("-")[1];
+                speciesList.push(speciesId);
+            });
+            return speciesList;
         }
 
         update() {
+            if (this.updating) {
+                this.triedAgain = true;
+                return;
+            }
+            if (arrayEquals(this.selectedSpeciesIds, this.findSelectedSpecies())) {
+                return;
+            }
+            this.updating = true;
             this.selectedSpeciesIds = [];
             this.selectedZooIds = [];
             // This is for styling selected species in zoo info windows.
@@ -394,7 +413,11 @@
                     const marker = map.getZooMarker(zooData);
                     marker.setVisible(true);
                 });
-                updateZooDistances();
+                return updateZooDistances();
+            }).then(function() {
+                self.updating = false;
+                // Update again, in case user has changed it while we've been updating
+                if (self.triedAgain) self.update();
             });
         }
     }
@@ -450,6 +473,17 @@
         });
     }
 
+    function arrayEquals(array1, array2) {
+        if (array1 == null || array2 == null) return false;
+        if (array1.length !== array2.length) return false;
+        array1.sort();
+        array2.sort();
+        for(let idx = 0; idx < array1.length; idx++) {
+            if (array1[idx] !== array2[idx]) return false;
+        }
+        return true;
+    }
+
     function userExpandCategory(id) {
         animalList.categories[id].loadSubElements(true, false);
     }
@@ -475,7 +509,7 @@
         }
     }
 
-    function updateZooDistances() {
+    async function updateZooDistances() {
         //get postcode
         let postcode = $("input#postcode").val();
         // Basic postcode sanity check
@@ -488,7 +522,7 @@
             return;
         }
         //// currentSelectedZooIds;
-        promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
+        return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
             $.each(zooDistances, function(idx, val) {
                 $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
             });
