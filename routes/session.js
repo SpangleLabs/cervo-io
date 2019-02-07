@@ -1,7 +1,7 @@
 const express = require('express');
 const Session = require("../models/Session");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const uuidv4 = require("uuid/v4");
 
 /* GET home page. */

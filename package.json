@@ -7,8 +7,10 @@
     "test": "npm run test-unit",
     "test-unit": "mocha --require co-mocha test/*/*.spec.js"
   },
+  "main": "lambda.js",
   "dependencies": {
-    "bcrypt": "^2.0.1",
+    "aws-serverless-express": "^3.3.5",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "~2.8.3",
     "debug": "~2.6.3",
