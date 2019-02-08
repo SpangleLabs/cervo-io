@@ -22,18 +22,22 @@
     <style id="zoo_species_selected"></style>
 </head>
 <body>
-<div style="width: 50%; height: 100%; float: left; position: fixed;">
-    <div id="map"></div>
-</div>
-<div id="selector" style="margin-left: 50%;">
-    <a href="index.html">Back to user index</a><br />
-    <h1>Just a test species selector</h1>
-    Animal list:<ul id='animals' class='odd'></ul>
-    <label for="postcode">Your postcode:</label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
-    <h2>Selected species</h2>
-    <ul id="selected-species"></ul>
-    <h2>Zoos with selected species</h2>
-    <ul id="selected-zoos"></ul>
+<div id="main">
+    <div id="selector">
+        <a href="index.html">Back to user index</a><br />
+        <h1>Just a test species selector</h1>
+        Animal list:<ul id='animals' class='odd'></ul>
+        <label for="postcode">Your postcode:</label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+        <h2>Selected species</h2>
+        <ul id="selected-species"></ul>
+        <h2>Zoos with selected species</h2>
+        <ul id="selected-zoos"></ul>
+    </div>
+    <div id="map-ccontainer">
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
 </div>
 </body>
 

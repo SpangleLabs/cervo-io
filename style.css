@@ -84,3 +84,34 @@ input.input-lat, input.input-long {
 span[onclick], li[onclick] {
     cursor: pointer;
 }
+/*Below is all the actual sections of the website for desktop and mobile*/
+#main {
+    height: 100%;
+}
+#map-ccontainer {
+    width: 100%;
+    height: 100%;
+}
+#map-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+#selector {
+    position: relative;
+    float: right;
+    width: 100%;
+}
+@media screen and (min-width:1152px) {
+    #map-container {
+    }
+    #map-ccontainer {
+        width: 50%;
+        order: 1;
+    }
+    #selector {
+        order: 2;
+        width: 50%;
+    }
+}
+/*End of website sections*/
