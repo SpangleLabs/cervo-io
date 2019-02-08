@@ -1,7 +1,7 @@
 /* Setting website font */
 body {
     font-family: 'Source Sans Pro', sans-serif;
-    font-size: 16px;
+    font-size: 22px;
 }
 
 /* Style for category list, but also selected species and selected zoos lists */
@@ -92,6 +92,9 @@ span[onclick], li[onclick] {
     width: 100%;
 }
 @media screen and (min-width:1152px) {
+    .body {
+        font-size: 16px;
+    }
     #map-container {
     }
     #map-ccontainer {
