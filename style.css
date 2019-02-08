@@ -1,14 +1,19 @@
+/* Setting website font */
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
 
+/* Style for category list, but also selected species and selected zoos lists */
 ul {
     padding-left: 10px;
     border-left: 1px dotted black;
 }
 li {
     list-style-type: none;
+    max-height: 1000000px;
 }
+
+/* Icons for category listing */
 li.closed:before {
     content: "📁";
 }
@@ -18,6 +23,8 @@ li.open:before {
 li.species:before {
     content: "🦌";
 }
+
+/* Colours for category listing */
 ul.odd {
     background-color: lightgrey;
 }
@@ -36,6 +43,8 @@ ul.odd > li.species.selected {
 ul.even > li.species.selected {
     background-color: royalblue;
 }
+
+/* Styling zoo species list in zoo map info window */
 ul.zoo_species {
     border-left: none;
     padding-left: 20px;
@@ -43,12 +52,13 @@ ul.zoo_species {
 ul.zoo_species > li {
     list-style-type: disc;
 }
-.latin_name {
+
+/* Styling text in category selector */
+.latin_name, .category_level {
     font-style: italic;
 }
-.category_level {
-    font-style: italic;
-}
+
+/* Postcode entry form styling */
 form {
     display: inline;
 }
@@ -56,9 +66,12 @@ form {
     color: red;
     font-weight: bold;
 }
+
+/* Styling clickable list items and spans */
 span[onclick], li[onclick] {
     cursor: pointer;
 }
+
 /*Below is all the actual sections of the website for desktop and mobile*/
 #main {
     height: 100%;
