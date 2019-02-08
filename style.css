@@ -1,18 +1,13 @@
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
 ul {
     padding-left: 10px;
     border-left: 1px dotted black;
 }
 li {
     list-style-type: none;
-}
-.latin_name {
-    font-style: italic;
-}
-.category_level {
-    font-style: italic;
-}
-form {
-    display: inline;
 }
 li.closed:before {
     content: "📁";
@@ -22,27 +17,6 @@ li.open:before {
 }
 li.species:before {
     content: "🦌";
-}
-li.add:before {
-    content: "➕";
-}
-.add form {
-    display: none;
-}
-table {
-    border-collapse: collapse;
-}
-tr, th, td {
-    border: 1px solid black;
-}
-th > .species_name {
-    white-space: nowrap;
-    width: 3em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-th > .species_name:hover {
-    width: auto;
 }
 ul.odd {
     background-color: lightgrey;
@@ -69,17 +43,18 @@ ul.zoo_species {
 ul.zoo_species > li {
     list-style-type: disc;
 }
-input.input-lat, input.input-long {
-    width: 5em;
+.latin_name {
+    font-style: italic;
+}
+.category_level {
+    font-style: italic;
+}
+form {
+    display: inline;
 }
 #invalid-postcode {
     color: red;
     font-weight: bold;
-}
-#failed-login {
-    color: red;
-    font-weight: bold;
-    display: none;
 }
 span[onclick], li[onclick] {
     cursor: pointer;

@@ -1,0 +1,24 @@
+
+table {
+    border-collapse: collapse;
+}
+tr, th, td {
+    border: 1px solid black;
+}
+th > .species_name {
+    white-space: nowrap;
+    width: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+th > .species_name:hover {
+    width: auto;
+}
+input.input-lat, input.input-long {
+    width: 5em;
+}
+#failed-login {
+    color: red;
+    font-weight: bold;
+    display: none;
+}
