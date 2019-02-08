@@ -2,14 +2,594 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Species selector</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <style id="zoo_species_selected"></style>
 </head>
 <body>
-<ul>
-    <li><a href="faq.html">Frequently asked questions</a></li>
-    <li><a href="admin/">Admin page, admins only</a></li>
-    <li><a href="species_selector.html">Map and species selection</a></li>
-</ul>
-
+<div id="main">
+    <div id="selector">
+        <a href="faq.html">Frequently asked questions</a><br />
+        <h1>Just a test species selector</h1>
+        Animal list:<ul id='animals' class='odd'></ul>
+        <label for="postcode">Your postcode:</label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+        <h2>Selected species</h2>
+        <ul id="selected-species"></ul>
+        <h2>Zoos with selected species</h2>
+        <ul id="selected-zoos"></ul>
+    </div>
+    <div id="map-ccontainer">
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
 </body>
+
+<script>
+    /**
+     * Wrapper around the google maps Map class, having handy methods and caches
+     */
+    class PageMap {
+
+        constructor(googleMap) {
+            this.googleMap = googleMap;
+            this.cacheZooMarkers = {};
+            this.cacheZooInfoWindows = {};
+        }
+
+        /**
+         * Creates a new google maps marker for a given zoo and saves to cache
+         * @param zooData data object of the zoo
+         */
+        getZooMarker(zooData) {
+            const zooId = zooData.zoo_id;
+            if (!this.cacheZooMarkers[zooId]) {
+                this.cacheZooMarkers[zooId] = new google.maps.Marker({
+                    position: new google.maps.LatLng(zooData.latitude, zooData.longitude),
+                    map: this.googleMap,
+                    title: zooData.name
+                });
+                const self = this;
+                this.cacheZooMarkers[zooId].addListener("click", function () {
+                    self.getZooInfoWindow(zooId).open(self.googleMap, self.cacheZooMarkers[zooId]);
+                });
+            }
+            return this.cacheZooMarkers[zooId];
+        }
+
+        getZooInfoWindow(zooId) {
+            if (!this.cacheZooInfoWindows[zooId]) {
+                this.cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
+                    content: "⏳"
+                });
+                const self = this;
+                promiseGet(config["api_url"] + "zoos/" + zooId).then(function (zoosData) {
+                    const zooData = zoosData[0];
+                    let infoContent = `<h1>${zooData.name}</h1>
+                        <a href='${zooData.link}'>${zooData.link}</a><br />
+                        <span style='font-weight: bold'>Postcode:</span> ${zooData.postcode}<br />
+                        <h2>Species:</h2>
+                        <ul class='zoo_species'>`;
+                    $.each(zooData.species, function (idx, zooSpecies) {
+                        infoContent += `<li class='zoo_species zoo_species_${zooSpecies.species_id}'>${zooSpecies.common_name} <span class='latin_name'>${zooSpecies.latin_name}</span>`;
+                    });
+                    infoContent += "</ul>";
+                    self.cacheZooInfoWindows[zooId].setContent(infoContent);
+                });
+            }
+            return this.cacheZooInfoWindows[zooId];
+        }
+
+        userToggleInfoWindow(zooId) {
+            $.each(this.cacheZooInfoWindows, function (zooInfoWindowId, infoWindow) {
+                if (zooInfoWindowId !== zooId) {
+                    infoWindow.close();
+                }
+            });
+            this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooId]);
+        }
+
+        hideAllMarkers() {
+            // Hide all info windows, except those for zoos currently selected. TODO: check
+            $.each(this.cacheZooInfoWindows, function(zooId, infoWindow) {
+                if (!selection.selectedZooIds.includes(zooId)) {
+                    infoWindow.close();
+                }
+            });
+            // Hide all markers
+            $.each(map.cacheZooMarkers, function(zooId, marker) {
+                marker.setVisible(false);
+            });
+            // Unbold species in any zoo marker info windows?
+            $("li.zoo_species").removeClass("selected_species");
+        }
+    }
+
+    /**
+     * Handler for the species and category list on the site, contains caches and data on categories and such
+     */
+    class AnimalList {
+        constructor() {
+            this.cacheCategoryLevel = [];
+            this.categories = {};
+            this.species = {};
+
+            $("#animals").append(spinner);
+
+            const categoryLevelsPromise = promiseGet(config["api_url"] + "category_levels/");
+            const firstCategoryPromise = promiseGet(config["api_url"] + "categories/");
+            const self = this;
+            Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function (data) {
+                self.cacheCategoryLevel = data[0];
+                const categoryData = data[1];
+                $.each(categoryData, function (index, itemData) {
+                    const newCategory = new Category(itemData);
+                    $("#animals").find("img.spinner").remove();
+                    newCategory.loadSubElements(true, false);
+                });
+            });
+        }
+
+        getCategoryLevel(id) {
+            let result = null;
+            $.each(this.cacheCategoryLevel, function (idx, val) {
+                if (val.category_level_id === id) {
+                    result = val;
+                }
+            });
+            return result;
+        }
+    }
+
+    /**
+     * Species category, from kingdoms to genera.
+     */
+    class Category {
+        constructor(categoryData) {
+            this.id = categoryData.category_id;
+            this.name = categoryData.name;
+            this.levelName = animalList.getCategoryLevel(categoryData.category_level_id).name;
+            this.parentCategoryId = categoryData.parent_category_id;
+            this.parentCategory = null;
+            this.selected = false;
+            if (this.parentCategoryId != null) {
+                this.parentCategory = animalList.categories[this.parentCategoryId];
+                this.selected = this.parentCategory.uiElement.hasClass("selected");
+                this.parentCategory.childCategories.push(this);
+            }
+            this.uiElement = this.render();
+            this.isOdd = this.uiElement.parent("ul").hasClass("odd");
+            this.childCategories = null;
+            this.childSpecies = null;
+            // Add self to animalList's big category dictionary
+            animalList.categories[this.id] = this;
+        }
+
+        render() {
+            const categoryLiId = "category-" + this.id;
+            const parentUI = this.parentCategory == null ? $("#animals") : this.parentCategory.uiElement.find("ul");
+            parentUI.append(
+                `<li class='category closed ${this.selected ? "selected" : ""}' id='${categoryLiId}'>
+                <span onclick='userExpandCategory(${this.id})'>
+                <span class='category_name'>${this.name}</span>
+                <span class='category_level'>${this.levelName}</span>
+                </span>
+                <span class='selector' onclick='userSelectCategory(${this.id})'>
+                    <img src="images/box_${this.selected ? "checked" : "unchecked"}.svg" alt="${this.selected ? "✔" : "➕"}️"/>
+                </span>
+                </li>`);
+            return $("#" + categoryLiId);
+        }
+
+        /**
+         * Returns a promise to expand this category
+         * @param expand
+         * @param recursive
+         * @returns {Promise<Array>}
+         */
+        loadSubElements(expand, recursive) {
+            this.uiElement.append(spinner);
+            let populatedCategoriesPromise = Promise.resolve([]);
+            const self = this;
+            if (!this.isPopulated()) {
+                self.childCategories = [];
+                self.childSpecies = [];
+                populatedCategoriesPromise = promiseGet(config["api_url"] + "categories/" + this.id).then(function (/*[CategoryObj]*/categoryObjs) {
+                    const categoryObj = categoryObjs[0];
+                    // Add base list element
+                    self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
+                    // Add subcategories
+                    $.each(categoryObj.sub_categories, function (index, itemData) {
+                        new Category(itemData);
+                    });
+                    // Add species in category
+                    $.each(categoryObj.species, function (index, itemData) {
+                        new Species(itemData);
+                    });
+                    // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
+                    let loadCategoryPromises = [];
+                    if (self.childCategories.length === 1 || recursive) {
+                        for(const subCategory of self.childCategories) {
+                            loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
+                        }
+                    }
+                    return Promise.all(loadCategoryPromises);
+                });
+            } else if (recursive) {
+                let loadCategoryPromises = [];
+                for(const subCategory of self.childCategories) {
+                    loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
+                }
+                populatedCategoriesPromise = Promise.all(loadCategoryPromises);
+            }
+            return populatedCategoriesPromise.then(function () {
+                if (expand) {
+                    self.expand();
+                }
+                self.uiElement.find("img.spinner").remove();
+            });
+        }
+
+        /**
+         * Checks if a category has been populated with subcategory and species data
+         * @returns {boolean}
+         */
+        isPopulated() {
+            return this.childCategories != null;
+        }
+
+        expand() {
+            if (this.uiElement.children("ul").is(":visible")) {
+                this.uiElement.find("ul").first().hide();
+                this.uiElement.addClass("closed");
+                this.uiElement.removeClass("open");
+            } else {
+                this.uiElement.find("ul").first().show();
+                this.uiElement.addClass("open");
+                this.uiElement.removeClass("closed");
+                if (this.childCategories != null
+                    && this.childCategories.length === 1
+                    && !this.childCategories[0].uiElement.children("ul").is(":visible")) {
+                    this.childCategories[0].expand();
+                }
+            }
+        }
+
+        select(isBeingSelected) {
+            this.selected = typeof isBeingSelected === "undefined" ? !this.selected : isBeingSelected;
+            const checkbox = this.uiElement.find("span.selector img");
+            checkbox.attr("src", this.selected ? "images/box_checked.svg" : "images/box_unchecked.svg");
+            checkbox.attr("alt", this.selected ? "✔" : "➕");
+            if (this.selected) {
+                this.uiElement.addClass("selected");
+            } else {
+                this.uiElement.removeClass("selected");
+            }
+            if (this.isPopulated()) {
+                for (const childCategory of this.childCategories) {
+                    childCategory.select(this.selected);
+                }
+                for (const childSpecies of this.childSpecies) {
+                    childSpecies.select(this.selected);
+                }
+            }
+        }
+    }
+
+    /**
+     * An actual species
+     */
+    class Species {
+        constructor(speciesData) {
+            this.id = speciesData.species_id;
+            this.name = speciesData.common_name;
+            this.latinName = speciesData.latin_name;
+            this.parentCategoryId = speciesData.category_id;
+            this.parentCategory = animalList.categories[this.parentCategoryId];
+            this.selected = this.parentCategory.uiElement.hasClass("selected");
+            this.uiElement = this.render();
+            this.zooList = null;
+            // Add self to parent category and animalList dict
+            animalList.species[this.id] = this;
+            this.parentCategory.childSpecies.push(this);
+        }
+
+        render() {
+            const speciesLiId = "species-"+this.id;
+            const parentUlElement = this.parentCategory.uiElement.find("ul");
+            parentUlElement.append(`<li class='species ${this.selected ? "selected" : ""}' id='${speciesLiId}'>
+                <span class='species_name'>${this.name} </span>
+                <span class='latin_name'>${this.latinName}</span>
+                <span class='selector' onclick='userSelectSpecies(${this.id})'>
+                    <img src="images/box_${this.selected ? "checked" : "unchecked"}.svg" alt="${this.selected ? "✔" : "➕"}️"/>
+                </span>
+                </li>`);
+            return $("#" + speciesLiId);
+        }
+
+        async getZooList() {
+            if(this.zooList == null) {
+                this.zooList = promiseGet(config["api_url"] + "species/" + this.id).then(function (data) {
+                    return data[0].zoos;
+                });
+            }
+            return this.zooList;
+        }
+
+        select(isBeingSelected) {
+            this.selected = typeof isBeingSelected === "undefined" ? !this.selected : isBeingSelected;
+            const checkbox = this.uiElement.find("span.selector img");
+            checkbox.attr("src", this.selected ? "images/box_checked.svg" : "images/box_unchecked.svg");
+            checkbox.attr("alt", this.selected ? "✔" : "➕");
+            if (this.selected) {
+                this.uiElement.addClass("selected");
+            } else {
+                this.uiElement.removeClass("selected");
+            }
+        }
+    }
+
+    /**
+     * Stores which species are currently selected, and stuff.
+     */
+    class Selection {
+        constructor() {
+            this.selectedSpeciesIds = [];
+            this.selectedZooIds = [];
+            this.updating = false;
+            this.triedAgain = false;
+        }
+
+        findSelectedSpecies() {
+            const speciesList = [];
+            $("li.species.selected").each(function(idx, elem) {
+                const speciesId = elem.id.split("-")[1];
+                speciesList.push(speciesId);
+            });
+            return speciesList;
+        }
+
+        update() {
+            if (this.updating) {
+                this.triedAgain = true;
+                return;
+            }
+            if (arrayEquals(this.selectedSpeciesIds, this.findSelectedSpecies())) {
+                return;
+            }
+            this.updating = true;
+            this.selectedSpeciesIds = [];
+            this.selectedZooIds = [];
+            // This is for styling selected species in zoo info windows.
+            let zooSpeciesSelected = $("#zoo_species_selected");
+            zooSpeciesSelected.empty();
+            let speciesDataPromises = [];
+            // Find all selected species on page
+            const self = this;
+            $("li.species.selected").each(function(idx, elem) {
+                const speciesId = elem.id.split("-")[1];
+                const species = animalList.species[speciesId];
+                zooSpeciesSelected.append(`li.zoo_species_${speciesId} { font-weight:bold; }`);
+                self.selectedSpeciesIds.push(speciesId);
+                // Generate promises returning dict of zoo id to zoos
+                speciesDataPromises.push(species.getZooList().then(function(/*SpeciesObj*/zooList) {
+                    let selectedZoos = {};
+                    $.each(zooList, function (zooIdx, zooData) {
+                        selectedZoos[zooData.zoo_id] = zooData;
+                    });
+                    return selectedZoos;
+                }));
+            });
+            // Update the selected species list
+            const selectedSpeciesElem = $("#selected-species");
+            selectedSpeciesElem.empty();
+            for(const speciesId of this.selectedSpeciesIds) {
+                const species = animalList.species[speciesId];
+                selectedSpeciesElem.append(`<li><span class="species_name">${species.name}</span> <span class="latin_name">${species.latinName}</span></li>`);
+            }
+            // Wait for all species zoo lists to have been retrieved
+            Promise.all(speciesDataPromises).then(function(selectedZooList) {
+                // Merge the list of zoo lists into one object
+                const selectedZoos = Object.assign({}, ...selectedZooList);
+                // Update zoos selected
+                let selectedZoosElem = $("#selected-zoos");
+                selectedZoosElem.empty();
+                self.selectedZooIds = Object.keys(selectedZoos);
+                map.hideAllMarkers();
+                $.each(selectedZoos, function(zooKey, zooData) {
+                    selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
+                    const marker = map.getZooMarker(zooData);
+                    marker.setVisible(true);
+                });
+                return updateZooDistances();
+            }).then(function() {
+                self.updating = false;
+                // Update again, in case user has changed it while we've been updating
+                if (self.triedAgain) self.update();
+            });
+        }
+    }
+    let map;
+    let googleMap;
+    let animalList;
+    let selection = new Selection();
+    const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
+
+
+    let cacheZooDistances = {};
+    function cacheAddZooDistances(postcode,zooDistanceData) {
+        if (!cacheZooDistances[postcode]) {
+            cacheZooDistances[postcode] = {};
+        }
+        $.each(zooDistanceData, function(idx, val) {
+            cacheZooDistances[postcode][val.zoo_id] = val.metres;
+        });
+    }
+
+    /**
+     * I pulled this method from somewhere else, tbh
+     * @param url
+     * @returns {Promise<object>}
+     */
+    function promiseGet(url) {
+        // Return a new promise.
+        return new Promise(function (resolve, reject) {
+            // Do the usual XHR stuff
+            let req = new XMLHttpRequest();
+            req.open('GET', url);
+
+            req.onload = function () {
+                // This is called even on 404 etc
+                // so check the status
+                if (req.status === 200) {
+                    // Resolve the promise with the response text
+                    resolve(JSON.parse(req.responseText));
+                } else {
+                    // Otherwise reject with the status text
+                    // which will hopefully be a meaningful error
+                    reject(Error(req.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function () {
+                reject(Error("Network Error"));
+            };
+
+            // Make the request
+            req.send();
+        });
+    }
+
+    function arrayEquals(array1, array2) {
+        if (array1 == null || array2 == null) return false;
+        if (array1.length !== array2.length) return false;
+        array1.sort();
+        array2.sort();
+        for(let idx = 0; idx < array1.length; idx++) {
+            if (array1[idx] !== array2[idx]) return false;
+        }
+        return true;
+    }
+
+    function userExpandCategory(id) {
+        animalList.categories[id].loadSubElements(true, false);
+    }
+
+    function userSelectCategory(categoryId) {
+        const category = animalList.categories[categoryId];
+        category.select();
+        category.loadSubElements(false, true).then(function() {
+            selection.update();
+        });
+    }
+
+    function userSelectSpecies(speciesId) {
+        const species = animalList.species[speciesId];
+        species.select();
+        selection.update();
+    }
+
+    function userUpdatePostcode() {
+        let postcode = $("input#postcode").val();
+        if (postcode.length >= 3) {
+            updateZooDistances();
+        }
+    }
+
+    async function updateZooDistances() {
+        //get postcode
+        let postcode = $("input#postcode").val();
+        // Basic postcode sanity check
+        if (postcode.length <= 3) {
+            $("#invalid-postcode").show();
+            return;
+        }
+        // check selected zoo list isn't empty
+        if (selection.selectedZooIds.length === 0) {
+            return;
+        }
+        //// currentSelectedZooIds;
+        return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
+            $.each(zooDistances, function(idx, val) {
+                $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
+            });
+            domReorderZoos(zooDistances);
+        })
+    }
+
+    function promiseGetZooDistances(postcode, zooIds) {
+        let zoosNeedingDistance = zooIds;
+        let foundDistances = [];
+        if (cacheZooDistances[postcode]) {
+            zoosNeedingDistance = [];
+            $.each(zooIds, function(idx, zooId) {
+                if (cacheZooDistances[postcode][zooId]) {
+                    foundDistances.push({
+                        zoo_id: zooId,
+                        metres: cacheZooDistances[postcode][zooId]
+                    });
+                } else {
+                    zoosNeedingDistance.push(zooId);
+                }
+            });
+        }
+        if (zoosNeedingDistance.length === 0) {
+            $("#invalid-postcode").hide();
+            return new Promise(function(resolve, reject) {
+                resolve(foundDistances);
+            })
+        }
+        //create url to request
+        let url = config["api_url"]+"zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
+        //get response
+        return promiseGet(url).then(function(newDistances) {
+            $("#invalid-postcode").hide();
+            cacheAddZooDistances(postcode, newDistances);
+            return foundDistances.concat(newDistances);
+        }).catch(function(err) {
+            //if response is 500, "invalid postcode"
+            $("#invalid-postcode").show();
+        });
+    }
+
+    function domReorderZoos(distances) {
+        const distancesSorted = distances.sort(function(a, b) { return b.metres - a.metres});
+        $.each(distancesSorted, function(idx, distance) {
+            const zooLi = $("li#selected-zoo-"+distance.zoo_id);
+            zooLi.parent().prepend(zooLi);
+        });
+    }
+
+    $(document).ready(function() {
+        animalList = new AnimalList();
+    });
+
+    function initMap() {
+        googleMap = new google.maps.Map(document.getElementById('map'), {
+            zoom: 6,
+            center: {lat: 55, lng: -3}
+        });
+        map = new PageMap(googleMap);
+    }
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4CV7NT3SIw7vguuin6WkHnzxS9szP8do&callback=initMap">
+</script>
 </html>
