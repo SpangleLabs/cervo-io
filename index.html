@@ -26,11 +26,11 @@
 <div id="main">
     <div id="selector">
         <a href="faq.html">Frequently asked questions</a><br />
-        <h1>Just a test species selector</h1>
-        Animal list:<ul id='animals' class='odd'></ul>
-        <label for="postcode">Your postcode:</label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+        <h1>Select which species you are interested in</h1>
+        <ul id='animals' class='odd'></ul>
         <h2>Selected species</h2>
         <ul id="selected-species"></ul>
+        <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
         <h2>Zoos with selected species</h2>
         <ul id="selected-zoos"></ul>
     </div>
@@ -508,16 +508,17 @@
     }
 
     function userUpdatePostcode() {
-        let postcode = $("input#postcode").val();
-        if (postcode.length >= 3) {
-            updateZooDistances();
-        }
+        updateZooDistances();
     }
 
     async function updateZooDistances() {
         //get postcode
         let postcode = $("input#postcode").val();
         // Basic postcode sanity check
+        if (postcode.length === 0) {
+            $("#invalid-postcode").hide();
+            return;
+        }
         if (postcode.length <= 3) {
             $("#invalid-postcode").show();
             return;

@@ -66,6 +66,7 @@ form {
 #invalid-postcode {
     color: red;
     font-weight: bold;
+    display: none;
 }
 
 /* Styling clickable list items and spans */
@@ -92,7 +93,7 @@ span[onclick], li[onclick] {
     width: 100%;
 }
 @media screen and (min-width:1152px) {
-    .body {
+    body {
         font-size: 16px;
     }
     #map-container {
