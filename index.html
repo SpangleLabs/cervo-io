@@ -30,7 +30,7 @@
         <ul id='animals' class='odd'></ul>
         <h2>Selected species</h2>
         <ul id="selected-species"></ul>
-        <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode">Invalid postcode.</span>
+        <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode" class="error">Invalid postcode.</span>
         <h2>Zoos with selected species</h2>
         <ul id="selected-zoos"></ul>
     </div>
@@ -131,7 +131,9 @@
             this.categories = {};
             this.species = {};
 
-            $("#animals").append(spinner);
+            const rootList = $("#animals");
+
+            rootList.append(spinner);
 
             const categoryLevelsPromise = promiseGet(config["api_url"] + "category_levels/");
             const firstCategoryPromise = promiseGet(config["api_url"] + "categories/");
@@ -141,9 +143,13 @@
                 const categoryData = data[1];
                 $.each(categoryData, function (index, itemData) {
                     const newCategory = new Category(itemData);
-                    $("#animals").find("img.spinner").remove();
+                    rootList.find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
                 });
+            }, function(err) {
+                console.log(err);
+                rootList.find("img.spinner").remove();
+                rootList.append("<span class=\"error\">Failed to connect to API</span>");
             });
         }
 

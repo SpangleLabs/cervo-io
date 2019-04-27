@@ -63,7 +63,7 @@ ul.zoo_species > li {
 form {
     display: inline;
 }
-#invalid-postcode {
+.error {
     color: red;
     font-weight: bold;
     display: none;
