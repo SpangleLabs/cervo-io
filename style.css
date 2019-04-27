@@ -66,6 +66,8 @@ form {
 .error {
     color: red;
     font-weight: bold;
+}
+#invalid-postcode {
     display: none;
 }
 
