@@ -27,7 +27,24 @@
     <div id="selector">
         <a href="faq.html">Frequently asked questions</a><br />
         <h1>Select which species you are interested in</h1>
-        <ul id='animals' class='odd'></ul>
+        Selector type:
+        <label>
+            <input type="radio" name="selector-type" value="taxonomical" id="selector-taxonomic" onchange="userChangeSelector(this)" checked="checked" />
+            Taxonomical
+        </label>
+        <label>
+            <input type="radio" name="selector-type" value="alphabetical" id="selector-alphabetic" onchange="userChangeSelector(this)"/>
+            Alphabetical
+        </label>
+        <label>
+            <input type="radio" name="selector-type" value="search" id="selector-search" onchange="userChangeSelector(this)"/>
+            Search
+        </label>
+        <ul id="animals-taxonomic" class='odd'></ul>
+        <div id="animals-alphabetic">ABCD</div>
+        <div id="animals-search">
+            <input name="animals-search-input" />
+        </div>
         <h2>Selected species</h2>
         <ul id="selected-species"></ul>
         <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode" class="error">Invalid postcode.</span>
@@ -131,7 +148,7 @@
             this.categories = {};
             this.species = {};
 
-            const rootList = $("#animals");
+            const rootList = $("#animals-taxonomic");
 
             rootList.append(spinner);
 
@@ -190,7 +207,7 @@
 
         render() {
             const categoryLiId = "category-" + this.id;
-            const parentUI = this.parentCategory == null ? $("#animals") : this.parentCategory.uiElement.find("ul");
+            const parentUI = this.parentCategory == null ? $("#animals-taxonomic") : this.parentCategory.uiElement.find("ul");
             parentUI.append(
                 `<li class='category closed ${this.selected ? "selected" : ""}' id='${categoryLiId}'>
                 <span onclick='userExpandCategory(${this.id})'>
@@ -432,9 +449,36 @@
             });
         }
     }
+
+    class Selector {
+        constructor() {
+            this.taxonomicView = $("#animals-taxonomic");
+            this.alphabeticView = $("#animals-alphabetic");
+            this.searchView = $("#animals-search");
+        }
+
+        displayTaxonomic() {
+            this.taxonomicView.show();
+            this.alphabeticView.hide();
+            this.searchView.hide();
+        }
+
+        displayAlphabetic() {
+            this.taxonomicView.hide();
+            this.alphabeticView.show();
+            this.searchView.hide();
+        }
+
+        displaySearch() {
+            this.taxonomicView.hide();
+            this.alphabeticView.hide();
+            this.searchView.show();
+        }
+    }
     let map;
     let googleMap;
     let animalList;
+    let selector = new Selector();
     let selection = new Selection();
     const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
@@ -515,6 +559,24 @@
 
     function userUpdatePostcode() {
         updateZooDistances();
+    }
+
+    function userChangeSelector(thing) {
+        const selectorType = thing.value;
+        switch(selectorType) {
+            case "taxonomical":
+                selector.displayTaxonomic();
+                console.log("Taxo");
+                break;
+            case "alphabetical":
+                selector.displayAlphabetic();
+                console.log("Alpha");
+                break;
+            case "search":
+                selector.displaySearch();
+                console.log("Serach");
+                break;
+        }
     }
 
     async function updateZooDistances() {

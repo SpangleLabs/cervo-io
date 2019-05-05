@@ -4,6 +4,14 @@ body {
     font-size: 22px;
 }
 
+/* Hide alphabetic and search by default */
+#animals-alphabetic {
+    display: none;
+}
+#animals-search {
+    display: none;
+}
+
 /* Style for category list, but also selected species and selected zoos lists */
 ul {
     padding-left: 10px;
