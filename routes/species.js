@@ -30,11 +30,20 @@ router.get('/:id?', function (req, res, next) {
             res.status(500).json(err);
         });
     } else {
-        Species.getAllSpecies().then(function (rows) {
-            res.json(rows);
-        }).catch(function (err) {
-            res.status(500).json(err);
-        });
+        if(req.query.name) {
+            const search = req.query.name;
+            Species.getSpeciesByName(search).then(function (rows) {
+                res.json(rows);
+            }).catch(function (err) {
+                res.status(500).json(err);
+            })
+        } else {
+            Species.getAllSpecies().then(function (rows) {
+                res.json(rows);
+            }).catch(function (err) {
+                res.status(500).json(err);
+            });
+        }
     }
 });
 
