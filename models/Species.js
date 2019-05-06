@@ -38,7 +38,7 @@ const Species = {
 
     getSpeciesByName: function (search) {
         return db.connection().then(function (conn) {
-            const result = conn.query("select * from zoo_species " +
+            const result = conn.query("select * from species " +
                 "where common_name like ? or latin_name like ?", [search, search]);
             conn.end();
             return result;
