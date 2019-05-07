@@ -43,10 +43,11 @@
         <ul id="animals-taxonomic" class='odd'></ul>
         <div id="animals-alphabetic">
             <div id="letter-list"></div>
-            <div id="letter-results"></div>
+            <ul id="letter-results"></ul>
         </div>
         <div id="animals-search">
-            <input name="animals-search-input" />
+            <input type="text" name="animals-search-input" id="animals-search-input" />
+            <input type="button" onclick="userSearchButton()" />
             <ul id="search-results"></ul>
         </div>
         <h2>Selected species</h2>
@@ -469,7 +470,7 @@
             this.letter = letter;
             this.rootElem = alphabetRoot;
             this.letterListElem = $("#letter-list");
-            this.letterResultsElem = $("#letter-results");
+            this.letterResultsElem = $("ul#letter-results");
             this.letterListElem.append("<span id='letter-list-"+letter+"' class='letter-list'>"+letter.toUpperCase()+"</span>");
             this.letterElem = $("#letter-list-"+letter);
             this.letterElem.click($.proxy(this.userClick, this));
@@ -480,11 +481,29 @@
             this.letterResultsElem.empty();
             const self = this;
             promiseGet(config["api_url"] + "species/?common_name="+this.letter+"%25").then(function(species) {
-                    for (const animal of species) {
-                        self.letterResultsElem.append("<li>"+animal["common_name"]+"</li>");
-                    }
+                for (const animal of species) {
+                    self.letterResultsElem.append("<li>"+animal["common_name"]+"</li>");
                 }
-            )
+            });
+        }
+    }
+
+    class Search {
+        constructor() {
+            this.searchElem = $("#animals-search");
+            this.searchBox = $("input#animals-search-input");
+            this.searchResults = $("ul#search-results");
+        }
+
+        update() {
+            const value = this.searchBox.val();
+            const self = this;
+            promiseGet(config["api_url"] + "species/?name=%25"+value+"%25").then(function(results) {
+                self.searchResults.empty();
+                for (const result of results) {
+                    self.searchResults.append("<li>"+result["common_name"]+" (<span class='latin_name'>"+result['latin_name']+"</span>)</li>");
+                }
+            });
         }
     }
 
@@ -533,6 +552,7 @@
     let googleMap;
     let animalList;
     let alphabetList;
+    let search;
     let selector = new Selector();
     let selection = new Selection();
     const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
@@ -620,6 +640,10 @@
         selector.update();
     }
 
+    function userSearchButton() {
+        search.update();
+    }
+
     async function updateZooDistances() {
         //get postcode
         let postcode = $("input#postcode").val();
@@ -691,6 +715,7 @@
     $(document).ready(function() {
         animalList = new AnimalList();
         alphabetList = new AlphabetList();
+        search = new Search();
     });
 
     function initMap() {
