@@ -41,7 +41,10 @@
             Search
         </label>
         <ul id="animals-taxonomic" class='odd'></ul>
-        <div id="animals-alphabetic"></div>
+        <div id="animals-alphabetic">
+            <div id="letter-list"></div>
+            <div id="letter-results"></div>
+        </div>
         <div id="animals-search">
             <input name="animals-search-input" />
             <ul id="search-results"></ul>
@@ -451,6 +454,40 @@
         }
     }
 
+    class AlphabetList {
+        constructor() {
+            this.rootElem = $("#animals-alphabetic");
+            this.letters = [];
+            for (const letter of "abcdefghijklmnopqrstuvwxyz") {
+                this.letters.push(new LetterListing(this.rootElem, letter));
+            }
+        }
+    }
+
+    class LetterListing {
+        constructor(alphabetRoot, letter) {
+            this.letter = letter;
+            this.rootElem = alphabetRoot;
+            this.letterListElem = $("#letter-list");
+            this.letterResultsElem = $("#letter-results");
+            this.letterListElem.append("<span id='letter-list-"+letter+"' class='letter-list'>"+letter.toUpperCase()+"</span>");
+            this.letterElem = $("#letter-list-"+letter);
+            this.letterElem.click($.proxy(this.userClick, this));
+            this.open = false;
+        }
+
+        userClick() {
+            this.letterResultsElem.empty();
+            const self = this;
+            promiseGet(config["api_url"] + "species/?common_name="+this.letter+"%25").then(function(species) {
+                    for (const animal of species) {
+                        self.letterResultsElem.append("<li>"+animal["common_name"]+"</li>");
+                    }
+                }
+            )
+        }
+    }
+
     class Selector {
         constructor() {
             this.taxonomicView = $("#animals-taxonomic");
@@ -495,6 +532,7 @@
     let map;
     let googleMap;
     let animalList;
+    let alphabetList;
     let selector = new Selector();
     let selection = new Selection();
     const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
@@ -652,6 +690,7 @@
 
     $(document).ready(function() {
         animalList = new AnimalList();
+        alphabetList = new AlphabetList();
     });
 
     function initMap() {
