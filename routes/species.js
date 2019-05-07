@@ -37,6 +37,13 @@ router.get('/:id?', function (req, res, next) {
             }).catch(function (err) {
                 res.status(500).json(err);
             })
+        } else if(req.query.common_name) {
+            const search = req.query.common_name;
+            Species.getSpeciesByCommonName(search).then(function (rows) {
+                res.json(rows);
+            }).catch(function (err) {
+                res.status(500).json(err);
+            })
         } else {
             Species.getAllSpecies().then(function (rows) {
                 res.json(rows);
