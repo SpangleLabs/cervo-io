@@ -29,21 +29,22 @@
         <h1>Select which species you are interested in</h1>
         Selector type:
         <label>
-            <input type="radio" name="selector-type" value="taxonomical" id="selector-taxonomic" onchange="userChangeSelector(this)" checked="checked" />
+            <input type="radio" name="selector-type" value="taxonomical" id="selector-taxonomic" onchange="userChangeSelector()" checked="checked" />
             Taxonomical
         </label>
         <label>
-            <input type="radio" name="selector-type" value="alphabetical" id="selector-alphabetic" onchange="userChangeSelector(this)"/>
+            <input type="radio" name="selector-type" value="alphabetical" id="selector-alphabetic" onchange="userChangeSelector()"/>
             Alphabetical
         </label>
         <label>
-            <input type="radio" name="selector-type" value="search" id="selector-search" onchange="userChangeSelector(this)"/>
+            <input type="radio" name="selector-type" value="search" id="selector-search" onchange="userChangeSelector()"/>
             Search
         </label>
         <ul id="animals-taxonomic" class='odd'></ul>
-        <div id="animals-alphabetic">ABCD</div>
+        <div id="animals-alphabetic"></div>
         <div id="animals-search">
             <input name="animals-search-input" />
+            <ul id="search-results"></ul>
         </div>
         <h2>Selected species</h2>
         <ul id="selected-species"></ul>
@@ -455,6 +456,22 @@
             this.taxonomicView = $("#animals-taxonomic");
             this.alphabeticView = $("#animals-alphabetic");
             this.searchView = $("#animals-search");
+            this.update();
+        }
+
+        update() {
+            const selectorType = document.querySelector('input[name=selector-type]:checked').value;
+                switch(selectorType) {
+                    case "taxonomical":
+                        this.displayTaxonomic();
+                        break;
+                    case "alphabetical":
+                        this.displayAlphabetic();
+                        break;
+                    case "search":
+                        this.displaySearch();
+                        break;
+                }
         }
 
         displayTaxonomic() {
@@ -561,22 +578,8 @@
         updateZooDistances();
     }
 
-    function userChangeSelector(thing) {
-        const selectorType = thing.value;
-        switch(selectorType) {
-            case "taxonomical":
-                selector.displayTaxonomic();
-                console.log("Taxo");
-                break;
-            case "alphabetical":
-                selector.displayAlphabetic();
-                console.log("Alpha");
-                break;
-            case "search":
-                selector.displaySearch();
-                console.log("Serach");
-                break;
-        }
+    function userChangeSelector() {
+        selector.update();
     }
 
     async function updateZooDistances() {
