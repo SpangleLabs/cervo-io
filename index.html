@@ -153,9 +153,9 @@
             this.categories = {};
             this.species = {};
 
-            const rootList = $("#animals-taxonomic");
+            this.rootList = $("#animals-taxonomic");
 
-            rootList.append(spinner);
+            this.rootList.append(spinner);
 
             const categoryLevelsPromise = promiseGet(config["api_url"] + "category_levels/");
             const firstCategoryPromise = promiseGet(config["api_url"] + "categories/");
@@ -165,14 +165,23 @@
                 const categoryData = data[1];
                 $.each(categoryData, function (index, itemData) {
                     const newCategory = new Category(itemData);
-                    rootList.find("img.spinner").remove();
+                    this.rootList.find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
                 });
             }, function(err) {
                 console.log(err);
-                rootList.find("img.spinner").remove();
-                rootList.append("<span class=\"error\">Failed to connect to API</span>");
+                this.rootList.find("img.spinner").remove();
+                this.rootList.append("<span class=\"error\">Failed to connect to API</span>");
             });
+        }
+
+        findSelectedSpecies() {
+            const speciesList = [];
+            $("li.species.selected").each(function (idx, elem) {
+                const speciesId = elem.id.split("-")[1];
+                speciesList.push(speciesId);
+            });
+            return speciesList;
         }
 
         getCategoryLevel(id) {
@@ -385,21 +394,12 @@
             this.triedAgain = false;
         }
 
-        findSelectedSpecies() {
-            const speciesList = [];
-            $("li.species.selected").each(function(idx, elem) {
-                const speciesId = elem.id.split("-")[1];
-                speciesList.push(speciesId);
-            });
-            return speciesList;
-        }
-
         update() {
             if (this.updating) {
                 this.triedAgain = true;
                 return;
             }
-            if (arrayEquals(this.selectedSpeciesIds, this.findSelectedSpecies())) {
+            if (arrayEquals(this.selectedSpeciesIds, selector.findSelectedSpecies())) {
                 return;
             }
             this.updating = true;
@@ -411,8 +411,7 @@
             let speciesDataPromises = [];
             // Find all selected species on page
             const self = this;
-            $("li.species.selected").each(function(idx, elem) {
-                const speciesId = elem.id.split("-")[1];
+            selector.findSelectedSpecies().each(function(speciesId) {
                 const species = animalList.species[speciesId];
                 zooSpeciesSelected.append(`li.zoo_species_${speciesId} { font-weight:bold; }`);
                 self.selectedSpeciesIds.push(speciesId);
@@ -463,6 +462,10 @@
                 this.letters.push(new LetterListing(this.rootElem, letter));
             }
         }
+
+        findSelectedSpecies() {
+            return [];
+        }
     }
 
     class LetterListing {
@@ -505,6 +508,10 @@
                 }
             });
         }
+
+        findSelectedSpecies() {
+            return [];
+        }
     }
 
     class Selector {
@@ -512,22 +519,34 @@
             this.taxonomicView = $("#animals-taxonomic");
             this.alphabeticView = $("#animals-alphabetic");
             this.searchView = $("#animals-search");
+            this.activeView = null;
             this.update();
         }
 
         update() {
-            const selectorType = document.querySelector('input[name=selector-type]:checked').value;
-                switch(selectorType) {
-                    case "taxonomical":
-                        this.displayTaxonomic();
-                        break;
-                    case "alphabetical":
-                        this.displayAlphabetic();
-                        break;
-                    case "search":
-                        this.displaySearch();
-                        break;
-                }
+            this.activeView = document.querySelector('input[name=selector-type]:checked').value;
+            switch(this.activeView) {
+                case "taxonomical":
+                    this.displayTaxonomic();
+                    break;
+                case "alphabetical":
+                    this.displayAlphabetic();
+                    break;
+                case "search":
+                    this.displaySearch();
+                    break;
+            }
+        }
+
+        findSelectedSpecies() {
+            switch(this.activeView) {
+                case "taxonomical":
+                    return animalList.findSelectedSpecies();
+                case "alphabetical":
+                    return alphabetList.findSelectedSpecies();
+                case "search":
+                    return search.findSelectedSpecies();
+            }
         }
 
         displayTaxonomic() {
