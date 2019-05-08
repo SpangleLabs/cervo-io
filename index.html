@@ -179,8 +179,8 @@
                 });
             }, function(err) {
                 console.log(err);
-                this.rootElem.find("img.spinner").remove();
-                this.rootElem.append("<span class=\"error\">Failed to connect to API</span>");
+                self.rootElem.find("img.spinner").remove();
+                self.rootElem.append("<span class=\"error\">Failed to connect to API</span>");
             });
         }
 
@@ -537,12 +537,12 @@
         }
 
         wireUpdates() {
-            $("input[name=selector-type]").change(this.update());
+            $("input[name=selector-type]").change($.proxy(this.update, this));
         }
 
         update() {
             this.activeView = document.querySelector('input[name=selector-type]:checked').value;
-            for(const key in this.viewKeys) {
+            for(const key of this.viewKeys) {
                 if (this.activeView === key) {
                     this.views[key].rootElem.show();
                 } else {
