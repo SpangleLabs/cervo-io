@@ -147,7 +147,7 @@
     /**
      * Handler for the species and category list on the site, contains caches and data on categories and such
      */
-    class AnimalList {
+    class TaxonomyView {
         constructor() {
             this.cacheCategoryLevel = [];
             this.categories = {};
@@ -454,7 +454,7 @@
         }
     }
 
-    class AlphabetList {
+    class AlphabetView {
         constructor() {
             this.rootElem = $("#animals-alphabetic");
             this.letters = [];
@@ -491,7 +491,7 @@
         }
     }
 
-    class Search {
+    class SearchView {
         constructor() {
             this.searchElem = $("#animals-search");
             this.searchBox = $("input#animals-search-input");
@@ -733,9 +733,9 @@
     }
 
     $(document).ready(function() {
-        animalList = new AnimalList();
-        alphabetList = new AlphabetList();
-        search = new Search();
+        animalList = new TaxonomyView();
+        alphabetList = new AlphabetView();
+        search = new SearchView();
     });
 
     function initMap() {
