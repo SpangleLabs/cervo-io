@@ -102,7 +102,7 @@
                     content: "⏳"
                 });
                 const self = this;
-                promiseGet(config["api_url"] + "zoos/" + zooId).then(function (zoosData) {
+                promiseGet("zoos/" + zooId).then(function (zoosData) {
                     const zooData = zoosData[0];
                     let infoContent = `<h1>${zooData.name}</h1>
                         <a href='${zooData.link}'>${zooData.link}</a><br />
@@ -157,8 +157,8 @@
 
             this.rootList.append(spinner);
 
-            const categoryLevelsPromise = promiseGet(config["api_url"] + "category_levels/");
-            const firstCategoryPromise = promiseGet(config["api_url"] + "categories/");
+            const categoryLevelsPromise = promiseGet("category_levels/");
+            const firstCategoryPromise = promiseGet("categories/");
             const self = this;
             Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function (data) {
                 self.cacheCategoryLevel = data[0];
@@ -248,7 +248,7 @@
             if (!this.isPopulated()) {
                 self.childCategories = [];
                 self.childSpecies = [];
-                populatedCategoriesPromise = promiseGet(config["api_url"] + "categories/" + this.id).then(function (/*[CategoryObj]*/categoryObjs) {
+                populatedCategoriesPromise = promiseGet("categories/" + this.id).then(function (/*[CategoryObj]*/categoryObjs) {
                     const categoryObj = categoryObjs[0];
                     // Add base list element
                     self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
@@ -363,7 +363,7 @@
 
         async getZooList() {
             if(this.zooList == null) {
-                this.zooList = promiseGet(config["api_url"] + "species/" + this.id).then(function (data) {
+                this.zooList = promiseGet("species/" + this.id).then(function (data) {
                     return data[0].zoos;
                 });
             }
@@ -592,7 +592,8 @@
      * @param url
      * @returns {Promise<object>}
      */
-    function promiseGet(url) {
+    function promiseGet(path) {
+        const url = config['api_key'] + path;
         // Return a new promise.
         return new Promise(function (resolve, reject) {
             // Do the usual XHR stuff
@@ -711,9 +712,9 @@
             })
         }
         //create url to request
-        let url = config["api_url"]+"zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
+        let path = "zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
         //get response
-        return promiseGet(url).then(function(newDistances) {
+        return promiseGet(path).then(function(newDistances) {
             $("#invalid-postcode").hide();
             cacheAddZooDistances(postcode, newDistances);
             return foundDistances.concat(newDistances);
