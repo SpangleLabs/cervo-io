@@ -492,7 +492,7 @@
         userClick() {
             this.letterResultsElem.empty();
             const self = this;
-            promiseGet(config["api_url"] + "species/?common_name="+this.letter+"%25").then(function(species) {
+            promiseGet("species/?common_name="+this.letter+"%25").then(function(species) {
                 for (const animal of species) {
                     self.letterResultsElem.append("<li>"+animal["common_name"]+"</li>");
                 }
@@ -510,7 +510,7 @@
         update() {
             const value = this.searchBox.val();
             const self = this;
-            promiseGet(config["api_url"] + "species/?name=%25"+value+"%25").then(function(results) {
+            promiseGet("species/?name=%25"+value+"%25").then(function(results) {
                 self.searchResults.empty();
                 for (const result of results) {
                     self.searchResults.append("<li>"+result["common_name"]+" (<span class='latin_name'>"+result['latin_name']+"</span>)</li>");
@@ -579,7 +579,7 @@
      * @returns {Promise<object>}
      */
     function promiseGet(path) {
-        const url = config['api_key'] + path;
+        const url = config['api_url'] + path;
         // Return a new promise.
         return new Promise(function (resolve, reject) {
             // Do the usual XHR stuff
