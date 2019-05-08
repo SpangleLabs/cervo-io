@@ -144,18 +144,27 @@
         }
     }
 
+    class View {
+        constructor(rootElem) {
+            this.rootElem = rootElem;
+        }
+
+        findSelectedSpecies() {
+            throw Error("Not implemented.");
+        }
+    }
+
     /**
      * Handler for the species and category list on the site, contains caches and data on categories and such
      */
-    class TaxonomyView {
+    class TaxonomyView extends View {
         constructor() {
+            super($("#animals-taxonomic"));
             this.cacheCategoryLevel = [];
             this.categories = {};
             this.species = {};
 
-            this.rootList = $("#animals-taxonomic");
-
-            this.rootList.append(spinner);
+            this.rootElem.append(spinner);
 
             const categoryLevelsPromise = promiseGet("category_levels/");
             const firstCategoryPromise = promiseGet("categories/");
@@ -165,13 +174,13 @@
                 const categoryData = data[1];
                 $.each(categoryData, function (index, itemData) {
                     const newCategory = new Category(itemData);
-                    this.rootList.find("img.spinner").remove();
+                    this.rootElem.find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
                 });
             }, function(err) {
                 console.log(err);
-                this.rootList.find("img.spinner").remove();
-                this.rootList.append("<span class=\"error\">Failed to connect to API</span>");
+                this.rootElem.find("img.spinner").remove();
+                this.rootElem.append("<span class=\"error\">Failed to connect to API</span>");
             });
         }
 
@@ -454,9 +463,9 @@
         }
     }
 
-    class AlphabetView {
+    class AlphabetView extends View {
         constructor() {
-            this.rootElem = $("#animals-alphabetic");
+            super($("#animals-alphabetic"));
             this.letters = [];
             for (const letter of "abcdefghijklmnopqrstuvwxyz") {
                 this.letters.push(new LetterListing(this.rootElem, letter));
@@ -491,9 +500,9 @@
         }
     }
 
-    class SearchView {
+    class SearchView extends View {
         constructor() {
-            this.searchElem = $("#animals-search");
+            super($("#animals-search"));
             this.searchBox = $("input#animals-search-input");
             this.searchResults = $("ul#search-results");
         }
@@ -733,6 +742,7 @@
     }
 
     $(document).ready(function() {
+        selector = new Selector();
         animalList = new TaxonomyView();
         alphabetList = new AlphabetView();
         search = new SearchView();
