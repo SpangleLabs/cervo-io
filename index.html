@@ -29,15 +29,15 @@
         <h1>Select which species you are interested in</h1>
         Selector type:
         <label>
-            <input type="radio" name="selector-type" value="taxonomical" id="selector-taxonomic" onchange="userChangeSelector()" checked="checked" />
+            <input type="radio" name="selector-type" value="taxonomical" id="selector-taxonomic" checked="checked" />
             Taxonomical
         </label>
         <label>
-            <input type="radio" name="selector-type" value="alphabetical" id="selector-alphabetic" onchange="userChangeSelector()"/>
+            <input type="radio" name="selector-type" value="alphabetical" id="selector-alphabetic"/>
             Alphabetical
         </label>
         <label>
-            <input type="radio" name="selector-type" value="search" id="selector-search" onchange="userChangeSelector()"/>
+            <input type="radio" name="selector-type" value="search" id="selector-search"/>
             Search
         </label>
         <ul id="animals-taxonomic" class='odd'></ul>
@@ -530,17 +530,19 @@
                 "alphabetical": new AlphabetView(),
                 "search": new SearchView()
             };
+            this.viewKeys = ["taxonomical", "alphabetical", "search"];
             this.activeView = null;
             this.update();
+            this.wireUpdates();
+        }
+
+        wireUpdates() {
+            $("input[name=selector-type]").change(this.update());
         }
 
         update() {
             this.activeView = document.querySelector('input[name=selector-type]:checked').value;
-            for(const key in this.views) {
-                if (!this.views.hasOwnProperty(key)) {
-                    continue;
-                }
-
+            for(const key in this.viewKeys) {
                 if (this.activeView === key) {
                     this.views[key].rootElem.show();
                 } else {
@@ -638,10 +640,6 @@
 
     function userUpdatePostcode() {
         updateZooDistances();
-    }
-
-    function userChangeSelector() {
-        selector.update();
     }
 
     function userSearchButton() {
