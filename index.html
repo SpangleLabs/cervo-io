@@ -525,63 +525,38 @@
 
     class Selector {
         constructor() {
-            this.taxonomicView = $("#animals-taxonomic");
-            this.alphabeticView = $("#animals-alphabetic");
-            this.searchView = $("#animals-search");
+            this.views = {
+                "taxonomical": new TaxonomyView(),
+                "alphabetical": new AlphabetView(),
+                "search": new SearchView()
+            };
             this.activeView = null;
             this.update();
         }
 
         update() {
             this.activeView = document.querySelector('input[name=selector-type]:checked').value;
-            switch(this.activeView) {
-                case "taxonomical":
-                    this.displayTaxonomic();
-                    break;
-                case "alphabetical":
-                    this.displayAlphabetic();
-                    break;
-                case "search":
-                    this.displaySearch();
-                    break;
+            for(const key in this.views) {
+                if (!this.views.hasOwnProperty(key)) {
+                    continue;
+                }
+
+                if (this.activeView === key) {
+                    this.views[key].rootElem.show();
+                } else {
+                    this.views[key].rootElem.hide();
+                }
             }
         }
 
         findSelectedSpecies() {
-            switch(this.activeView) {
-                case "taxonomical":
-                    return animalList.findSelectedSpecies();
-                case "alphabetical":
-                    return alphabetList.findSelectedSpecies();
-                case "search":
-                    return search.findSelectedSpecies();
-            }
-        }
-
-        displayTaxonomic() {
-            this.taxonomicView.show();
-            this.alphabeticView.hide();
-            this.searchView.hide();
-        }
-
-        displayAlphabetic() {
-            this.taxonomicView.hide();
-            this.alphabeticView.show();
-            this.searchView.hide();
-        }
-
-        displaySearch() {
-            this.taxonomicView.hide();
-            this.alphabeticView.hide();
-            this.searchView.show();
+            return this.views[this.activeView].findSelectedSpecies();
         }
     }
     let map;
     let googleMap;
-    let animalList;
-    let alphabetList;
-    let search;
-    let selector = new Selector();
+    let animalList; // TODO: remove
+    let selector;
     let selection = new Selection();
     const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
@@ -670,7 +645,7 @@
     }
 
     function userSearchButton() {
-        search.update();
+        selector["search"].update();
     }
 
     async function updateZooDistances() {
@@ -743,9 +718,6 @@
 
     $(document).ready(function() {
         selector = new Selector();
-        animalList = new TaxonomyView();
-        alphabetList = new AlphabetView();
-        search = new SearchView();
     });
 
     function initMap() {
