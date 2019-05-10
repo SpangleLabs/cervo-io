@@ -362,7 +362,7 @@
         }
 
         render() {
-            const speciesLiId = "species-"+this.id;
+            const speciesLiId = `species-${this.id}`;
             const parentUlElement = this.parentCategory.uiElement.find("ul");
             parentUlElement.append(`<li class='species ${this.selected ? "selected" : ""}' id='${speciesLiId}'>
                 <span class='species_name'>${this.name} </span>
@@ -527,8 +527,8 @@
             this.rootElem = alphabetRoot;
             this.letterListElem = $("#letter-list");
             this.letterResultsElem = $("ul#letter-results");
-            this.letterListElem.append("<span id='letter-list-"+letter+"' class='letter-list'>"+letter.toUpperCase()+"</span>");
-            this.letterElem = $("#letter-list-"+letter);
+            this.letterListElem.append("<span id='letter-list-${letter}' class='letter-list'>${letter.toUpperCase()}</span>");
+            this.letterElem = $(`#letter-list-${letter}`);
             this.letterElem.click($.proxy(this.userClick, this));
             this.open = false;
         }
@@ -536,9 +536,9 @@
         userClick() {
             this.letterResultsElem.empty();
             const self = this;
-            promiseGet("species/?common_name="+this.letter+"%25").then(function(species) {
+            promiseGet("species/?common_name=${this.letter}%25").then(function(species) {
                 for (const animal of species) {
-                    self.letterResultsElem.append("<li>"+animal["common_name"]+"</li>");
+                    self.letterResultsElem.append("<li>${animal['common_name']}</li>");
                 }
             });
         }
@@ -554,10 +554,10 @@
         updateSearchResults() {
             const value = this.searchBox.val();
             const self = this;
-            promiseGet("species/?name=%25"+value+"%25").then(function(results) {
+            promiseGet("species/?name=%25${value}%25").then(function(results) {
                 self.searchResults.empty();
                 for (const result of results) {
-                    self.searchResults.append("<li>"+result["common_name"]+" (<span class='latin_name'>"+result['latin_name']+"</span>)</li>");
+                    self.searchResults.append("<li>${result['common_name'']} (<span class='latin_name'>${result['latin_name']}</span>)</li>");
                 }
             });
         }
@@ -710,7 +710,7 @@
         //// currentSelectedZooIds;
         return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
             for (const val of zooDistances) {
-                $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
+                $("#selected-zoo-${val.zoo_id} .distance").text("(${val.metres/1000}km)");
             }
             domReorderZoos(zooDistances);
         })
@@ -739,7 +739,7 @@
             })
         }
         //create url to request
-        let path = "zoo_distances/"+postcode+"/"+zoosNeedingDistance.join(",");
+        let path = `zoo_distances/${postcode}/`+zoosNeedingDistance.join(",");
         //get response
         return promiseGet(path).then(function(newDistances) {
             $("#invalid-postcode").hide();
@@ -754,7 +754,7 @@
     function domReorderZoos(distances) {
         const distancesSorted = distances.sort(function(a, b) { return b.metres - a.metres});
         for (const distance of distancesSorted) {
-            const zooLi = $("li#selected-zoo-"+distance.zoo_id);
+            const zooLi = $(`li#selected-zoo-${distance.zoo_id}`);
             zooLi.parent().prepend(zooLi);
         }
     }
