@@ -511,7 +511,13 @@
             selectedSpeciesElem.empty();
             for(const speciesId of this.selectedSpeciesIds) {
                 const species = animalData.species[speciesId];
-                selectedSpeciesElem.append(`<li><span class="species_name">${species.commonName}</span> <span class="latin_name">${species.latinName}</span></li>`);
+                selectedSpeciesElem.append(`<li>
+<span class="species_name">${species.commonName}</span>
+<span class="latin_name">${species.latinName}</span>
+<span class='selector' onclick='userSelectSpecies(${speciesId})'>
+    <img src="images/box_checked.svg" alt="$✔"/>
+</span>
+</li>`);
             }
             // Wait for all species zoo lists to have been retrieved
             const self = this;
