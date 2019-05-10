@@ -307,7 +307,7 @@
                     }
                     // Add species in category
                     for (const itemData of categoryObj.species) {
-                        new TaxonomySpecies(itemData, this.taxonomyView);
+                        new TaxonomySpecies(itemData, self.taxonomyView);
                     }
                     // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                     let loadCategoryPromises = [];
