@@ -493,7 +493,7 @@
                 selectedZoosElem.empty();
                 self.selectedZooIds = Object.keys(selectedZoos);
                 map.hideAllMarkers();
-                for (const zooData of selectedZoos) {
+                for (const zooData of Object.values(selectedZoos)) {
                     selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
                     const marker = map.getZooMarker(zooData);
                     marker.setVisible(true);
