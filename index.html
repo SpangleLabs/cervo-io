@@ -212,7 +212,7 @@
                 self.cacheCategoryLevel = data[0];
                 const categoryData = data[1];
                 for (const itemData of categoryData) {
-                    const newCategory = new TaxonomyCategory(itemData);
+                    const newCategory = new TaxonomyCategory(itemData, self);
                     self.rootElem.find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
                 }
@@ -247,15 +247,16 @@
      * Species category, from kingdoms to genera.
      */
     class TaxonomyCategory {
-        constructor(categoryData) {
+        constructor(categoryData, taxonomyView) {
+            this.taxonomyView = taxonomyView;
             this.id = categoryData.category_id;
             this.name = categoryData.name;
-            this.levelName = animalList.getCategoryLevel(categoryData.category_level_id).name;
+            this.levelName = taxonomyView.getCategoryLevel(categoryData.category_level_id).name;
             this.parentCategoryId = categoryData.parent_category_id;
             this.parentCategory = null;
             this.selected = false;
             if (this.parentCategoryId != null) {
-                this.parentCategory = animalList.categories[this.parentCategoryId];
+                this.parentCategory = taxonomyView.categories[this.parentCategoryId];
                 this.selected = this.parentCategory.uiElement.hasClass("selected");
                 this.parentCategory.childCategories.push(this);
             }
@@ -263,8 +264,8 @@
             this.isOdd = this.uiElement.parent("ul").hasClass("odd");
             this.childCategories = null;
             this.childSpecies = null;
-            // Add self to animalList's big category dictionary
-            animalList.categories[this.id] = this;
+            // Add self to root taxonomy view's big category dictionary
+            taxonomyView.categories[this.id] = this;
         }
 
         render() {
@@ -302,11 +303,11 @@
                     self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
                     // Add subcategories
                     for (const itemData of categoryObj.sub_categories) {
-                        new TaxonomyCategory(itemData);
+                        new TaxonomyCategory(itemData, self.taxonomyView);
                     }
                     // Add species in category
                     for (const itemData of categoryObj.species) {
-                        new TaxonomySpecies(itemData);
+                        new TaxonomySpecies(itemData, this.taxonomyView);
                     }
                     // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                     let loadCategoryPromises = [];
@@ -382,15 +383,16 @@
      * An actual species
      */
     class TaxonomySpecies {
-        constructor(speciesData) {
+        constructor(speciesData, taxonomyView) {
             this.data = animalData.getOrCreateSpecies(speciesData);
+            this.taxonomyView = taxonomyView;
 
-            this.parentCategory = animalList.categories[this.data.parentCategoryId];
+            this.parentCategory = this.taxonomyView.categories[this.data.parentCategoryId];
             this.selected = this.parentCategory.uiElement.hasClass("selected");
             this.uiElement = this.render();
 
-            // Add self to parent category and animalList dict
-            animalList.species[this.data.id] = this; // this is fine
+            // Add self to parent category and taxonomyView dict
+            this.taxonomyView.species[this.data.id] = this; // this is fine
             // If selected, add to selection:
             if(this.selected) {
                 selection.addSpecies(this.data.id);
@@ -602,7 +604,6 @@
                 "alphabetical": new AlphabetView(),
                 "search": new SearchView()
             };
-            animalList = this.views["taxonomical"];  // TODO: remove
             this.viewKeys = ["taxonomical", "alphabetical", "search"];
             this.activeView = null;
             this.update();
@@ -627,7 +628,6 @@
     let map;
     let googleMap;
     const animalData = new AnimalData();
-    let animalList; // TODO: remove
     let selector;
     let selection = new Selection();
     const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
@@ -691,11 +691,11 @@
     }
 
     function userExpandCategory(id) {
-        animalList.categories[id].loadSubElements(true, false);
+        selector.views["taxonomical"].categories[id].loadSubElements(true, false);
     }
 
     function userSelectCategory(categoryId) {
-        const category = animalList.categories[categoryId];
+        const category = selector.views["taxonomical"].categories[categoryId];
         category.select();
         category.loadSubElements(false, true).then(function() {
             //selection.update();
@@ -703,7 +703,7 @@
     }
 
     function userSelectSpecies(speciesId) {
-        const species = animalList.species[speciesId];
+        const species = selector.views["taxonomical"].species[speciesId];
         species.select();
 //        selection.toggleSpecies(speciesId);
     }
