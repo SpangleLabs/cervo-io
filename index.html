@@ -109,9 +109,9 @@
                         <span style='font-weight: bold'>Postcode:</span> ${zooData.postcode}<br />
                         <h2>Species:</h2>
                         <ul class='zoo_species'>`;
-                    $.each(zooData.species, function (idx, zooSpecies) {
+                    for (let zooSpecies of zooData.species) {
                         infoContent += `<li class='zoo_species zoo_species_${zooSpecies.species_id}'>${zooSpecies.common_name} <span class='latin_name'>${zooSpecies.latin_name}</span>`;
-                    });
+                    }
                     infoContent += "</ul>";
                     self.cacheZooInfoWindows[zooId].setContent(infoContent);
                 });
@@ -120,25 +120,25 @@
         }
 
         userToggleInfoWindow(zooId) {
-            $.each(this.cacheZooInfoWindows, function (zooInfoWindowId, infoWindow) {
+            for (const [zooInfoWindowId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
                 if (zooInfoWindowId !== zooId) {
                     infoWindow.close();
                 }
-            });
+            }
             this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooId]);
         }
 
         hideAllMarkers() {
             // Hide all info windows, except those for zoos currently selected. TODO: check
-            $.each(this.cacheZooInfoWindows, function(zooId, infoWindow) {
+            for (const [zooId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
                 if (!selection.selectedZooIds.includes(zooId)) {
                     infoWindow.close();
                 }
-            });
+            }
             // Hide all markers
-            $.each(map.cacheZooMarkers, function(zooId, marker) {
+            for (const marker of Object.values(map.cacheZooMarkers)) {
                 marker.setVisible(false);
-            });
+            }
             // Unbold species in any zoo marker info windows?
             $("li.zoo_species").removeClass("selected_species");
         }
@@ -172,11 +172,11 @@
             Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function (data) {
                 self.cacheCategoryLevel = data[0];
                 const categoryData = data[1];
-                $.each(categoryData, function (index, itemData) {
+                for (const itemData of categoryData) {
                     const newCategory = new Category(itemData);
                     self.rootElem.find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
-                });
+                }
             }, function(err) {
                 console.log(err);
                 self.rootElem.find("img.spinner").remove();
@@ -195,11 +195,11 @@
 
         getCategoryLevel(id) {
             let result = null;
-            $.each(this.cacheCategoryLevel, function (idx, val) {
+            for (const val of this.cacheCategoryLevel) {
                 if (val.category_level_id === id) {
                     result = val;
                 }
-            });
+            }
             return result;
         }
     }
@@ -262,13 +262,13 @@
                     // Add base list element
                     self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
                     // Add subcategories
-                    $.each(categoryObj.sub_categories, function (index, itemData) {
+                    for (const itemData of categoryObj.sub_categories) {
                         new Category(itemData);
-                    });
+                    }
                     // Add species in category
-                    $.each(categoryObj.species, function (index, itemData) {
+                    for (const itemData of categoryObj.species) {
                         new Species(itemData);
-                    });
+                    }
                     // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                     let loadCategoryPromises = [];
                     if (self.childCategories.length === 1 || recursive) {
@@ -470,9 +470,9 @@
                 // Generate promises returning dict of zoo id to zoos
                 speciesDataPromises.push(species.getZooList().then(function(/*SpeciesObj*/zooList) {
                     let selectedZoos = {};
-                    $.each(zooList, function (zooIdx, zooData) {
+                    for (const zooData of zooList) {
                         selectedZoos[zooData.zoo_id] = zooData;
-                    });
+                    }
                     return selectedZoos;
                 }));
             }
@@ -493,11 +493,11 @@
                 selectedZoosElem.empty();
                 self.selectedZooIds = Object.keys(selectedZoos);
                 map.hideAllMarkers();
-                $.each(selectedZoos, function(zooKey, zooData) {
+                for (const zooData of selectedZoos) {
                     selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
                     const marker = map.getZooMarker(zooData);
                     marker.setVisible(true);
-                });
+                }
                 return updateZooDistances();
             }).then(function() {
                 self.updating = false;
@@ -613,9 +613,9 @@
         if (!cacheZooDistances[postcode]) {
             cacheZooDistances[postcode] = {};
         }
-        $.each(zooDistanceData, function(idx, val) {
+        for (const val of zooDistanceData) {
             cacheZooDistances[postcode][val.zoo_id] = val.metres;
-        });
+        }
     }
 
     /**
@@ -709,9 +709,9 @@
         }
         //// currentSelectedZooIds;
         return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
-            $.each(zooDistances, function(idx, val) {
+            for (const val of zooDistances) {
                 $("#selected-zoo-"+val.zoo_id+" .distance").text("("+val.metres/1000+"km)");
-            });
+            }
             domReorderZoos(zooDistances);
         })
     }
@@ -721,7 +721,7 @@
         let foundDistances = [];
         if (cacheZooDistances[postcode]) {
             zoosNeedingDistance = [];
-            $.each(zooIds, function(idx, zooId) {
+            for (const zooId of zooIds) {
                 if (cacheZooDistances[postcode][zooId]) {
                     foundDistances.push({
                         zoo_id: zooId,
@@ -730,7 +730,7 @@
                 } else {
                     zoosNeedingDistance.push(zooId);
                 }
-            });
+            }
         }
         if (zoosNeedingDistance.length === 0) {
             $("#invalid-postcode").hide();
@@ -753,10 +753,10 @@
 
     function domReorderZoos(distances) {
         const distancesSorted = distances.sort(function(a, b) { return b.metres - a.metres});
-        $.each(distancesSorted, function(idx, distance) {
+        for (const distance of distancesSorted) {
             const zooLi = $("li#selected-zoo-"+distance.zoo_id);
             zooLi.parent().prepend(zooLi);
-        });
+        }
     }
 
     $(document).ready(function() {
