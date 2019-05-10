@@ -173,7 +173,7 @@
                 self.cacheCategoryLevel = data[0];
                 const categoryData = data[1];
                 for (const itemData of categoryData) {
-                    const newCategory = new Category(itemData);
+                    const newCategory = new TaxonomyCategory(itemData);
                     self.rootElem.find("img.spinner").remove();
                     newCategory.loadSubElements(true, false);
                 }
@@ -207,7 +207,7 @@
     /**
      * Species category, from kingdoms to genera.
      */
-    class Category {
+    class TaxonomyCategory {
         constructor(categoryData) {
             this.id = categoryData.category_id;
             this.name = categoryData.name;
@@ -263,7 +263,7 @@
                     self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
                     // Add subcategories
                     for (const itemData of categoryObj.sub_categories) {
-                        new Category(itemData);
+                        new TaxonomyCategory(itemData);
                     }
                     // Add species in category
                     for (const itemData of categoryObj.species) {
