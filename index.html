@@ -46,7 +46,10 @@
             <ul id="letter-results"></ul>
         </div>
         <div id="animals-search">
-            <input type="text" name="animals-search-input" id="animals-search-input" />
+            <label>
+                Search:
+                <input type="text" name="animals-search-input" id="animals-search-input" />
+            </label>
             <input type="button" onclick="userSearchButton()" />
             <ul id="search-results"></ul>
         </div>
@@ -129,7 +132,7 @@
         }
 
         hideAllMarkers() {
-            // Hide all info windows, except those for zoos currently selected. TODO: check
+            // Hide all info windows, except those for zoos currently selected.
             for (const [zooId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
                 if (!selection.selectedZooIds.includes(zooId)) {
                     infoWindow.close();
@@ -620,10 +623,6 @@
                 }
             }
         }
-
-        findSelectedSpecies() {
-            return this.views[this.activeView].findSelectedSpecies();
-        }
     }
     let map;
     let googleMap;
@@ -646,7 +645,7 @@
 
     /**
      * I pulled this method from somewhere else, tbh
-     * @param url
+     * @param path API relative path
      * @returns {Promise<object>}
      */
     function promiseGet(path) {
