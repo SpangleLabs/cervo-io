@@ -79,6 +79,9 @@ ul.zoo_species > li {
 .letter-list.even.selected {
     background-color: indianred;
 }
+.letter-list.disabled {
+    color: gray;
+}
 
 /* Styling text in taxonomy category selector, and latin names */
 .latin_name, .category_level {
@@ -102,7 +105,7 @@ form {
 }
 
 /* Styling clickable list items and spans */
-span[onclick], li[onclick], .letter-list {
+span[onclick], li[onclick], .letter-list:not(.disabled) {
     cursor: pointer;
 }
 

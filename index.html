@@ -564,6 +564,15 @@
             this.updating = false;
             // Latest letter loaded, for debouncing
             this.latestLetter = null;
+            // Get the list of valid first letters, and update the invalid ones.
+            const self = this;
+            promiseGet("/species/valid_first_letters").then(function(letters) {
+                for (const letter of Object.keys(self.letters)) {
+                    if (!letters.includes(letter.toUpperCase())) {
+                        self.letters[letter].disable();
+                    }
+                }
+            });
         }
     }
 
@@ -627,6 +636,11 @@
                 this.letterElem.find(`.${speciesClass}.selector`).click(function() {userSelectSpecies(species.id)});
             }
             this.rootElem.find("img.spinner").remove();
+        }
+
+        disable() {
+            this.letterElem.addClass("disabled");
+            this.letterElem.off();
         }
     }
 
