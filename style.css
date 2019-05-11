@@ -84,7 +84,7 @@ form {
 }
 
 /* Styling clickable list items and spans */
-span[onclick], li[onclick] {
+span[onclick], li[onclick], .letter-list {
     cursor: pointer;
 }
 
