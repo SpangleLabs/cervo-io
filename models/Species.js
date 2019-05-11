@@ -56,6 +56,16 @@ const Species = {
         });
     },
 
+    getFirstLetters: function () {
+        return db.connection().then(function (conn) {
+            const result = conn.query("select distinct left(common_name, 1) as letter " +
+                "from species " +
+                "order by letter");
+            conn.end();
+            return result;
+        })
+    },
+
     addSpecies: function (Species) {
         return db.connection().then(function (conn) {
             const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +

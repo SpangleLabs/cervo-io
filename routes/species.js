@@ -3,6 +3,14 @@ const Species = require("../models/Species.js");
 const Zoos = require("../models/Zoos.js");
 const router = express.Router();
 
+router.get("/valid_first_letters", function (req, res, next) {
+    Species.getFirstLetters().then(function (letters) {
+        res.json(letters.map(a => a['letter']));
+    }).catch(function (err) {
+        res.status(500).json(err);
+    });
+});
+
 /* GET species listing. */
 router.get('/:id?', function (req, res, next) {
     if (req.params.id) {
