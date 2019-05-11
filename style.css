@@ -62,6 +62,24 @@ ul.zoo_species > li {
     list-style-type: disc;
 }
 
+/* Styling letter list letters */
+.letter-list {
+    font-size: 130%;
+    padding: 0 5px;
+}
+.letter-list.odd {
+    background-color: lightgrey;
+}
+.letter-list.even {
+    background-color: darkgray;
+}
+.letter-list.odd.selected {
+    background-color: palevioletred;
+}
+.letter-list.even.selected {
+    background-color: indianred;
+}
+
 /* Styling text in taxonomy category selector, and latin names */
 .latin_name, .category_level {
     font-style: italic;

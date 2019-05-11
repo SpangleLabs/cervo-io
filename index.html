@@ -555,8 +555,10 @@
         constructor() {
             super($("#animals-alphabetic"));
             this.letters = {};
+            let odd = true;
             for (const letter of "abcdefghijklmnopqrstuvwxyz") {
-                this.letters[letter] = new AlphabetLetter(this, letter);
+                this.letters[letter] = new AlphabetLetter(this, letter, odd);
+                odd = !odd;
             }
             // Whether it is currently updating, for debouncing
             this.updating = false;
@@ -569,13 +571,13 @@
      * Get list of species matching letter, display/hide them.
      */
     class AlphabetLetter {
-        constructor(alphabetView, letter) {
+        constructor(alphabetView, letter, odd) {
             this.letter = letter;
             this.alphabetView = alphabetView;
             this.rootElem = alphabetView.rootElem;
             this.letterListElem = $("#letter-list");
             this.letterResultsElem = $("ul#letter-results");
-            this.letterListElem.append(`<span id='letter-list-${letter}' class='letter-list'>${letter.toUpperCase()}</span>`);
+            this.letterListElem.append(`<span id='letter-list-${letter}' class='letter-list ${odd ? "odd" : "even"}'>${letter.toUpperCase()}</span>`);
             this.letterElem = $(`#letter-list-${letter}`);
             this.letterElem.click($.proxy(this.userClick, this));
             // Cache of animal list for this letter
@@ -590,6 +592,8 @@
             this.alphabetView.updating = true;
             this.alphabetView.latestLetter = this.letter;
             this.letterResultsElem.empty();
+            this.alphabetView.rootElem.find(".letter-list").removeClass("selected");
+            this.letterElem.addClass("selected");
             const self = this;
             this.rootElem.append(spinner);
             if(this.animals == null) {
