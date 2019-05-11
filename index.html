@@ -187,10 +187,6 @@
         constructor(rootElem) {
             this.rootElem = rootElem;
         }
-
-        findSelectedSpecies() {
-            throw Error("Not implemented.");
-        }
     }
 
     /**
@@ -221,15 +217,6 @@
                 self.rootElem.find("img.spinner").remove();
                 self.rootElem.append("<span class=\"error\">Failed to connect to API</span>");
             });
-        }
-
-        findSelectedSpecies() {
-            const speciesList = [];
-            $("li.species.selected").each(function (idx, elem) {
-                const speciesId = elem.id.split("-")[1];
-                speciesList.push(speciesId);
-            });
-            return speciesList;
         }
 
         getCategoryLevel(id) {
@@ -558,10 +545,6 @@
                 this.letters.push(new AlphabetLetter(this.rootElem, letter));
             }
         }
-
-        findSelectedSpecies() {
-            return [];
-        }
     }
 
     class AlphabetLetter {
@@ -610,10 +593,6 @@
                     self.searchResults.append(`<li>${result['common_name']} (<span class='latin_name'>${result['latin_name']}</span>)</li>`);
                 }
             });
-        }
-
-        findSelectedSpecies() {
-            return [];
         }
     }
 
