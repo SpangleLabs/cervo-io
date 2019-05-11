@@ -588,13 +588,9 @@
                     <span class='selector' onclick='userSelectSpecies(${species.id})'>
                         <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
                     </span></li>`);
-                    self.letterElem.find(`.${speciesClass}.selector`).click(function() {self.speciesSelect(species.id)});
+                    self.letterElem.find(`.${speciesClass}.selector`).click(function() {userSelectSpecies(species.id)});
                 }
             });
-        }
-
-        speciesSelect(speciesId) {
-            selection.addSpecies(speciesId);
         }
     }
 
