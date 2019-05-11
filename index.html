@@ -554,10 +554,14 @@
     class AlphabetView extends View {
         constructor() {
             super($("#animals-alphabetic"));
-            this.letters = [];
+            this.letters = {};
             for (const letter of "abcdefghijklmnopqrstuvwxyz") {
-                this.letters.push(new AlphabetLetter(this.rootElem, letter));
+                this.letters[letter] = new AlphabetLetter(this, letter);
             }
+            // Whether it is currently updating, for debouncing
+            this.updating = false;
+            // Latest letter loaded, for debouncing
+            this.latestLetter = null;
         }
     }
 
@@ -565,18 +569,26 @@
      * Get list of species matching letter, display/hide them.
      */
     class AlphabetLetter {
-        constructor(alphabetRoot, letter) {
+        constructor(alphabetView, letter) {
             this.letter = letter;
-            this.rootElem = alphabetRoot;
+            this.alphabetView = alphabetView;
+            this.rootElem = alphabetView.rootElem;
             this.letterListElem = $("#letter-list");
             this.letterResultsElem = $("ul#letter-results");
             this.letterListElem.append(`<span id='letter-list-${letter}' class='letter-list'>${letter.toUpperCase()}</span>`);
             this.letterElem = $(`#letter-list-${letter}`);
             this.letterElem.click($.proxy(this.userClick, this));
+            // Cache of animal list for this letter
             this.animals = null;
         }
 
         userClick() {
+            if(this.alphabetView.updating) {
+                this.alphabetView.latestLetter = this.letter;
+                return;
+            }
+            this.alphabetView.updating = true;
+            this.alphabetView.latestLetter = this.letter;
             this.letterResultsElem.empty();
             const self = this;
             this.rootElem.append(spinner);
@@ -584,9 +596,17 @@
                 promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals) {
                     self.animals = animals;
                     self.renderList(animals);
+                    self.alphabetView.updating = false;
+                    if(self.alphabetView.latestLetter !== self.letter) {
+                        self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
+                    }
                 });
             } else {
                 this.renderList(this.animals);
+                this.alphabetView.updating = false;
+                if(self.alphabetView.latestLetter !== self.letter) {
+                    self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
+                }
             }
         }
 
