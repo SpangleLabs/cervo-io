@@ -590,6 +590,7 @@
         updateSearchResults() {
             const value = this.searchBox.val();
             const self = this;
+            this.rootElem.append(spinner);
             promiseGet(`species/?name=%25${value}%25`).then(function(animals) {
                 self.searchResults.empty();
                 for (const animal of animals) {
@@ -601,6 +602,7 @@
     <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
 </span></li>`);
                 }
+                self.rootElem.find("img.spinner").remove();
             });
         }
     }
