@@ -587,10 +587,16 @@
         updateSearchResults() {
             const value = this.searchBox.val();
             const self = this;
-            promiseGet(`species/?name=%25${value}%25`).then(function(results) {
+            promiseGet(`species/?name=%25${value}%25`).then(function(animals) {
                 self.searchResults.empty();
-                for (const result of results) {
-                    self.searchResults.append(`<li>${result['common_name']} (<span class='latin_name'>${result['latin_name']}</span>)</li>`);
+                for (const animal of animals) {
+                    const species = animalData.getOrCreateSpecies(animal);
+                    const speciesClass = `species-${species.id}`;
+                    const selected = selection.containsSpecies(species.id);
+                    self.searchResults.append(`<li class="${speciesClass}">${species.commonName} (<span class='latin_name'>${species.latinName}</span>)
+<span class='selector' onclick='userSelectSpecies(${species.id})'>
+    <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
+</span></li>`);
                 }
             });
         }
