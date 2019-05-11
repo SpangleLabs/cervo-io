@@ -406,9 +406,9 @@
             const speciesLiId = `species-${this.data.id}`;
             const parentUlElement = this.parentCategory.uiElement.find("ul");
             parentUlElement.append(`<li class='species ${selected ? "selected" : ""} ${speciesLiId}'>
-                <span class='species_name'>${this.data.commonName} </span>
-                <span class='latin_name'>${this.data.latinName}</span>
                 <span class='selector' onclick='userSelectSpecies(${this.data.id})'>
+                    <span class='species_name'>${this.data.commonName} </span>
+                    <span class='latin_name'>${this.data.latinName}</span>
                     <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
                 </span>
                 </li>`);
@@ -517,9 +517,9 @@
             for(const speciesId of this.selectedSpeciesIds) {
                 const species = animalData.species[speciesId];
                 selectedSpeciesElem.append(`<li>
-<span class="species_name">${species.commonName}</span>
-<span class="latin_name">${species.latinName}</span>
 <span class='selector' onclick='userSelectSpecies(${speciesId})'>
+    <span class="species_name">${species.commonName}</span>
+    <span class="latin_name">${species.latinName}</span>
     <img src="images/box_checked.svg" alt="$✔"/>
 </span>
 </li>`);
@@ -595,8 +595,9 @@
                 const species = animalData.getOrCreateSpecies(animal);
                 const speciesClass = `species-${species.id}`;
                 const selected = selection.containsSpecies(species.id);
-                this.letterResultsElem.append(`<li class="${speciesClass}">${species.commonName}
+                this.letterResultsElem.append(`<li class="${speciesClass}">
                     <span class='selector' onclick='userSelectSpecies(${species.id})'>
+                    ${species.commonName}
                         <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
                     </span></li>`);
                 this.letterElem.find(`.${speciesClass}.selector`).click(function() {userSelectSpecies(species.id)});
@@ -630,8 +631,9 @@
                     const commonName = species.commonName.replace(searchRegex,replacement);
                     const latinName = species.latinName.replace(searchRegex,replacement);
                     self.searchResults.append(
-`<li class="${speciesClass}">${commonName} (<span class='latin_name'>${latinName}</span>)
+`<li class="${speciesClass}">
 <span class='selector' onclick='userSelectSpecies(${species.id})'>
+    ${commonName} (<span class='latin_name'>${latinName}</span>)
     <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
 </span></li>`);
                 }
