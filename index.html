@@ -573,26 +573,35 @@
             this.letterListElem.append(`<span id='letter-list-${letter}' class='letter-list'>${letter.toUpperCase()}</span>`);
             this.letterElem = $(`#letter-list-${letter}`);
             this.letterElem.click($.proxy(this.userClick, this));
-            this.open = false;
+            this.animals = null;
         }
 
         userClick() {
             this.letterResultsElem.empty();
             const self = this;
             this.rootElem.append(spinner);
-            promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals) {
-                for (const animal of animals) {
-                    const species = animalData.getOrCreateSpecies(animal);
-                    const speciesClass = `species-${species.id}`;
-                    const selected = selection.containsSpecies(species.id);
-                    self.letterResultsElem.append(`<li class="${speciesClass}">${species.commonName}
+            if(this.animals == null) {
+                promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals) {
+                    self.animals = animals;
+                    self.renderList(animals);
+                });
+            } else {
+                this.renderList(this.animals);
+            }
+        }
+
+        renderList(animals) {
+            for (const animal of animals) {
+                const species = animalData.getOrCreateSpecies(animal);
+                const speciesClass = `species-${species.id}`;
+                const selected = selection.containsSpecies(species.id);
+                this.letterResultsElem.append(`<li class="${speciesClass}">${species.commonName}
                     <span class='selector' onclick='userSelectSpecies(${species.id})'>
                         <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
                     </span></li>`);
-                    self.letterElem.find(`.${speciesClass}.selector`).click(function() {userSelectSpecies(species.id)});
-                }
-                self.rootElem.find("img.spinner").remove();
-            });
+                this.letterElem.find(`.${speciesClass}.selector`).click(function() {userSelectSpecies(species.id)});
+            }
+            this.rootElem.find("img.spinner").remove();
         }
     }
 
