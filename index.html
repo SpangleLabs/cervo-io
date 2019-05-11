@@ -147,6 +147,9 @@
         }
     }
 
+    /**
+     * Store data about known species
+     */
     class AnimalData {
         constructor() {
             this.species = {};
@@ -164,6 +167,9 @@
         }
     }
 
+    /**
+     * Stores species info, and lists of zoos the species appear in
+     */
     class SpeciesData {
         constructor(speciesData) {
             this.id = speciesData.species_id;
@@ -190,7 +196,7 @@
     }
 
     /**
-     * Handler for the species and category list on the site, contains caches and data on categories and such
+     * Load and create base taxonomy categories, cache category levels, categories and taxonomy species
      */
     class TaxonomyView extends View {
         constructor() {
@@ -231,7 +237,9 @@
     }
 
     /**
-     * Species category, from kingdoms to genera.
+     * Displays a taxonomy category, in correct location.
+     * If necessary, load subcategories and species, potentially recursively.
+     * Select/unselect self. Add/remove child species from selection.
      */
     class TaxonomyCategory {
         constructor(categoryData, taxonomyView) {
@@ -371,7 +379,7 @@
     }
 
     /**
-     * An actual species
+     * Displays a species in the taxonomy view
      */
     class TaxonomySpecies {
         constructor(speciesData, taxonomyView) {
@@ -407,7 +415,7 @@
     }
 
     /**
-     * Stores which species are currently selected, and stuff.
+     * Store list of selected species, and update their selected status as appropriate. Get list of zoos for them
      */
     class Selection {
         constructor() {
@@ -538,6 +546,9 @@
         }
     }
 
+    /**
+     * Create and store list of AlphabetLetter objects
+     */
     class AlphabetView extends View {
         constructor() {
             super($("#animals-alphabetic"));
@@ -548,6 +559,9 @@
         }
     }
 
+    /**
+     * Get list of species matching letter, display/hide them.
+     */
     class AlphabetLetter {
         constructor(alphabetRoot, letter) {
             this.letter = letter;
@@ -580,6 +594,9 @@
         }
     }
 
+    /**
+     * Take user input and search for species, list results (highlight search term in names).
+     */
     class SearchView extends View {
         constructor() {
             super($("#animals-search"));
@@ -607,6 +624,9 @@
         }
     }
 
+    /**
+     * Handle (and update) which view is active
+     */
     class Selector {
         constructor() {
             this.views = {
