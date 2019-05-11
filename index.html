@@ -482,6 +482,7 @@
                 this.triedAgain = true;
                 return;
             }
+            this.triedAgain = false;
             if (arrayEquals(this.selectedSpeciesIds, this.listSpeciesCurrentlyDisplayed())) {
                 return;
             }
