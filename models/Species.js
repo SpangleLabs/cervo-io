@@ -39,7 +39,8 @@ const Species = {
     getSpeciesByName: function (search) {
         return db.connection().then(function (conn) {
             const result = conn.query("select * from species " +
-                "where common_name like ? or latin_name like ?", [search, search]);
+                "where common_name like ? or latin_name like ? " +
+                "order by common_name", [search, search]);
             conn.end();
             return result;
         });
@@ -48,7 +49,8 @@ const Species = {
     getSpeciesByCommonName: function (search) {
         return db.connection().then(function (conn) {
             const result = conn.query("select * from species " +
-                "where common_name like ?", [search]);
+                "where common_name like ? " +
+                "order by common_name", [search]);
             conn.end();
             return result;
         });
