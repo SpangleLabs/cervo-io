@@ -563,6 +563,7 @@
         userClick() {
             this.letterResultsElem.empty();
             const self = this;
+            this.rootElem.append(spinner);
             promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals) {
                 for (const animal of animals) {
                     const species = animalData.getOrCreateSpecies(animal);
@@ -574,6 +575,7 @@
                     </span></li>`);
                     self.letterElem.find(`.${speciesClass}.selector`).click(function() {userSelectSpecies(species.id)});
                 }
+                self.rootElem.find("img.spinner").remove();
             });
         }
     }
