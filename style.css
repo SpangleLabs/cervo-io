@@ -12,7 +12,7 @@ body {
     display: none;
 }
 
-/* Style for category list, but also selected species and selected zoos lists */
+/* Style for taxonomy category list, but also selected species and selected zoos lists */
 ul {
     padding-left: 10px;
     border-left: 1px dotted black;
@@ -22,7 +22,7 @@ li {
     max-height: 1000000px;
 }
 
-/* Icons for category listing */
+/* Icons for taxonomy category listing */
 li.closed:before {
     content: "📁";
 }
@@ -33,7 +33,7 @@ li.species:before {
     content: "🦌";
 }
 
-/* Colours for category listing */
+/* Colours for taxonomy category listing */
 ul.odd {
     background-color: lightgrey;
 }
@@ -62,9 +62,13 @@ ul.zoo_species > li {
     list-style-type: disc;
 }
 
-/* Styling text in category selector */
+/* Styling text in taxonomy category selector, and latin names */
 .latin_name, .category_level {
     font-style: italic;
+}
+/* Styling search term in search results */
+.search_term {
+    font-weight: bold;
 }
 
 /* Postcode entry form styling */

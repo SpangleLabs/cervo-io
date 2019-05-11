@@ -606,6 +606,8 @@
 
         updateSearchResults() {
             const value = this.searchBox.val();
+            const searchRegex = new RegExp(value, "gi");
+            const replacement = `<span class='search_term'>$&</span>`;
             const self = this;
             this.rootElem.append(spinner);
             promiseGet(`species/?name=%25${value}%25`).then(function(animals) {
@@ -614,7 +616,10 @@
                     const species = animalData.getOrCreateSpecies(animal);
                     const speciesClass = `species-${species.id}`;
                     const selected = selection.containsSpecies(species.id);
-                    self.searchResults.append(`<li class="${speciesClass}">${species.commonName} (<span class='latin_name'>${species.latinName}</span>)
+                    const commonName = species.commonName.replace(searchRegex,replacement);
+                    const latinName = species.latinName.replace(searchRegex,replacement);
+                    self.searchResults.append(
+`<li class="${speciesClass}">${commonName} (<span class='latin_name'>${latinName}</span>)
 <span class='selector' onclick='userSelectSpecies(${species.id})'>
     <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
 </span></li>`);
