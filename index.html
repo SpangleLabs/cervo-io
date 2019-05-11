@@ -379,13 +379,14 @@
             this.taxonomyView = taxonomyView;
 
             this.parentCategory = this.taxonomyView.categories[this.data.parentCategoryId];
-            const selected = this.parentCategory.uiElement.hasClass("selected");
-            this.uiElement = this.render(selected);
+            const categorySelected = this.parentCategory.uiElement.hasClass("selected");
+            const alreadySelected = selection.containsSpecies(this.data.id);
+            this.uiElement = this.render(categorySelected || alreadySelected);
 
             // Add self to parent category and taxonomyView dict
             this.taxonomyView.species[this.data.id] = this; // this is fine
             // If selected, add to selection:
-            if(selected) {
+            if(categorySelected) {
                 selection.addSpecies(this.data.id);
             }
             this.parentCategory.childSpecies.push(this);
