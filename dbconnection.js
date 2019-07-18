@@ -7,7 +7,8 @@ module.exports = {
         const mysqlConfig = {
             user: config['mysql']['username'],
             password: config['mysql']['password'],
-            database: config['mysql']['database']
+            database: config['mysql']['database'],
+            connectTimeout: 5000
         }
 
         if ("host" in config["mysql"]) {
