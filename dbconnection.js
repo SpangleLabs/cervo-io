@@ -18,6 +18,9 @@ module.exports = {
             mysqlConfig["socketPath"] = config["mysql"]["socketPath"];
         }
 
-        return mysql.createConnection(mysqlConfig);
+        return mysql.createConnection(mysqlConfig).catch(function(err) {
+            console.log("Mysql failed to make connection.");
+            console.log(err);
+        });
     }
 };
