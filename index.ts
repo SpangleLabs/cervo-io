@@ -1,7 +1,50 @@
+import "https://maps.googleapis.com/maps/api/js?key=AIzaSyA4CV7NT3SIw7vguuin6WkHnzxS9szP8do&callback=initMap"
+
+interface ZooJson {
+    zoo_id: number;
+    name: string;
+    postcode: string;
+    link: string;
+    latitude: number;
+    longitude: number;
+}
+
+interface SpeciesJson {
+    species_id: number;
+    common_name: string;
+    latin_name: string;
+    category_id: number;
+}
+
+interface FullSpeciesJson extends SpeciesJson {
+    zoos: ZooJson[];
+}
+
+interface CategoryLevel {
+    category_level_id: number;
+    name: string;
+}
+
+interface CategoryJson {
+    category_id: number;
+    name: string;
+    category_level_id: number;
+    parent_category_id: number | null;
+    hidden?: boolean;  // TODO: seems to be in subcategories?
+}
+
+interface FullCategoryJson extends CategoryJson {
+    sub_categories: CategoryJson[];
+    species: SpeciesJson[];
+}
+
 /**
  * Wrapper around the google maps Map class, having handy methods and caches
  */
 class PageMap {
+    googleMap: google.maps.Map;
+    cacheZooMarkers: {[key: number] : google.maps.Marker};
+    cacheZooInfoWindows: {[key: number] : google.maps.InfoWindow};
 
     constructor(googleMap) {
         this.googleMap = googleMap;
@@ -13,8 +56,8 @@ class PageMap {
      * Creates a new google maps marker for a given zoo and saves to cache
      * @param zooData data object of the zoo
      */
-    getZooMarker(zooData) {
-        const zooId = zooData.zoo_id;
+    getZooMarker(zooData: ZooJson): google.maps.Marker {
+        const zooId: number = zooData.zoo_id;
         if (!this.cacheZooMarkers[zooId]) {
             this.cacheZooMarkers[zooId] = new google.maps.Marker({
                 position: new google.maps.LatLng(zooData.latitude, zooData.longitude),
@@ -29,7 +72,7 @@ class PageMap {
         return this.cacheZooMarkers[zooId];
     }
 
-    getZooInfoWindow(zooId) {
+    getZooInfoWindow(zooId: number): google.maps.InfoWindow {
         if (!this.cacheZooInfoWindows[zooId]) {
             this.cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
                 content: "⏳"
@@ -52,7 +95,7 @@ class PageMap {
         return this.cacheZooInfoWindows[zooId];
     }
 
-    userToggleInfoWindow(zooId) {
+    userToggleInfoWindow(zooId: number): void {
         for (const [zooInfoWindowId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
             if (zooInfoWindowId !== zooId) {
                 infoWindow.close();
@@ -61,7 +104,7 @@ class PageMap {
         this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooId]);
     }
 
-    hideAllMarkers() {
+    hideAllMarkers(): void {
         // Hide all info windows, except those for zoos currently selected.
         for (const [zooId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
             if (!selection.selectedZooIds.includes(zooId)) {
@@ -81,11 +124,13 @@ class PageMap {
  * Store data about known species
  */
 class AnimalData {
+    species: {[key: number] : SpeciesData};
+
     constructor() {
         this.species = {};
     }
 
-    getOrCreateSpecies(speciesData) {
+    getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {
         const speciesId = speciesData.species_id;
         if (this.species[speciesId]) {
             return this.species[speciesId];
@@ -101,7 +146,13 @@ class AnimalData {
  * Stores species info, and lists of zoos the species appear in
  */
 class SpeciesData {
-    constructor(speciesData) {
+    id: number;
+    commonName: string;
+    latinName: string;
+    parentCategoryId: number;
+    zooList: ZooJson[];
+
+    constructor(speciesData: SpeciesJson) {
         this.id = speciesData.species_id;
         this.commonName = speciesData.common_name;
         this.latinName = speciesData.latin_name;
@@ -109,7 +160,7 @@ class SpeciesData {
         this.zooList = null;
     }
 
-    async getZooList() {
+    async getZooList(): Promise<ZooJson[]> {
         if(this.zooList == null) {
             this.zooList = promiseGet("species/" + this.id).then(function (data) {
                 return data[0].zoos;
@@ -120,6 +171,8 @@ class SpeciesData {
 }
 
 class View {
+    rootElem: any;  // TODO
+
     constructor(rootElem) {
         this.rootElem = rootElem;
     }
@@ -644,12 +697,12 @@ class Selector {
         }
     }
 }
-let map;
-let googleMap;
-const animalData = new AnimalData();
-let selector;
-let selection = new Selection();
-const spinner = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
+let map: PageMap;
+let googleMap: google.maps.Map;
+const animalData: AnimalData = new AnimalData();
+let selector: Selector;
+let selection: Selection = new Selection();
+const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
 
 let cacheZooDistances = {};
@@ -698,7 +751,7 @@ function promiseGet(path) {
     });
 }
 
-function arrayEquals(array1, array2) {
+function arrayEquals<T>(array1: T[], array2: T[]): boolean {
     if (array1 == null || array2 == null) return false;
     if (array1.length !== array2.length) return false;
     array1.sort();
