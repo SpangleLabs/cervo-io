@@ -55,10 +55,10 @@
             </form>
             <ul id="search-results"></ul>
         </div>
-        <h2>Selected species</h2>
+        <h2>Selected species<span id="selected-species-count"></span></h2>
         <ul id="selected-species"></ul>
         <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode" class="error">Invalid postcode.</span>
-        <h2>Zoos with selected species</h2>
+        <h2>Zoos with selected species<span id="selected-zoos-count"></span></h2>
         <ul id="selected-zoos"></ul>
     </div>
     <div id="map-ccontainer">
@@ -524,6 +524,8 @@
 </span>
 </li>`);
             }
+            // Update selected species count
+            $("#selected-species-count").text(` (${this.selectedSpeciesIds.length})`);
             // Wait for all species zoo lists to have been retrieved
             const self = this;
             Promise.all(speciesDataPromises).then(function(selectedZooList) {
@@ -533,6 +535,9 @@
                 let selectedZoosElem = $("#selected-zoos");
                 selectedZoosElem.empty();
                 self.selectedZooIds = Object.keys(selectedZoos);
+                // Update count of zoos
+                $("#selected-zoos-count").text(` (${self.selectedZooIds.length})`);
+                // Update the list, and map markers
                 map.hideAllMarkers();
                 for (const zooData of Object.values(selectedZoos)) {
                     selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
