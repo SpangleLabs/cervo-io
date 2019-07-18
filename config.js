@@ -1,4 +1,4 @@
 
 const config = {
-    "api_url": "http://localhost:3000/"
+    "api_url": "https://ynnyxrq3yl.execute-api.eu-west-1.amazonaws.com/latest/"
 };
