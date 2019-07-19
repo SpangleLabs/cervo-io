@@ -1,0 +1,30 @@
+{
+  "name": "zoosite",
+  "version": "1.0.0",
+  "description": "Frontend for the cervo.io zoo listing website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshcoales/zoosite.git"
+  },
+  "keywords": [
+    "website",
+    "frontend",
+    "deer",
+    "zoos",
+    "deer",
+    "parks"
+  ],
+  "author": "Joshua Coales",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/joshcoales/zoosite/issues"
+  },
+  "homepage": "https://github.com/joshcoales/zoosite#readme",
+  "dependencies": {
+    "jquery": "^3.4.1"
+  }
+}
