@@ -596,7 +596,7 @@ class Selection {
 class AlphabetView extends View {
     letters: {[key: string]: AlphabetLetter};
     updating: boolean;
-    latestLetter:;
+    latestLetter: string;
 
     constructor() {
         super($("#animals-alphabetic"));
