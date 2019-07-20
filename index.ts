@@ -1,12 +1,22 @@
-import "https://maps.googleapis.com/maps/api/js?key=AIzaSyA4CV7NT3SIw7vguuin6WkHnzxS9szP8do&callback=initMap"
+import config from "./config";
+import $ from "jquery";
 
 interface ZooJson {
     zoo_id: number;
     name: string;
     postcode: string;
     link: string;
-    latitude: number;
-    longitude: number;
+    latitude: number;  // TODO: missing from fullzoo?
+    longitude: number;  // TODO: missing from fullzoo?
+}
+
+interface SpeciesZooJson extends ZooJson {
+    zoo_species_id: number;
+    species_id: number;
+}
+
+interface FullZooJson extends ZooJson {
+    species: ZooSpeciesJson[];
 }
 
 interface SpeciesJson {
@@ -16,11 +26,16 @@ interface SpeciesJson {
     category_id: number;
 }
 
+interface ZooSpeciesJson extends SpeciesJson {
+    zoo_species_id: number;
+    zoo_id: number;
+}
+
 interface FullSpeciesJson extends SpeciesJson {
     zoos: ZooJson[];
 }
 
-interface CategoryLevel {
+interface CategoryLevelJson {
     category_level_id: number;
     name: string;
 }
@@ -38,15 +53,22 @@ interface FullCategoryJson extends CategoryJson {
     species: SpeciesJson[];
 }
 
+interface ZooDistanceJson {
+    user_postcode_id: number;  // TODO: this is pointless
+    zoo_id: number;
+    metres: number;
+    zoo_distance_id: number;
+}
+
 /**
  * Wrapper around the google maps Map class, having handy methods and caches
  */
 class PageMap {
     googleMap: google.maps.Map;
-    cacheZooMarkers: {[key: number] : google.maps.Marker};
-    cacheZooInfoWindows: {[key: number] : google.maps.InfoWindow};
+    cacheZooMarkers: {[key: string] : google.maps.Marker};
+    cacheZooInfoWindows: {[key: string] : google.maps.InfoWindow};
 
-    constructor(googleMap) {
+    constructor(googleMap: google.maps.Map) {
         this.googleMap = googleMap;
         this.cacheZooMarkers = {};
         this.cacheZooInfoWindows = {};
@@ -58,27 +80,29 @@ class PageMap {
      */
     getZooMarker(zooData: ZooJson): google.maps.Marker {
         const zooId: number = zooData.zoo_id;
-        if (!this.cacheZooMarkers[zooId]) {
-            this.cacheZooMarkers[zooId] = new google.maps.Marker({
+        const zooKey: string = zooId.toString();
+        if (!this.cacheZooMarkers[zooKey]) {
+            this.cacheZooMarkers[zooKey] = new google.maps.Marker({
                 position: new google.maps.LatLng(zooData.latitude, zooData.longitude),
                 map: this.googleMap,
                 title: zooData.name
             });
             const self = this;
-            this.cacheZooMarkers[zooId].addListener("click", function () {
-                self.getZooInfoWindow(zooId).open(self.googleMap, self.cacheZooMarkers[zooId]);
+            this.cacheZooMarkers[zooKey].addListener("click", function () {
+                self.getZooInfoWindow(zooId).open(self.googleMap, self.cacheZooMarkers[zooKey]);
             });
         }
-        return this.cacheZooMarkers[zooId];
+        return this.cacheZooMarkers[zooKey];
     }
 
     getZooInfoWindow(zooId: number): google.maps.InfoWindow {
-        if (!this.cacheZooInfoWindows[zooId]) {
-            this.cacheZooInfoWindows[zooId] = new google.maps.InfoWindow({
+        const zooKey: string = zooId.toString();
+        if (!this.cacheZooInfoWindows[zooKey]) {
+            this.cacheZooInfoWindows[zooKey] = new google.maps.InfoWindow({
                 content: "⏳"
             });
             const self = this;
-            promiseGet("zoos/" + zooId).then(function (zoosData) {
+            promiseGet("zoos/" + zooId).then(function (zoosData: FullZooJson[]) {
                 const zooData = zoosData[0];
                 let infoContent = `<h1>${zooData.name}</h1>
                         <a href='${zooData.link}'>${zooData.link}</a><br />
@@ -89,31 +113,37 @@ class PageMap {
                     infoContent += `<li class='zoo_species zoo_species_${zooSpecies.species_id}'>${zooSpecies.common_name} <span class='latin_name'>${zooSpecies.latin_name}</span>`;
                 }
                 infoContent += "</ul>";
-                self.cacheZooInfoWindows[zooId].setContent(infoContent);
+                self.cacheZooInfoWindows[zooKey].setContent(infoContent);
             });
         }
-        return this.cacheZooInfoWindows[zooId];
+        return this.cacheZooInfoWindows[zooKey];
     }
 
     userToggleInfoWindow(zooId: number): void {
-        for (const [zooInfoWindowId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
-            if (zooInfoWindowId !== zooId) {
-                infoWindow.close();
+        const zooKey: string = zooId.toString();
+        for (let zooInfoWindowId in this.cacheZooInfoWindows) {
+            if (zooInfoWindowId !== zooKey) {
+                this.cacheZooInfoWindows[zooInfoWindowId].close();
             }
         }
-        this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooId]);
+        for (let zooInfoWindowId in this.cacheZooInfoWindows) {
+            if (zooInfoWindowId !== zooKey) {
+                this.cacheZooInfoWindows[zooInfoWindowId].close();
+            }
+        }
+        this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers[zooKey]);
     }
 
     hideAllMarkers(): void {
         // Hide all info windows, except those for zoos currently selected.
-        for (const [zooId, infoWindow] of Object.entries(this.cacheZooInfoWindows)) {
-            if (!selection.selectedZooIds.includes(zooId)) {
-                infoWindow.close();
+        for (let zooKey in this.cacheZooInfoWindows) {
+            if (!selection.selectedZooIds.includes(zooKey)) {
+                this.cacheZooInfoWindows[zooKey].close();
             }
         }
         // Hide all markers
-        for (const marker of Object.values(map.cacheZooMarkers)) {
-            marker.setVisible(false);
+        for (let zooKey in map.cacheZooMarkers) {
+            map.cacheZooMarkers[zooKey].setVisible(false);
         }
         // Unbold species in any zoo marker info windows?
         $("li.zoo_species").removeClass("selected_species");
@@ -150,7 +180,7 @@ class SpeciesData {
     commonName: string;
     latinName: string;
     parentCategoryId: number;
-    zooList: ZooJson[];
+    zooList: Promise<ZooJson[]> | null;
 
     constructor(speciesData: SpeciesJson) {
         this.id = speciesData.species_id;
@@ -162,7 +192,7 @@ class SpeciesData {
 
     async getZooList(): Promise<ZooJson[]> {
         if(this.zooList == null) {
-            this.zooList = promiseGet("species/" + this.id).then(function (data) {
+            this.zooList = promiseGet("species/" + this.id).then(function (data: FullSpeciesJson[]) {
                 return data[0].zoos;
             });
         }
@@ -171,9 +201,9 @@ class SpeciesData {
 }
 
 class View {
-    rootElem: any;  // TODO
+    rootElem: JQuery<HTMLElement>;
 
-    constructor(rootElem) {
+    constructor(rootElem: JQuery<HTMLElement>) {
         this.rootElem = rootElem;
     }
 }
@@ -182,6 +212,10 @@ class View {
  * Load and create base taxonomy categories, cache category levels, categories and taxonomy species
  */
 class TaxonomyView extends View {
+    cacheCategoryLevel: CategoryLevelJson[];
+    categories: {[key: string]: TaxonomyCategory};
+    species: {[key: string]: TaxonomySpecies};
+
     constructor() {
         super($("#animals-taxonomic"));
         this.cacheCategoryLevel = [];
@@ -193,11 +227,11 @@ class TaxonomyView extends View {
         const categoryLevelsPromise = promiseGet("category_levels/");
         const firstCategoryPromise = promiseGet("categories/");
         const self = this;
-        Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function (data) {
+        Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function (data: [CategoryLevelJson[], CategoryJson[]]) {
             self.cacheCategoryLevel = data[0];
-            const categoryData = data[1];
+            const categoryData: CategoryJson[] = data[1];
             for (const itemData of categoryData) {
-                const newCategory = new TaxonomyCategory(itemData, self);
+                const newCategory: TaxonomyCategory = new TaxonomyCategory(itemData, self);
                 self.rootElem.find("img.spinner").remove();
                 newCategory.loadSubElements(true, false);
             }
@@ -208,7 +242,7 @@ class TaxonomyView extends View {
         });
     }
 
-    getCategoryLevel(id) {
+    getCategoryLevel(id: number): CategoryLevelJson | null {
         let result = null;
         for (const val of this.cacheCategoryLevel) {
             if (val.category_level_id === id) {
@@ -225,7 +259,19 @@ class TaxonomyView extends View {
  * Select/unselect self. Add/remove child species from selection.
  */
 class TaxonomyCategory {
-    constructor(categoryData, taxonomyView) {
+    taxonomyView: TaxonomyView;
+    id: number;
+    name: string;
+    levelName: string;
+    parentCategoryId: number | null;
+    parentCategory: TaxonomyCategory | null;
+    selected: boolean;
+    uiElement: JQuery<HTMLElement>;
+    isOdd: boolean;
+    childCategories: TaxonomyCategory[] | null;
+    childSpecies: TaxonomySpecies[] | null;
+
+    constructor(categoryData: CategoryJson, taxonomyView: TaxonomyView) {
         this.taxonomyView = taxonomyView;
         this.id = categoryData.category_id;
         this.name = categoryData.name;
@@ -246,9 +292,9 @@ class TaxonomyCategory {
         taxonomyView.categories[this.id] = this;
     }
 
-    render() {
-        const categoryLiId = "category-" + this.id;
-        const parentUI = this.parentCategory == null ? $("#animals-taxonomic") : this.parentCategory.uiElement.find("ul");
+    render(): JQuery<HTMLElement> {
+        const categoryLiId: string = "category-" + this.id;
+        const parentUI: JQuery<HTMLElement> = this.parentCategory == null ? $("#animals-taxonomic") : this.parentCategory.uiElement.find("ul");
         parentUI.append(
             `<li class='category closed ${this.selected ? "selected" : ""}' id='${categoryLiId}'>
                 <span onclick='userExpandCategory(${this.id})'>
@@ -268,14 +314,14 @@ class TaxonomyCategory {
      * @param recursive
      * @returns {Promise<Array>}
      */
-    loadSubElements(expand, recursive) {
+    loadSubElements(expand: boolean, recursive: boolean): Promise<void> {
         this.uiElement.append(spinner);
         let populatedCategoriesPromise = Promise.resolve([]);
         const self = this;
         if (!this.isPopulated()) {
             self.childCategories = [];
             self.childSpecies = [];
-            populatedCategoriesPromise = promiseGet("categories/" + this.id).then(function (/*[CategoryObj]*/categoryObjs) {
+            populatedCategoriesPromise = promiseGet("categories/" + this.id).then(function (categoryObjs: FullCategoryJson[]) {
                 const categoryObj = categoryObjs[0];
                 // Add base list element
                 self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
@@ -315,11 +361,11 @@ class TaxonomyCategory {
      * Checks if a category has been populated with subcategory and species data
      * @returns {boolean}
      */
-    isPopulated() {
+    isPopulated(): boolean {
         return this.childCategories != null;
     }
 
-    expand() {
+    expand(): void {
         if (this.uiElement.children("ul").is(":visible")) {
             this.uiElement.find("ul").first().hide();
             this.uiElement.addClass("closed");
@@ -336,7 +382,7 @@ class TaxonomyCategory {
         }
     }
 
-    select(isBeingSelected) {
+    select(isBeingSelected?: boolean) {
         this.selected = typeof isBeingSelected === "undefined" ? !this.selected : isBeingSelected;
         const checkbox = this.uiElement.find("span.selector img");
         checkbox.attr("src", this.selected ? "images/box_checked.svg" : "images/box_unchecked.svg");
@@ -365,13 +411,18 @@ class TaxonomyCategory {
  * Displays a species in the taxonomy view
  */
 class TaxonomySpecies {
-    constructor(speciesData, taxonomyView) {
+    data: SpeciesData;
+    taxonomyView: TaxonomyView;
+    parentCategory: TaxonomyCategory;
+    uiElement: JQuery<HTMLElement>;
+
+    constructor(speciesData: SpeciesJson, taxonomyView: TaxonomyView) {
         this.data = animalData.getOrCreateSpecies(speciesData);
         this.taxonomyView = taxonomyView;
 
         this.parentCategory = this.taxonomyView.categories[this.data.parentCategoryId];
-        const categorySelected = this.parentCategory.uiElement.hasClass("selected");
-        const alreadySelected = selection.containsSpecies(this.data.id);
+        const categorySelected: boolean = this.parentCategory.uiElement.hasClass("selected");
+        const alreadySelected: boolean = selection.containsSpecies(this.data.id);
         this.uiElement = this.render(categorySelected || alreadySelected);
 
         // Add self to parent category and taxonomyView dict
@@ -383,7 +434,7 @@ class TaxonomySpecies {
         this.parentCategory.childSpecies.push(this);
     }
 
-    render(selected) {
+    render(selected: boolean): JQuery<HTMLElement> {
         const speciesLiId = `species-${this.data.id}`;
         const parentUlElement = this.parentCategory.uiElement.find("ul");
         parentUlElement.append(`<li class='species ${selected ? "selected" : ""} ${speciesLiId}'>
@@ -401,6 +452,11 @@ class TaxonomySpecies {
  * Store list of selected species, and update their selected status as appropriate. Get list of zoos for them
  */
 class Selection {
+    selectedSpeciesIds: number[];
+    selectedZooIds: string[];
+    updating: boolean;
+    triedAgain: boolean;
+
     constructor() {
         this.selectedSpeciesIds = [];
         this.selectedZooIds = [];
@@ -408,7 +464,7 @@ class Selection {
         this.triedAgain = false;
     }
 
-    toggleSpecies(speciesId) {
+    toggleSpecies(speciesId: number): void {
         if(this.containsSpecies(speciesId)) {
             this.removeSpecies(speciesId);
         } else {
@@ -416,7 +472,7 @@ class Selection {
         }
     }
 
-    addSpecies(speciesId) {
+    addSpecies(speciesId: number) {
         // Add to list
         if(!this.containsSpecies(speciesId)) {
             this.selectedSpeciesIds.push(speciesId);
@@ -431,7 +487,7 @@ class Selection {
         this.update();
     }
 
-    removeSpecies(speciesId) {
+    removeSpecies(speciesId: number) {
         // Remove species from list
         if(this.containsSpecies(speciesId)) {
             this.selectedSpeciesIds.splice(this.selectedSpeciesIds.indexOf(speciesId), 1);
@@ -446,11 +502,11 @@ class Selection {
         this.update();
     }
 
-    containsSpecies(speciesId) {
+    containsSpecies(speciesId: number): boolean {
         return this.selectedSpeciesIds.indexOf(speciesId) !== -1;
     }
 
-    listSpeciesCurrentlyDisplayed() {
+    listSpeciesCurrentlyDisplayed(): string[] {
         const selectionStyle = $("#zoo_species_selected").text();
         const currentlyDisplayed = [];
         const idRegex = /li\.zoo_species_([0-9]+) /g;
@@ -538,6 +594,10 @@ class Selection {
  * Create and store list of AlphabetLetter objects
  */
 class AlphabetView extends View {
+    letters: {[key: string]: AlphabetLetter};
+    updating: boolean;
+    latestLetter:;
+
     constructor() {
         super($("#animals-alphabetic"));
         this.letters = {};
@@ -566,7 +626,15 @@ class AlphabetView extends View {
  * Get list of species matching letter, display/hide them.
  */
 class AlphabetLetter {
-    constructor(alphabetView, letter, odd) {
+    letter: string;
+    alphabetView: AlphabetView;
+    rootElem: JQuery<HTMLElement>;
+    letterListElem: JQuery<HTMLElement>;
+    letterResultsElem: JQuery<HTMLElement>;
+    letterElem: JQuery<HTMLElement>;
+    animals: SpeciesJson[] | null;
+
+    constructor(alphabetView: AlphabetView, letter: string, odd: boolean) {
         this.letter = letter;
         this.alphabetView = alphabetView;
         this.rootElem = alphabetView.rootElem;
@@ -592,7 +660,7 @@ class AlphabetLetter {
         const self = this;
         this.rootElem.append(spinner);
         if(this.animals == null) {
-            promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals) {
+            promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals: SpeciesJson[]) {
                 self.animals = animals;
                 self.renderList(animals);
                 self.alphabetView.updating = false;
@@ -609,7 +677,7 @@ class AlphabetLetter {
         }
     }
 
-    renderList(animals) {
+    renderList(animals: SpeciesJson[]) {
         for (const animal of animals) {
             const species = animalData.getOrCreateSpecies(animal);
             const speciesClass = `species-${species.id}`;
@@ -634,6 +702,9 @@ class AlphabetLetter {
  * Take user input and search for species, list results (highlight search term in names).
  */
 class SearchView extends View {
+    searchBox: JQuery<HTMLElement>;
+    searchResults: JQuery<HTMLElement>;
+
     constructor() {
         super($("#animals-search"));
         this.searchBox = $("input#animals-search-input");
@@ -641,7 +712,7 @@ class SearchView extends View {
     }
 
     updateSearchResults() {
-        const value = this.searchBox.val();
+        const value: string = <string>this.searchBox.val();
         const searchRegex = new RegExp(value, "gi");
         const replacement = `<span class='search_term'>$&</span>`;
         const self = this;
@@ -670,6 +741,10 @@ class SearchView extends View {
  * Handle (and update) which view is active
  */
 class Selector {
+    views: {[key: string]: View};
+    viewKeys: string[];
+    activeView: string | null;
+
     constructor() {
         this.views = {
             "taxonomical": new TaxonomyView(),
@@ -705,8 +780,8 @@ let selection: Selection = new Selection();
 const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
 
-let cacheZooDistances = {};
-function cacheAddZooDistances(postcode,zooDistanceData) {
+let cacheZooDistances: {[key: string]: {[key: number]: number}} = {};
+function cacheAddZooDistances(postcode: string, zooDistanceData: ZooDistanceJson[]) {
     if (!cacheZooDistances[postcode]) {
         cacheZooDistances[postcode] = {};
     }
@@ -720,7 +795,7 @@ function cacheAddZooDistances(postcode,zooDistanceData) {
  * @param path API relative path
  * @returns {Promise<object>}
  */
-function promiseGet(path) {
+function promiseGet(path: string): Promise<any> {
     const url = config['api_url'] + path;
     // Return a new promise.
     return new Promise(function (resolve, reject) {
@@ -762,33 +837,36 @@ function arrayEquals<T>(array1: T[], array2: T[]): boolean {
     return true;
 }
 
-function userExpandCategory(id) {
-    selector.views["taxonomical"].categories[id].loadSubElements(true, false);
+function userExpandCategory(id: number): void {
+    const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
+    taxonomyView.categories[id].loadSubElements(true, false);
 }
 
-function userSelectCategory(categoryId) {
-    const category = selector.views["taxonomical"].categories[categoryId];
+function userSelectCategory(categoryId: number): void {
+    const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
+    const category = taxonomyView.categories[categoryId];
     category.select();
     category.loadSubElements(false, true).then(function() {
         //selection.update();
     });
 }
 
-function userSelectSpecies(speciesId) {
+function userSelectSpecies(speciesId: number): void {
     selection.toggleSpecies(speciesId);
 }
 
-function userUpdatePostcode() {
+function userUpdatePostcode(): void {
     updateZooDistances();
 }
 
-function userSearchButton() {
-    selector.views["search"].updateSearchResults();
+function userSearchButton(): void {
+    const searchView: SearchView = <SearchView>selector.views["search"];
+    searchView.updateSearchResults();
 }
 
-async function updateZooDistances() {
+async function updateZooDistances(): Promise<void> {
     //get postcode
-    let postcode = $("input#postcode").val();
+    let postcode: string = <string>$("input#postcode").val();
     // Basic postcode sanity check
     if (postcode.length === 0) {
         $("#invalid-postcode").hide();
@@ -803,7 +881,7 @@ async function updateZooDistances() {
         return;
     }
     //// currentSelectedZooIds;
-    return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances) {
+    return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances: ZooDistanceJson[]) {
         for (const val of zooDistances) {
             $(`#selected-zoo-${val.zoo_id} .distance`).text(`(${val.metres/1000}km)`);
         }
@@ -811,9 +889,9 @@ async function updateZooDistances() {
     })
 }
 
-function promiseGetZooDistances(postcode, zooIds) {
+function promiseGetZooDistances(postcode: string, zooIds: number[]) {
     let zoosNeedingDistance = zooIds;
-    let foundDistances = [];
+    let foundDistances: {zoo_id: number, metres: number}[] = [];
     if (cacheZooDistances[postcode]) {
         zoosNeedingDistance = [];
         for (const zooId of zooIds) {
@@ -836,7 +914,7 @@ function promiseGetZooDistances(postcode, zooIds) {
     //create url to request
     let path = `zoo_distances/${postcode}/`+zoosNeedingDistance.join(",");
     //get response
-    return promiseGet(path).then(function(newDistances) {
+    return promiseGet(path).then(function(newDistances: ZooDistanceJson[]) {
         $("#invalid-postcode").hide();
         cacheAddZooDistances(postcode, newDistances);
         return foundDistances.concat(newDistances);
@@ -846,7 +924,7 @@ function promiseGetZooDistances(postcode, zooIds) {
     });
 }
 
-function domReorderZoos(distances) {
+function domReorderZoos(distances: ZooDistanceJson[]) {
     const distancesSorted = distances.sort(function(a, b) { return b.metres - a.metres});
     for (const distance of distancesSorted) {
         const zooLi = $(`li#selected-zoo-${distance.zoo_id}`);

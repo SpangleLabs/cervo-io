@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/joshcoales/zoosite#readme",
   "dependencies": {
+    "@types/googlemaps": "^3.37.0",
+    "@types/jquery": "^3.3.30",
     "jquery": "^3.4.1"
   }
 }
