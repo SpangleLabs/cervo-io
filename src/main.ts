@@ -840,6 +840,7 @@ function userExpandCategory(id: number): void {
     const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
     taxonomyView.categories[id].loadSubElements(true, false);
 }
+(<any>window).userExpandCategory = userExpandCategory;
 
 function userSelectCategory(categoryId: number): void {
     const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
@@ -849,19 +850,23 @@ function userSelectCategory(categoryId: number): void {
         //selection.update();
     });
 }
+(<any>window).userSelectCategory = userSelectCategory;
 
 function userSelectSpecies(speciesId: number): void {
     selection.toggleSpecies(speciesId);
 }
+(<any>window).userSelectSpecies = userSelectSpecies;
 
 function userUpdatePostcode(): void {
     updateZooDistances();
 }
+(<any>window).userUpdatePostcode = userUpdatePostcode;
 
 function userSearchButton(): void {
     const searchView: SearchView = <SearchView>selector.views["search"];
     searchView.updateSearchResults();
 }
+(<any>window).userSearchButton = userSearchButton;
 
 async function updateZooDistances(): Promise<void> {
     //get postcode
@@ -943,3 +948,4 @@ function initMap() {
     });
     map = new PageMap(googleMap);
 }
+(<any>window).initMap = initMap;
