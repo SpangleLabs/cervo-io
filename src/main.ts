@@ -53,10 +53,13 @@ interface FullCategoryJson extends CategoryJson {
     species: SpeciesJson[];
 }
 
-interface ZooDistanceJson {
-    user_postcode_id: number;  // TODO: this is pointless
+interface ZooDistanceCache {
     zoo_id: number;
     metres: number;
+}
+
+interface ZooDistanceJson extends ZooDistanceCache {
+    user_postcode_id: number;  // TODO: this is pointless
     zoo_distance_id: number;
 }
 
@@ -506,13 +509,13 @@ class Selection {
         return this.selectedSpeciesIds.indexOf(speciesId) !== -1;
     }
 
-    listSpeciesCurrentlyDisplayed(): string[] {
+    listSpeciesCurrentlyDisplayed(): number[] {
         const selectionStyle = $("#zoo_species_selected").text();
         const currentlyDisplayed = [];
         const idRegex = /li\.zoo_species_([0-9]+) /g;
         let match = idRegex.exec(selectionStyle);
         while (match != null) {
-            currentlyDisplayed.push(match[1]);
+            currentlyDisplayed.push(Number(match[1]));
             match = idRegex.exec(selectionStyle);
         }
         return currentlyDisplayed;
@@ -533,17 +536,18 @@ class Selection {
         // This is for styling selected species in zoo info windows.
         let zooSpeciesSelected = $("#zoo_species_selected");
         zooSpeciesSelected.empty();
-        let speciesDataPromises = [];
+        let speciesDataPromises: Promise<{[key: string]: ZooJson}>[] = [];
         // Update style for selected species, and get list of promises for zoo data
         for(const speciesId of this.selectedSpeciesIds) {
             const species = animalData.species[speciesId];
             zooSpeciesSelected.append(`li.zoo_species_${speciesId} { font-weight:bold; }`);
             //self.selectedSpeciesIds.push(speciesId);
             // Generate promises returning dict of zoo id to zoos
-            speciesDataPromises.push(species.getZooList().then(function(/*SpeciesObj*/zooList) {
-                let selectedZoos = {};
+            speciesDataPromises.push(species.getZooList().then(function(zooList: ZooJson[]) {
+                let selectedZoos: {[key: string]: ZooJson} = {};
                 for (const zooData of zooList) {
-                    selectedZoos[zooData.zoo_id] = zooData;
+                    const zooKey = zooData.zoo_id.toString();
+                    selectedZoos[zooKey] = zooData;
                 }
                 return selectedZoos;
             }));
@@ -565,9 +569,9 @@ class Selection {
         $("#selected-species-count").text(` (${this.selectedSpeciesIds.length})`);
         // Wait for all species zoo lists to have been retrieved
         const self = this;
-        Promise.all(speciesDataPromises).then(function(selectedZooList) {
+        Promise.all(speciesDataPromises).then(function(selectedZooList: {[key: string]: ZooJson}[]) {
             // Merge the list of zoo lists into one object
-            const selectedZoos = Object.assign({}, ...selectedZooList);
+            const selectedZoos: {[key: string]: ZooJson} = Object.assign({}, ...selectedZooList);
             // Update zoos selected
             let selectedZoosElem = $("#selected-zoos");
             selectedZoosElem.empty();
@@ -576,7 +580,8 @@ class Selection {
             $("#selected-zoos-count").text(` (${self.selectedZooIds.length})`);
             // Update the list, and map markers
             map.hideAllMarkers();
-            for (const zooData of Object.values(selectedZoos)) {
+            for (const zooKey in selectedZoos) {
+                const zooData = selectedZoos[zooKey];
                 selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='map.userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
                 const marker = map.getZooMarker(zooData);
                 marker.setVisible(true);
@@ -762,7 +767,7 @@ class Selector {
     }
 
     update() {
-        this.activeView = document.querySelector('input[name=selector-type]:checked').value;
+        this.activeView = <string>$('input[name=selector-type]:checked').val();
         for(const key of this.viewKeys) {
             if (this.activeView === key) {
                 this.views[key].rootElem.show();
@@ -780,7 +785,7 @@ let selection: Selection = new Selection();
 const spinner: string = `<img class="spinner" src="../images/spinner.svg" alt="⏳"/>`;
 
 
-let cacheZooDistances: {[key: string]: {[key: number]: number}} = {};
+let cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
 function cacheAddZooDistances(postcode: string, zooDistanceData: ZooDistanceJson[]) {
     if (!cacheZooDistances[postcode]) {
         cacheZooDistances[postcode] = {};
@@ -881,7 +886,7 @@ async function updateZooDistances(): Promise<void> {
         return;
     }
     //// currentSelectedZooIds;
-    return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances: ZooDistanceJson[]) {
+    return promiseGetZooDistances(postcode, selection.selectedZooIds).then(function(zooDistances: ZooDistanceCache[]) {
         for (const val of zooDistances) {
             $(`#selected-zoo-${val.zoo_id} .distance`).text(`(${val.metres/1000}km)`);
         }
@@ -889,19 +894,19 @@ async function updateZooDistances(): Promise<void> {
     })
 }
 
-function promiseGetZooDistances(postcode: string, zooIds: number[]) {
-    let zoosNeedingDistance = zooIds;
-    let foundDistances: {zoo_id: number, metres: number}[] = [];
+function promiseGetZooDistances(postcode: string, zooKeys: string[]): Promise<ZooDistanceCache[]> {
+    let zoosNeedingDistance = zooKeys;
+    let foundDistances: ZooDistanceCache[] = [];
     if (cacheZooDistances[postcode]) {
         zoosNeedingDistance = [];
-        for (const zooId of zooIds) {
-            if (cacheZooDistances[postcode][zooId]) {
+        for (const zooKey of zooKeys) {
+            if (cacheZooDistances[postcode][zooKey]) {
                 foundDistances.push({
-                    zoo_id: zooId,
-                    metres: cacheZooDistances[postcode][zooId]
+                    zoo_id: Number(zooKey),
+                    metres: cacheZooDistances[postcode][zooKey]
                 });
             } else {
-                zoosNeedingDistance.push(zooId);
+                zoosNeedingDistance.push(zooKey);
             }
         }
     }
@@ -921,10 +926,11 @@ function promiseGetZooDistances(postcode: string, zooIds: number[]) {
     }).catch(function(err) {
         //if response is 500, "invalid postcode"
         $("#invalid-postcode").show();
+        return [];
     });
 }
 
-function domReorderZoos(distances: ZooDistanceJson[]) {
+function domReorderZoos(distances: ZooDistanceCache[]) {
     const distancesSorted = distances.sort(function(a, b) { return b.metres - a.metres});
     for (const distance of distancesSorted) {
         const zooLi = $(`li#selected-zoo-${distance.zoo_id}`);
