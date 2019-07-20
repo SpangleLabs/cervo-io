@@ -776,7 +776,7 @@ let googleMap: google.maps.Map;
 const animalData: AnimalData = new AnimalData();
 let selector: Selector;
 let selection: Selection = new Selection();
-const spinner: string = `<img class="spinner" src="../images/spinner.svg" alt="⏳"/>`;
+const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
 
 let cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
