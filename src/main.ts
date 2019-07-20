@@ -245,14 +245,8 @@ class TaxonomyView extends View {
         });
     }
 
-    getCategoryLevel(id: number): CategoryLevelJson | null {
-        let result = null;
-        for (const val of this.cacheCategoryLevel) {
-            if (val.category_level_id === id) {
-                result = val;
-            }
-        }
-        return result;
+    getCategoryLevel(id: number) {
+        return this.cacheCategoryLevel.find(x=>x.category_level_id === id);
     }
 }
 
