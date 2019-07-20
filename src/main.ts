@@ -557,7 +557,7 @@ class Selection {
 <span class='selector' onclick='userSelectSpecies(${speciesId})'>
     <span class="species_name">${species.commonName}</span>
     <span class="latin_name">${species.latinName}</span>
-    <img src="images/box_checked.svg" alt="$✔"/>
+    <img src="../images/box_checked.svg" alt="$✔"/>
 </span>
 </li>`);
         }
@@ -596,7 +596,7 @@ class Selection {
 class AlphabetView extends View {
     letters: {[key: string]: AlphabetLetter};
     updating: boolean;
-    latestLetter: string;
+    latestLetter: string | null;
 
     constructor() {
         super($("#animals-alphabetic"));
@@ -777,7 +777,7 @@ let googleMap: google.maps.Map;
 const animalData: AnimalData = new AnimalData();
 let selector: Selector;
 let selection: Selection = new Selection();
-const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
+const spinner: string = `<img class="spinner" src="../images/spinner.svg" alt="⏳"/>`;
 
 
 let cacheZooDistances: {[key: string]: {[key: number]: number}} = {};
