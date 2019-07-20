@@ -2,8 +2,9 @@
   "name": "zoosite",
   "version": "1.0.0",
   "description": "Frontend for the cervo.io zoo listing website",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
+    "build": "webpack --config webpack.config.js --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,5 +29,14 @@
     "@types/googlemaps": "^3.37.0",
     "@types/jquery": "^3.3.30",
     "jquery": "^3.4.1"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "source-map-loader": "^0.2.4",
+    "tslint": "^5.18.0",
+    "tslint-loader": "^3.5.4",
+    "typescript": "^3.5.3",
+    "webpack": "^4.36.1",
+    "webpack-cli": "^3.3.6"
   }
 }
