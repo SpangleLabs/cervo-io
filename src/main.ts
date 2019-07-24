@@ -10,10 +10,10 @@ interface ZooJson {
     longitude: number;  // TODO: missing from fullzoo?
 }
 
-interface SpeciesZooJson extends ZooJson {
-    zoo_species_id: number;
-    species_id: number;
-}
+// interface SpeciesZooJson extends ZooJson {
+//     zoo_species_id: number;
+//     species_id: number;
+// }
 
 interface FullZooJson extends ZooJson {
     species: ZooSpeciesJson[];
@@ -272,7 +272,11 @@ class TaxonomyCategory {
         this.taxonomyView = taxonomyView;
         this.id = categoryData.category_id;
         this.name = categoryData.name;
-        this.levelName = taxonomyView.getCategoryLevel(categoryData.category_level_id).name;
+        const categoryLevel = taxonomyView.getCategoryLevel(categoryData.category_level_id);
+        this.levelName = "{unknown level}";
+        if (categoryLevel) {
+            this.levelName = categoryLevel.name;
+        }
         this.parentCategoryId = categoryData.parent_category_id;
         this.parentCategory = null;
         this.selected = false;
@@ -313,7 +317,7 @@ class TaxonomyCategory {
      */
     loadSubElements(expand: boolean, recursive: boolean): Promise<void> {
         this.uiElement.append(spinner);
-        let populatedCategoriesPromise = Promise.resolve([]);
+        let populatedCategoriesPromise: Promise<void[]> = new Promise(resolve => []);
         const self = this;
         if (!this.isPopulated()) {
             self.childCategories = [];
@@ -340,7 +344,7 @@ class TaxonomyCategory {
                 return Promise.all(loadCategoryPromises);
             });
         } else if (recursive) {
-            let loadCategoryPromises = [];
+            let loadCategoryPromises: Promise<void>[] = [];
             for(const subCategory of self.childCategories) {
                 loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
             }
@@ -663,14 +667,14 @@ class AlphabetLetter {
                 self.animals = animals;
                 self.renderList(animals);
                 self.alphabetView.updating = false;
-                if(self.alphabetView.latestLetter !== self.letter) {
+                if(self.alphabetView.latestLetter && self.alphabetView.latestLetter !== self.letter) {
                     self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
                 }
             });
         } else {
             this.renderList(this.animals);
             this.alphabetView.updating = false;
-            if(self.alphabetView.latestLetter !== self.letter) {
+            if(self.alphabetView.latestLetter && self.alphabetView.latestLetter !== self.letter) {
                 self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
             }
         }
