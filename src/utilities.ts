@@ -1,5 +1,6 @@
 import config from "./config";
 
+export const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
 /**
  * I pulled this method from somewhere else, tbh
@@ -35,4 +36,15 @@ export function promiseGet(path: string): Promise<any> {
         // Make the request
         req.send();
     });
+}
+
+export function arrayEquals<T>(array1: T[], array2: T[]): boolean {
+    if (array1 == null || array2 == null) return false;
+    if (array1.length !== array2.length) return false;
+    array1.sort();
+    array2.sort();
+    for(let idx = 0; idx < array1.length; idx++) {
+        if (array1[idx] !== array2[idx]) return false;
+    }
+    return true;
 }
