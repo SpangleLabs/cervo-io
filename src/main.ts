@@ -1,67 +1,6 @@
-import config from "./config";
 import $ from "jquery";
-
-interface ZooJson {
-    zoo_id: number;
-    name: string;
-    postcode: string;
-    link: string;
-    latitude: number;  // TODO: missing from fullzoo?
-    longitude: number;  // TODO: missing from fullzoo?
-}
-
-// interface SpeciesZooJson extends ZooJson {
-//     zoo_species_id: number;
-//     species_id: number;
-// }
-
-interface FullZooJson extends ZooJson {
-    species: ZooSpeciesJson[];
-}
-
-interface SpeciesJson {
-    species_id: number;
-    common_name: string;
-    latin_name: string;
-    category_id: number;
-}
-
-interface ZooSpeciesJson extends SpeciesJson {
-    zoo_species_id: number;
-    zoo_id: number;
-}
-
-interface FullSpeciesJson extends SpeciesJson {
-    zoos: ZooJson[];
-}
-
-interface CategoryLevelJson {
-    category_level_id: number;
-    name: string;
-}
-
-interface CategoryJson {
-    category_id: number;
-    name: string;
-    category_level_id: number;
-    parent_category_id: number | null;
-    hidden?: boolean;  // TODO: seems to be in subcategories?
-}
-
-interface FullCategoryJson extends CategoryJson {
-    sub_categories: CategoryJson[];
-    species: SpeciesJson[];
-}
-
-interface ZooDistanceCache {
-    zoo_id: number;
-    metres: number;
-}
-
-interface ZooDistanceJson extends ZooDistanceCache {
-    user_postcode_id: number;  // TODO: this is pointless
-    zoo_distance_id: number;
-}
+import {AnimalData, SpeciesData} from "./animalData";
+import {promiseGet} from "./utilities";
 
 /**
  * Wrapper around the google maps Map class, having handy methods and caches
@@ -150,56 +89,6 @@ class PageMap {
         }
         // Unbold species in any zoo marker info windows?
         $("li.zoo_species").removeClass("selected_species");
-    }
-}
-
-/**
- * Store data about known species
- */
-class AnimalData {
-    species: {[key: number] : SpeciesData};
-
-    constructor() {
-        this.species = {};
-    }
-
-    getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {
-        const speciesId = speciesData.species_id;
-        if (this.species[speciesId]) {
-            return this.species[speciesId];
-        } else {
-            const newSpecies = new SpeciesData(speciesData);
-            this.species[speciesId] = newSpecies;
-            return newSpecies;
-        }
-    }
-}
-
-/**
- * Stores species info, and lists of zoos the species appear in
- */
-class SpeciesData {
-    id: number;
-    commonName: string;
-    latinName: string;
-    parentCategoryId: number;
-    zooList: Promise<ZooJson[]> | null;
-
-    constructor(speciesData: SpeciesJson) {
-        this.id = speciesData.species_id;
-        this.commonName = speciesData.common_name;
-        this.latinName = speciesData.latin_name;
-        this.parentCategoryId = speciesData.category_id;
-        this.zooList = null;
-    }
-
-    async getZooList(): Promise<ZooJson[]> {
-        if(this.zooList == null) {
-            this.zooList = promiseGet("species/" + this.id).then(function (data: FullSpeciesJson[]) {
-                return data[0].zoos;
-            });
-        }
-        return this.zooList;
     }
 }
 
@@ -791,42 +680,6 @@ function cacheAddZooDistances(postcode: string, zooDistanceData: ZooDistanceJson
     for (const val of zooDistanceData) {
         cacheZooDistances[postcode][val.zoo_id] = val.metres;
     }
-}
-
-/**
- * I pulled this method from somewhere else, tbh
- * @param path API relative path
- * @returns {Promise<object>}
- */
-function promiseGet(path: string): Promise<any> {
-    const url = config['api_url'] + path;
-    // Return a new promise.
-    return new Promise(function (resolve, reject) {
-        // Do the usual XHR stuff
-        let req = new XMLHttpRequest();
-        req.open('GET', url);
-
-        req.onload = function () {
-            // This is called even on 404 etc
-            // so check the status
-            if (req.status === 200) {
-                // Resolve the promise with the response text
-                resolve(JSON.parse(req.responseText));
-            } else {
-                // Otherwise reject with the status text
-                // which will hopefully be a meaningful error
-                reject(Error(req.statusText));
-            }
-        };
-
-        // Handle network errors
-        req.onerror = function () {
-            reject(Error("Network Error"));
-        };
-
-        // Make the request
-        req.send();
-    });
 }
 
 function arrayEquals<T>(array1: T[], array2: T[]): boolean {
