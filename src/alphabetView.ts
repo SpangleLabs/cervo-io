@@ -13,7 +13,7 @@ export class AlphabetView extends View {
     updating: boolean;
     latestLetter: string | null;
 
-    constructor(animalData: AnimalData, selection: SelectedSpecies) {
+    constructor(animalData: AnimalData, selection: SelectedSpecies, validLetters: string[]) {
         super($("#animals-alphabetic"), animalData, selection);
         this.letters = {};
         let odd = true;
@@ -26,14 +26,11 @@ export class AlphabetView extends View {
         // Latest letter loaded, for debouncing
         this.latestLetter = null;
         // Get the list of valid first letters, and update the invalid ones.
-        const self = this;
-        promiseGet("/species/valid_first_letters").then(function(letters) {
-            for (const letter of Object.keys(self.letters)) {
-                if (!letters.includes(letter.toUpperCase())) {
-                    self.letters[letter].disable();
-                }
+        for (const letter in this.letters) {
+            if (!validLetters.includes(letter.toUpperCase())) {
+                this.letters[letter].disable();
             }
-        });
+        }
     }
 }
 

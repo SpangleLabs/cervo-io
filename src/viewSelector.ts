@@ -18,28 +18,52 @@ export class ViewSelector {
     constructor(animalData: AnimalData, selection: SelectedSpecies) {
         this.views = {
             "taxonomical": null,
-            "alphabetical": new AlphabetView(animalData, selection),
+            "alphabetical": null,
             "search": new SearchView(animalData, selection)
         };
         this.viewKeys = ["taxonomical", "alphabetical", "search"];
         this.activeView = null;
         const viewSelector = this;
-        this.initialiseTaxonomyView(animalData, selection).then(function() {
+        this.initialiseViews(animalData, selection).then(function() {
             viewSelector.update();
             viewSelector.wireUpdates();
         });
     }
 
-    initialiseTaxonomyView(animalData: AnimalData, selection: SelectedSpecies): Promise<void> {
+    initialiseViews(animalData: AnimalData, selection: SelectedSpecies): Promise<void> {
         const rootElem = $("#animals-taxonomic");
-        rootElem.append(spinner);
         const viewSelector = this;
-        return Promise.all([animalData.promiseCategoryLevels(), animalData.promiseBaseCategories()]).then(function (data: [CategoryLevelJson[], CategoryJson[]]) {
-            viewSelector.views["taxonomical"] = new TaxonomyView(animalData, selection, data[0], data[1]);
+        return Promise.all(
+            [
+                this.initialiseTaxonomyView(animalData, selection),
+                this.initialiseAlphabetView(animalData, selection)
+            ]
+        ).then(function (views) {
+            viewSelector.views["taxonomical"] = views[0];
+            viewSelector.views["alphabetical"] = views[1];
         }, function(err) {
             console.log(err);
             rootElem.find("img.spinner").remove();
             rootElem.append("<span class=\"error\">Failed to connect to API</span>");
+        });
+    }
+
+    initialiseTaxonomyView(animalData: AnimalData, selection: SelectedSpecies): Promise<TaxonomyView> {
+        const rootElem = $("#animals-taxonomic");
+        rootElem.append(spinner);
+        return Promise.all(
+            [
+                animalData.promiseCategoryLevels(),
+                animalData.promiseBaseCategories()
+            ]
+        ).then(function (data: [CategoryLevelJson[], CategoryJson[]]) {
+            return new TaxonomyView(animalData, selection, data[0], data[1]);
+        });
+    }
+
+    initialiseAlphabetView(animalData: AnimalData, selection: SelectedSpecies): Promise<AlphabetView> {
+        return animalData.promiseValidFirstLetters().then(function(validLetters) {
+            return new AlphabetView(animalData, selection, validLetters);
         });
     }
 

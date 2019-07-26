@@ -8,6 +8,7 @@ export class AnimalData {
     species: {[key: number] : SpeciesData};
     categoryLevels: Promise<CategoryLevelJson[]>;
     baseCategory: Promise<CategoryJson[]>;
+    validFirstLetters: Promise<string[]>;
 
     constructor() {
         this.species = {};
@@ -25,6 +26,13 @@ export class AnimalData {
             this.baseCategory = promiseGet("categories/");
         }
         return this.baseCategory;
+    }
+
+    promiseValidFirstLetters() : Promise<string[]> {
+        if (!this.validFirstLetters) {
+            this.validFirstLetters = promiseGet("species/valid_first_letters/");
+        }
+        return this.validFirstLetters;
     }
 
     getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {
