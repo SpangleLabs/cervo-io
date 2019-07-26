@@ -22,11 +22,19 @@ export class TaxonomyView extends View {
         this.rootElem.append(spinner);
 
         this.cacheCategoryLevel = categoryLevels;
+        const baseTaxoCategories: TaxonomyCategory[] = [];
         for (const itemData of baseCategories) {
             const newCategory: TaxonomyCategory = new TaxonomyCategory(itemData, this);
-            this.rootElem.find("img.spinner").remove();
-            newCategory.loadSubElements(true, false);
+            baseTaxoCategories.push(newCategory);
         }
+        this.rootElem.find("img.spinner").remove();
+        this.expandBaseCategories(baseTaxoCategories);
+    }
+
+    expandBaseCategories(baseCategories: TaxonomyCategory[]): Promise<void> {
+        return Promise.all(
+            baseCategories.map(x => x.loadSubElements(true, false))
+        ).then();
     }
 
     getCategoryLevel(id: number) {
