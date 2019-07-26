@@ -6,9 +6,25 @@ import {promiseGet} from "./utilities";
 
 export class AnimalData {
     species: {[key: number] : SpeciesData};
+    categoryLevels: Promise<CategoryLevelJson[]>;
+    baseCategory: Promise<CategoryJson[]>;
 
     constructor() {
         this.species = {};
+    }
+
+    promiseCategoryLevels() : Promise<CategoryLevelJson[]> {
+        if (!this.categoryLevels) {
+            this.categoryLevels = promiseGet("category_levels/");
+        }
+        return this.categoryLevels;
+    }
+
+    promiseBaseCategories() : Promise<CategoryJson[]> {
+        if (!this.baseCategory) {
+            this.baseCategory = promiseGet("categories/");
+        }
+        return this.baseCategory;
     }
 
     getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {

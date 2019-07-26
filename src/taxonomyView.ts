@@ -13,7 +13,7 @@ export class TaxonomyView extends View {
     categories: {[key: string]: TaxonomyCategory};
     species: {[key: string]: TaxonomySpecies};
 
-    constructor(animalData: AnimalData, selection: SelectedSpecies) {
+    constructor(animalData: AnimalData, selection: SelectedSpecies, categoryLevels: CategoryLevelJson[], baseCategories: CategoryJson[]) {
         super($("#animals-taxonomic"), animalData, selection);
         this.cacheCategoryLevel = [];
         this.categories = {};
@@ -21,22 +21,12 @@ export class TaxonomyView extends View {
 
         this.rootElem.append(spinner);
 
-        const categoryLevelsPromise = promiseGet("category_levels/");
-        const firstCategoryPromise = promiseGet("categories/");
-        const self = this;
-        Promise.all([categoryLevelsPromise, firstCategoryPromise]).then(function (data: [CategoryLevelJson[], CategoryJson[]]) {
-            self.cacheCategoryLevel = data[0];
-            const categoryData: CategoryJson[] = data[1];
-            for (const itemData of categoryData) {
-                const newCategory: TaxonomyCategory = new TaxonomyCategory(itemData, self);
-                self.rootElem.find("img.spinner").remove();
-                newCategory.loadSubElements(true, false);
-            }
-        }, function(err) {
-            console.log(err);
-            self.rootElem.find("img.spinner").remove();
-            self.rootElem.append("<span class=\"error\">Failed to connect to API</span>");
-        });
+        this.cacheCategoryLevel = categoryLevels;
+        for (const itemData of baseCategories) {
+            const newCategory: TaxonomyCategory = new TaxonomyCategory(itemData, this);
+            this.rootElem.find("img.spinner").remove();
+            newCategory.loadSubElements(true, false);
+        }
     }
 
     getCategoryLevel(id: number) {

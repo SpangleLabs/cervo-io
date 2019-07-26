@@ -5,6 +5,7 @@ import {AlphabetView} from "./alphabetView";
 import {SearchView} from "./searchView";
 import $ from "jquery";
 import {View} from "./views";
+import {spinner} from "./utilities";
 
 /**
  * Handle (and update) which view is active
@@ -16,14 +17,30 @@ export class ViewSelector {
 
     constructor(animalData: AnimalData, selection: SelectedSpecies) {
         this.views = {
-            "taxonomical": new TaxonomyView(animalData, selection),
+            "taxonomical": null,
             "alphabetical": new AlphabetView(animalData, selection),
             "search": new SearchView(animalData, selection)
         };
         this.viewKeys = ["taxonomical", "alphabetical", "search"];
         this.activeView = null;
-        this.update();
-        this.wireUpdates();
+        const viewSelector = this;
+        this.initialiseTaxonomyView(animalData, selection).then(function() {
+            viewSelector.update();
+            viewSelector.wireUpdates();
+        });
+    }
+
+    initialiseTaxonomyView(animalData: AnimalData, selection: SelectedSpecies): Promise<void> {
+        const rootElem = $("#animals-taxonomic");
+        rootElem.append(spinner);
+        const viewSelector = this;
+        return Promise.all([animalData.promiseCategoryLevels(), animalData.promiseBaseCategories()]).then(function (data: [CategoryLevelJson[], CategoryJson[]]) {
+            viewSelector.views["taxonomical"] = new TaxonomyView(animalData, selection, data[0], data[1]);
+        }, function(err) {
+            console.log(err);
+            rootElem.find("img.spinner").remove();
+            rootElem.append("<span class=\"error\">Failed to connect to API</span>");
+        });
     }
 
     wireUpdates() {
