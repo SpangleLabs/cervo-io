@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseGet, spinner} from "./utilities";
+import {spinner} from "./utilities";
 import {View} from "./views";
 import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -72,7 +72,7 @@ class AlphabetLetter {
         const self = this;
         this.rootElem.append(spinner);
         if(this.animals == null) {
-            promiseGet(`species/?common_name=${this.letter}%25`).then(function(animals: SpeciesJson[]) {
+            this.alphabetView.animalData.promiseSpeciesByLetter(this.letter).then(function(animals: SpeciesJson[]) {
                 self.animals = animals;
                 self.renderList(animals);
                 self.alphabetView.updating = false;
