@@ -1,7 +1,7 @@
 import $ from "jquery";
 import {spinner} from "./utilities";
 import {View} from "./views";
-import {AnimalData} from "./animalData";
+import {AnimalData, SpeciesData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
 
 
@@ -44,7 +44,7 @@ class AlphabetLetter {
     letterListElem: JQuery<HTMLElement>;
     letterResultsElem: JQuery<HTMLElement>;
     letterElem: JQuery<HTMLElement>;
-    animals: SpeciesJson[] | null;
+    animals: SpeciesData[] | null;
 
     constructor(alphabetView: AlphabetView, letter: string, odd: boolean) {
         this.letter = letter;
@@ -72,7 +72,7 @@ class AlphabetLetter {
         const self = this;
         this.rootElem.append(spinner);
         if(this.animals == null) {
-            this.alphabetView.animalData.promiseSpeciesByLetter(this.letter).then(function(animals: SpeciesJson[]) {
+            this.alphabetView.animalData.promiseSpeciesByLetter(this.letter).then(function(animals: SpeciesData[]) {
                 self.animals = animals;
                 self.renderList(animals);
                 self.alphabetView.updating = false;
@@ -89,9 +89,8 @@ class AlphabetLetter {
         }
     }
 
-    renderList(animals: SpeciesJson[]) {
-        for (const animal of animals) {
-            const species = this.alphabetView.animalData.getOrCreateSpecies(animal);
+    renderList(animals: SpeciesData[]) {
+        for (const species of animals) {
             const speciesClass = `species-${species.id}`;
             const selected = this.alphabetView.selection.containsSpecies(species.id);
             this.letterResultsElem.append(`<li class="${speciesClass}">

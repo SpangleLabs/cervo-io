@@ -9,11 +9,11 @@ export class AnimalData {
     categoryLevels: Promise<CategoryLevelJson[]>;
     baseCategory: Promise<CategoryJson[]>;
     validFirstLetters: Promise<string[]>;
-    speciesByLetter: Map<string, Promise<SpeciesJson[]>>;
+    speciesByLetter: Map<string, Promise<SpeciesData[]>>;
 
     constructor() {
         this.species = {};
-        this.speciesByLetter = new Map<string, Promise<SpeciesJson[]>>();
+        this.speciesByLetter = new Map<string, Promise<SpeciesData[]>>();
     }
 
     promiseCategoryLevels() : Promise<CategoryLevelJson[]> {
@@ -37,9 +37,13 @@ export class AnimalData {
         return this.validFirstLetters;
     }
 
-    promiseSpeciesByLetter(letter: string) : Promise<SpeciesJson[]> {
+    promiseSpeciesByLetter(letter: string) : Promise<SpeciesData[]> {
         if (!this.speciesByLetter.has(letter)) {
-            this.speciesByLetter.set(letter, promiseGet(`species/?common_name=${letter}%25`));
+            const self = this;
+            const speciesPromise = promiseGet(`species/?common_name=${letter}%25`).then(function(data: SpeciesJson[]) {
+                return data.map(x => self.getOrCreateSpecies(x));
+            });
+            this.speciesByLetter.set(letter, speciesPromise);
         }
         return this.speciesByLetter.get(letter);
     }
