@@ -50,7 +50,7 @@ export class ViewSelector {
     initialiseTaxonomyView(animalData: AnimalData, selection: SelectedSpecies): Promise<TaxonomyView> {
         const rootElem = $("#animals-taxonomic");
         // Create promise to create taxonomy view
-        const taxoPromise = Promise.all(
+        let taxoPromise = Promise.all(
             [
                 animalData.promiseCategoryLevels(),
                 animalData.promiseBaseCategories()
@@ -58,14 +58,15 @@ export class ViewSelector {
         ).then(function (data: [CategoryLevelJson[], CategoryData[]]) {
             return new TaxonomyView(animalData, selection, data[0], data[1]);
         });
+        taxoPromise = promiseSpinner(rootElem,taxoPromise);
         // Promise to expand the taxonomy view
         const expandBasePromise = taxoPromise.then(function(taxonomyView) {
             return taxonomyView.expandBaseCategories();
         }).then();
         // When both are done, return the taxonomy view
-        return promiseSpinner(rootElem, Promise.all([taxoPromise, expandBasePromise]).then(function(data: [TaxonomyView, void]) {
+        return Promise.all([taxoPromise, expandBasePromise]).then(function(data: [TaxonomyView, void]) {
             return data[0];
-        }));
+        });
     }
 
     initialiseAlphabetView(animalData: AnimalData, selection: SelectedSpecies): Promise<AlphabetView> {
