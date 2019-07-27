@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseGet, promiseSpinner} from "./utilities";
+import {promiseSpinner} from "./utilities";
 import {View} from "./views";
 import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -23,10 +23,9 @@ export class SearchView extends View {
         const searchRegex = new RegExp(value, "gi");
         const replacement = `<span class='search_term'>$&</span>`;
         const self = this;
-        const getAndRenderResults = promiseGet(`species/?name=%25${value}%25`).then(function(animals) {
+        const getAndRenderResults = this.animalData.promiseSearchSpecies(value).then(function(animals) {
             self.searchResults.empty();
-            for (const animal of animals) {
-                const species = self.animalData.getOrCreateSpecies(animal);
+            for (const species of animals) {
                 const speciesClass = `species-${species.id}`;
                 const selected = self.selection.containsSpecies(species.id);
                 const commonName = species.commonName.replace(searchRegex,replacement);

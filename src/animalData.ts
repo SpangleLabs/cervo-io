@@ -53,6 +53,13 @@ export class AnimalData {
         return this.speciesByLetter.get(letter);
     }
 
+    promiseSearchSpecies(search: string) : Promise<SpeciesData[]> {
+        const self = this;
+        return promiseGet(`species/?name=%25${search}%25`).then(function(animals: SpeciesJson[]) {
+            return animals.map(x => self.getOrCreateSpecies(x));
+        });
+    }
+
     getOrCreateCategory(categoryData: CategoryJson): CategoryData {
         const categoryId = categoryData.category_id;
         if (!this.categories.has(categoryId)) {
