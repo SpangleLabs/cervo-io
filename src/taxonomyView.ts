@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {spinner} from "./utilities";
+import {promiseSpinner} from "./utilities";
 import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 import {View} from "./views";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -106,7 +106,6 @@ class TaxonomyCategory {
      * @returns {Promise<Array>}
      */
     loadSubElements(expand: boolean, recursive: boolean): Promise<void> {
-        this.uiElement.append(spinner);
         let populatedCategoriesPromise: Promise<void[]> = new Promise(resolve => []);
         const self = this;
         if (!this.isPopulated()) {
@@ -141,12 +140,11 @@ class TaxonomyCategory {
             }
             populatedCategoriesPromise = Promise.all(loadCategoryPromises);
         }
-        return populatedCategoriesPromise.then(function () {
+        return promiseSpinner(this.uiElement, populatedCategoriesPromise.then(function () {
             if (expand) {
                 self.expand();
             }
-            self.uiElement.find("img.spinner").remove();
-        });
+        }));
     }
 
     /**
