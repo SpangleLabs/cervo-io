@@ -12,6 +12,7 @@ export class TaxonomyView extends View {
     cacheCategoryLevel: CategoryLevelJson[];
     categories: {[key: string]: TaxonomyCategory};
     species: {[key: string]: TaxonomySpecies};
+    baseTaxoCategories: TaxonomyCategory[];
 
     constructor(animalData: AnimalData, selection: SelectedSpecies, categoryLevels: CategoryLevelJson[], baseCategories: CategoryJson[]) {
         super($("#animals-taxonomic"), animalData, selection);
@@ -22,18 +23,18 @@ export class TaxonomyView extends View {
         this.rootElem.append(spinner);
 
         this.cacheCategoryLevel = categoryLevels;
-        const baseTaxoCategories: TaxonomyCategory[] = [];
+        this.baseTaxoCategories = [];
         for (const itemData of baseCategories) {
             const newCategory: TaxonomyCategory = new TaxonomyCategory(itemData, this);
-            baseTaxoCategories.push(newCategory);
+            this.baseTaxoCategories.push(newCategory);
         }
         this.rootElem.find("img.spinner").remove();
-        this.expandBaseCategories(baseTaxoCategories);
     }
 
-    expandBaseCategories(baseCategories: TaxonomyCategory[]): Promise<void> {
+    expandBaseCategories(): Promise<void> {
+        const self = this;
         return Promise.all(
-            baseCategories.map(x => x.loadSubElements(true, false))
+            self.baseTaxoCategories.map(x => x.loadSubElements(true, false))
         ).then();
     }
 
