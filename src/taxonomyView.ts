@@ -20,15 +20,12 @@ export class TaxonomyView extends View {
         this.categories = {};
         this.species = {};
 
-        this.rootElem.append(spinner);
-
         this.cacheCategoryLevel = categoryLevels;
         this.baseTaxoCategories = [];
         for (const itemData of baseCategories) {
             const newCategory: TaxonomyCategory = new TaxonomyCategory(itemData, this);
             this.baseTaxoCategories.push(newCategory);
         }
-        this.rootElem.find("img.spinner").remove();
     }
 
     expandBaseCategories(): Promise<void> {

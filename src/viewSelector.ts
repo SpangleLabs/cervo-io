@@ -5,7 +5,7 @@ import {AlphabetView} from "./alphabetView";
 import {SearchView} from "./searchView";
 import $ from "jquery";
 import {View} from "./views";
-import {spinner} from "./utilities";
+import {promiseSpinner} from "./utilities";
 
 /**
  * Handle (and update) which view is active
@@ -43,14 +43,12 @@ export class ViewSelector {
             viewSelector.views["alphabetical"] = views[1];
         }, function(err) {
             console.log(err);
-            rootElem.find("img.spinner").remove();
             rootElem.append("<span class=\"error\">Failed to connect to API</span>");
         });
     }
 
     initialiseTaxonomyView(animalData: AnimalData, selection: SelectedSpecies): Promise<TaxonomyView> {
         const rootElem = $("#animals-taxonomic");
-        rootElem.append(spinner);
         // Create promise to create taxonomy view
         const taxoPromise = Promise.all(
             [
@@ -65,9 +63,9 @@ export class ViewSelector {
             return taxonomyView.expandBaseCategories();
         }).then();
         // When both are done, return the taxonomy view
-        return Promise.all([taxoPromise, expandBasePromise]).then(function(data: [TaxonomyView, void]) {
+        return promiseSpinner(rootElem, Promise.all([taxoPromise, expandBasePromise]).then(function(data: [TaxonomyView, void]) {
             return data[0];
-        });
+        }));
     }
 
     initialiseAlphabetView(animalData: AnimalData, selection: SelectedSpecies): Promise<AlphabetView> {

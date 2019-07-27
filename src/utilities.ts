@@ -48,3 +48,19 @@ export function arrayEquals<T>(array1: T[], array2: T[]): boolean {
     }
     return true;
 }
+
+export function addSpinner(element: JQuery<Element>): void {
+    element.append(spinner);
+}
+
+export function removeSpinner(element: JQuery<Element>): void {
+    element.find("img.spinner").remove();
+}
+
+export function promiseSpinner<T>(element: JQuery<Element>, promise: Promise<T>): Promise<T> {
+    addSpinner(element);
+    return promise.then(function(data: T) {
+        removeSpinner(element);
+        return data;
+    });
+}
