@@ -1,4 +1,4 @@
-import {AnimalData} from "./animalData";
+import {AnimalData, CategoryData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
 import {TaxonomyView} from "./taxonomyView";
 import {AlphabetView} from "./alphabetView";
@@ -55,7 +55,7 @@ export class ViewSelector {
                 animalData.promiseCategoryLevels(),
                 animalData.promiseBaseCategories()
             ]
-        ).then(function (data: [CategoryLevelJson[], CategoryJson[]]) {
+        ).then(function (data: [CategoryLevelJson[], CategoryData[]]) {
             return new TaxonomyView(animalData, selection, data[0], data[1]);
         });
         // Promise to expand the taxonomy view

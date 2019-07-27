@@ -6,13 +6,15 @@ import {promiseGet} from "./utilities";
 
 export class AnimalData {
     species: {[key: number] : SpeciesData};
+    categories: Map<number, CategoryData>;
     categoryLevels: Promise<CategoryLevelJson[]>;
-    baseCategory: Promise<CategoryJson[]>;
+    baseCategory: Promise<CategoryData[]>;
     validFirstLetters: Promise<string[]>;
     speciesByLetter: Map<string, Promise<SpeciesData[]>>;
 
     constructor() {
         this.species = {};
+        this.categories = new Map<number, CategoryData>();
         this.speciesByLetter = new Map<string, Promise<SpeciesData[]>>();
     }
 
@@ -23,9 +25,12 @@ export class AnimalData {
         return this.categoryLevels;
     }
 
-    promiseBaseCategories() : Promise<CategoryJson[]> {
+    promiseBaseCategories() : Promise<CategoryData[]> {
         if (!this.baseCategory) {
-            this.baseCategory = promiseGet("categories/");
+            const self = this;
+            this.baseCategory = promiseGet("categories/").then(function(data: CategoryJson[]) {
+                return data.map(x => self.getOrCreateCategory(x));
+            });
         }
         return this.baseCategory;
     }
@@ -48,6 +53,15 @@ export class AnimalData {
         return this.speciesByLetter.get(letter);
     }
 
+    getOrCreateCategory(categoryData: CategoryJson): CategoryData {
+        const categoryId = categoryData.category_id;
+        if (!this.categories.has(categoryId)) {
+            const newCategory = new CategoryData(categoryData, this);
+            this.categories.set(categoryId, newCategory);
+        }
+        return this.categories.get(categoryId);
+    }
+
     getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {
         const speciesId = speciesData.species_id;
         if (this.species[speciesId]) {
@@ -57,6 +71,51 @@ export class AnimalData {
             this.species[speciesId] = newSpecies;
             return newSpecies;
         }
+    }
+}
+
+export class CategoryData {
+    animalData: AnimalData;
+    id: number;
+    name: string;
+    categoryLevelId: number;
+    parentCategoryId: number | null;
+    _fullDataPromise: Promise<FullCategoryJson> | null;
+    subCategories: Promise<CategoryData> | null;
+    species: Promise<SpeciesData> | null;
+
+    constructor(categoryData: CategoryJson, animalData: AnimalData) {
+        this.animalData = animalData;
+        this.id = categoryData.category_id;
+        this.name = categoryData.name;
+        this.categoryLevelId = categoryData.category_level_id;
+        this.parentCategoryId = categoryData.parent_category_id;
+        this._fullDataPromise = null;
+        this.subCategories = null;
+        this.species = null;
+    }
+
+    async promiseFullData(): Promise<FullCategoryJson> {
+        if (!this._fullDataPromise) {
+            this._fullDataPromise = promiseGet("categories/" + this.id).then(function (data: FullCategoryJson[]) {
+                return data[0];
+            });
+        }
+        return this._fullDataPromise;
+    }
+
+    async getSubCategories(): Promise<CategoryData[]> {
+        const self = this;
+        return this.promiseFullData().then(function (data: FullCategoryJson) {
+            return data.sub_categories.map(x => self.animalData.getOrCreateCategory(x));
+        });
+    }
+
+    async getSpecies(): Promise<SpeciesData[]> {
+        const self = this;
+        return this.promiseFullData().then(function (data: FullCategoryJson) {
+            return data.species.map(x => self.animalData.getOrCreateSpecies(x));
+        });
     }
 }
 
