@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseGet, spinner} from "./utilities";
+import {promiseGet, promiseSpinner} from "./utilities";
 import {View} from "./views";
 import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -18,13 +18,12 @@ export class SearchView extends View {
         this.searchResults = $("ul#search-results");
     }
 
-    updateSearchResults() {
+    updateSearchResults(): Promise<void> {
         const value: string = <string>this.searchBox.val();
         const searchRegex = new RegExp(value, "gi");
         const replacement = `<span class='search_term'>$&</span>`;
         const self = this;
-        this.rootElem.append(spinner);
-        promiseGet(`species/?name=%25${value}%25`).then(function(animals) {
+        const getAndRenderResults = promiseGet(`species/?name=%25${value}%25`).then(function(animals) {
             self.searchResults.empty();
             for (const animal of animals) {
                 const species = self.animalData.getOrCreateSpecies(animal);
@@ -39,7 +38,7 @@ export class SearchView extends View {
     <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
 </span></li>`);
             }
-            self.rootElem.find("img.spinner").remove();
         });
+        return promiseSpinner(this.rootElem, getAndRenderResults);
     }
 }

@@ -1,6 +1,6 @@
 import config from "./config";
 
-export const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
+const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
 /**
  * I pulled this method from somewhere else, tbh
@@ -49,11 +49,11 @@ export function arrayEquals<T>(array1: T[], array2: T[]): boolean {
     return true;
 }
 
-export function addSpinner(element: JQuery<Element>): void {
+function addSpinner(element: JQuery<Element>): void {
     element.append(spinner);
 }
 
-export function removeSpinner(element: JQuery<Element>): void {
+function removeSpinner(element: JQuery<Element>): void {
     element.find("img.spinner").remove();
 }
 
