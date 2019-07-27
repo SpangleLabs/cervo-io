@@ -35,7 +35,7 @@ export class TaxonomyView extends View {
         ).then();
     }
 
-    getCategoryLevel(id: number) {
+    getCategoryLevel(id: number): CategoryLevelJson | null {
         return this.cacheCategoryLevel.find(x=>x.category_level_id === id);
     }
 }
@@ -106,7 +106,7 @@ class TaxonomyCategory {
      * @returns {Promise<Array>}
      */
     loadSubElements(expand: boolean, recursive: boolean): Promise<void> {
-        let populatedCategoriesPromise: Promise<void[]> = new Promise(resolve => []);
+        let populatedCategoriesPromise: Promise<void[]> = Promise.resolve([]);
         const self = this;
         if (!this.isPopulated()) {
             self.childCategories = [];
@@ -125,7 +125,7 @@ class TaxonomyCategory {
                     new TaxonomySpecies(itemData, self.taxonomyView);
                 }
                 // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
-                let loadCategoryPromises = [];
+                let loadCategoryPromises: Promise<void>[] = [];
                 if (self.childCategories.length === 1 || recursive) {
                     for(const subCategory of self.childCategories) {
                         loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
@@ -134,10 +134,7 @@ class TaxonomyCategory {
                 return Promise.all(loadCategoryPromises);
             });
         } else if (recursive) {
-            let loadCategoryPromises: Promise<void>[] = [];
-            for(const subCategory of self.childCategories) {
-                loadCategoryPromises.push(subCategory.loadSubElements(expand, recursive));
-            }
+            let loadCategoryPromises: Promise<void>[] = self.childCategories.map(x => x.loadSubElements(expand, recursive));
             populatedCategoriesPromise = Promise.all(loadCategoryPromises);
         }
         return promiseSpinner(this.uiElement, populatedCategoriesPromise.then(function () {
