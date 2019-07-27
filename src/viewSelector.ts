@@ -15,16 +15,19 @@ export class ViewSelector {
     viewKeys: string[];
     activeView: string | null;
 
-    constructor(animalData: AnimalData, selection: SelectedSpecies) {
+    constructor() {
         this.views = {
             "taxonomical": null,
             "alphabetical": null,
-            "search": new SearchView(animalData, selection)
+            "search": null
         };
         this.viewKeys = ["taxonomical", "alphabetical", "search"];
         this.activeView = null;
+    }
+
+    async initialise(animalData: AnimalData, selection: SelectedSpecies): Promise<void> {
         const viewSelector = this;
-        this.initialiseViews(animalData, selection).then(function() {
+        return this.initialiseViews(animalData, selection).then(function() {
             viewSelector.update();
             viewSelector.wireUpdates();
         });
@@ -41,6 +44,7 @@ export class ViewSelector {
         ).then(function (views) {
             viewSelector.views["taxonomical"] = views[0];
             viewSelector.views["alphabetical"] = views[1];
+            viewSelector.views["search"] = new SearchView(animalData, selection);
         }, function(err) {
             console.log(err);
             rootElem.append("<span class=\"error\">Failed to connect to API</span>");

@@ -55,6 +55,7 @@ function initMap() {
     });
     map = new PageMap(googleMap);
     selection = new SelectedSpecies(animalData, map);
-    selector = new ViewSelector(animalData, selection);
+    selector = new ViewSelector();
+    selector.initialise(animalData, selection);
 }
 (<any>window).initMap = initMap;
