@@ -24,6 +24,7 @@ export class TaxonomyView extends View {
         this.baseTaxoCategories = [];
         for (const categoryData of baseCategories) {
             const newCategory: TaxonomyCategory = new TaxonomyCategory(categoryData, this);
+            this.categories[categoryData.id] = newCategory;
             this.baseTaxoCategories.push(newCategory);
         }
     }
@@ -73,14 +74,11 @@ class TaxonomyCategory {
         if (this.parentCategoryId != null) {
             this.parentCategory = taxonomyView.categories[this.parentCategoryId];
             this.selected = this.parentCategory.uiElement.hasClass("selected");
-            this.parentCategory.childCategories.push(this);
         }
         this.uiElement = this.render();
         this.isOdd = this.uiElement.parent("ul").hasClass("odd");
         this.childCategories = null;
         this.childSpecies = null;
-        // Add self to root taxonomy view's big category dictionary
-        taxonomyView.categories[this.data.id] = this;
     }
 
     render(): JQuery<HTMLElement> {
@@ -118,11 +116,13 @@ class TaxonomyCategory {
                 self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
                 // Add subcategories
                 for (const subCategory of subCategories) {
-                    new TaxonomyCategory(subCategory, self.taxonomyView);
+                    const newCategory = new TaxonomyCategory(subCategory, self.taxonomyView);
+                    self.taxonomyView.categories[subCategory.id] = newCategory;
+                    self.childCategories.push(newCategory);
                 }
                 // Add species in category
                 for (const itemData of species) {
-                    new TaxonomySpecies(itemData, self.taxonomyView);
+                    self.childSpecies.push(new TaxonomySpecies(itemData, self.taxonomyView));
                 }
                 // If category contains only 1 subcategory, open the subcategory. (or if recursive is specified)
                 let loadCategoryPromises: Promise<void>[] = [];
@@ -218,7 +218,6 @@ class TaxonomySpecies {
         if(categorySelected) {
             this.taxonomyView.selection.addSpecies(this.data.id);
         }
-        this.parentCategory.childSpecies.push(this);
     }
 
     render(selected: boolean): JQuery<HTMLElement> {
