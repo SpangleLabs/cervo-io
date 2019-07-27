@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {spinner} from "./utilities";
+import {promiseSpinner} from "./utilities";
 import {View} from "./views";
 import {AnimalData, SpeciesData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -59,10 +59,11 @@ class AlphabetLetter {
         this.animals = null;
     }
 
-    userClick() {
+    userClick(): Promise<void> {
+        // Debounce
         if(this.alphabetView.updating) {
             this.alphabetView.latestLetter = this.letter;
-            return;
+            return Promise.resolve();
         }
         this.alphabetView.updating = true;
         this.alphabetView.latestLetter = this.letter;
@@ -70,23 +71,24 @@ class AlphabetLetter {
         this.alphabetView.rootElem.find(".letter-list").removeClass("selected");
         this.letterElem.addClass("selected");
         const self = this;
-        this.rootElem.append(spinner);
-        if(this.animals == null) {
-            this.alphabetView.animalData.promiseSpeciesByLetter(this.letter).then(function(animals: SpeciesData[]) {
+        // Promise getting the animal list if you don't have it
+        let promiseGetAnimals = Promise.resolve();
+        if(!this.animals) {
+            promiseGetAnimals = this.alphabetView.animalData.promiseSpeciesByLetter(this.letter).then(function(animals: SpeciesData[]) {
                 self.animals = animals;
-                self.renderList(animals);
-                self.alphabetView.updating = false;
-                if(self.alphabetView.latestLetter && self.alphabetView.latestLetter !== self.letter) {
-                    self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
-                }
             });
-        } else {
-            this.renderList(this.animals);
-            this.alphabetView.updating = false;
+        }
+        // Render animal list
+        const promiseRenderAnimals = promiseGetAnimals.then(function() {
+            self.renderList(self.animals);
+        });
+        // Wrap render with spinner, then debounce
+        return promiseSpinner(this.rootElem, promiseRenderAnimals).then(function() {
+            self.alphabetView.updating = false;
             if(self.alphabetView.latestLetter && self.alphabetView.latestLetter !== self.letter) {
                 self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
             }
-        }
+        });
     }
 
     renderList(animals: SpeciesData[]) {
@@ -105,7 +107,6 @@ class AlphabetLetter {
                 }
                 );
         }
-        this.rootElem.find("img.spinner").remove();
     }
 
     disable() {
