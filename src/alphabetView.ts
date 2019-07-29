@@ -9,16 +9,16 @@ import {SelectedSpecies} from "./selectedSpecies";
  * Create and store list of AlphabetLetter objects
  */
 export class AlphabetView extends View {
-    letters: {[key: string]: AlphabetLetter};
+    letters: Map<string, AlphabetLetter>;
     updating: boolean;
     latestLetter: string | null;
 
     constructor(animalData: AnimalData, selection: SelectedSpecies, validLetters: string[]) {
         super($("#animals-alphabetic"), animalData, selection);
-        this.letters = {};
+        this.letters = new Map<string, AlphabetLetter>();
         let odd = true;
         for (const letter of "abcdefghijklmnopqrstuvwxyz") {
-            this.letters[letter] = new AlphabetLetter(this, letter, odd);
+            this.letters.set(letter, new AlphabetLetter(this, letter, odd));
             odd = !odd;
         }
         // Whether it is currently updating, for debouncing
@@ -26,9 +26,9 @@ export class AlphabetView extends View {
         // Latest letter loaded, for debouncing
         this.latestLetter = null;
         // Get the list of valid first letters, and update the invalid ones.
-        for (const letter in this.letters) {
+        for (const letter of this.letters.keys()) {
             if (!validLetters.includes(letter.toUpperCase())) {
-                this.letters[letter].disable();
+                this.letters.get(letter).disable();
             }
         }
     }
@@ -86,7 +86,7 @@ class AlphabetLetter {
         return promiseSpinner(this.rootElem, promiseRenderAnimals).then(function() {
             self.alphabetView.updating = false;
             if(self.alphabetView.latestLetter && self.alphabetView.latestLetter !== self.letter) {
-                self.alphabetView.letters[self.alphabetView.latestLetter].userClick();
+                self.alphabetView.letters.get(self.alphabetView.latestLetter).userClick();
             }
         });
     }

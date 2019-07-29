@@ -10,21 +10,22 @@ import {SelectedSpecies} from "./selectedSpecies";
  */
 export class TaxonomyView extends View {
     cacheCategoryLevel: CategoryLevelJson[];
-    categories: {[key: string]: TaxonomyCategory};
-    species: {[key: string]: TaxonomySpecies};
+    categories: Map<string, TaxonomyCategory>;
+    species: Map<string, TaxonomySpecies>;
     baseTaxoCategories: TaxonomyCategory[];
 
     constructor(animalData: AnimalData, selection: SelectedSpecies, categoryLevels: CategoryLevelJson[], baseCategories: CategoryData[]) {
         super($("#animals-taxonomic"), animalData, selection);
         this.cacheCategoryLevel = [];
-        this.categories = {};
-        this.species = {};
+        this.categories = new Map<string, TaxonomyCategory>();
+        this.species = new Map<string, TaxonomySpecies>();
 
         this.cacheCategoryLevel = categoryLevels;
         this.baseTaxoCategories = [];
         for (const categoryData of baseCategories) {
             const newCategory: TaxonomyCategory = new TaxonomyCategory(categoryData, this);
-            this.categories[categoryData.id] = newCategory;
+            const categoryKey = categoryData.id.toString();
+            this.categories.set(categoryKey, newCategory);
             this.baseTaxoCategories.push(newCategory);
         }
     }
@@ -72,7 +73,8 @@ class TaxonomyCategory {
         this.parentCategory = null;
         this.selected = false;
         if (this.parentCategoryId != null) {
-            this.parentCategory = taxonomyView.categories[this.parentCategoryId];
+            const parentCategoryKey = this.parentCategoryId.toString();
+            this.parentCategory = taxonomyView.categories.get(parentCategoryKey);
             this.selected = this.parentCategory.uiElement.hasClass("selected");
         }
         this.uiElement = this.render();
@@ -117,7 +119,8 @@ class TaxonomyCategory {
                 // Add subcategories
                 for (const subCategory of subCategories) {
                     const newCategory = new TaxonomyCategory(subCategory, self.taxonomyView);
-                    self.taxonomyView.categories[subCategory.id] = newCategory;
+                    const subCategoryKey = subCategory.id.toString();
+                    self.taxonomyView.categories.set(subCategoryKey, newCategory);
                     self.childCategories.push(newCategory);
                 }
                 // Add species in category
@@ -207,13 +210,15 @@ class TaxonomySpecies {
         this.data = speciesData;
         this.taxonomyView = taxonomyView;
 
-        this.parentCategory = this.taxonomyView.categories[this.data.parentCategoryId];
+        const parentCategoryKey = this.data.parentCategoryId.toString();
+        this.parentCategory = this.taxonomyView.categories.get(parentCategoryKey);
         const categorySelected: boolean = this.parentCategory.uiElement.hasClass("selected");
         const alreadySelected: boolean = this.taxonomyView.selection.containsSpecies(this.data.id);
         this.uiElement = this.render(categorySelected || alreadySelected);
 
         // Add self to parent category and taxonomyView dict
-        this.taxonomyView.species[this.data.id] = this; // this is fine
+        const speciesKey = this.data.id.toString();
+        this.taxonomyView.species.set(speciesKey, this); // this is fine
         // If selected, add to selection:
         if(categorySelected) {
             this.taxonomyView.selection.addSpecies(this.data.id);

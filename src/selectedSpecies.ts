@@ -92,7 +92,7 @@ export class SelectedSpecies {
         let speciesDataPromises: Promise<{[key: string]: ZooJson}>[] = [];
         // Update style for selected species, and get list of promises for zoo data
         for(const speciesId of this.selectedSpeciesIds) {
-            const species = this.animalData.species[speciesId];
+            const species = this.animalData.species.get(speciesId);;
             zooSpeciesSelected.append(`li.zoo_species_${speciesId} { font-weight:bold; }`);
             //self.selectedSpeciesIds.push(speciesId);
             // Generate promises returning dict of zoo id to zoos
@@ -109,7 +109,7 @@ export class SelectedSpecies {
         const selectedSpeciesElem = $("#selected-species");
         selectedSpeciesElem.empty();
         for(const speciesId of this.selectedSpeciesIds) {
-            const species = this.animalData.species[speciesId];
+            const species = this.animalData.species.get(speciesId);
             selectedSpeciesElem.append(`<li>
 <span class='selector' onclick='userSelectSpecies(${speciesId})'>
     <span class="species_name">${species.commonName}</span>

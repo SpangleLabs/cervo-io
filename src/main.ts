@@ -11,15 +11,17 @@ let selector: ViewSelector;
 let selection: SelectedSpecies;
 
 function userExpandCategory(id: number): void {
+    const categoryKey = id.toString();
     const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
-    taxonomyView.categories[id].loadSubElements(true, false);
+    taxonomyView.categories.get(categoryKey).loadSubElements(true, false);
 }
 
 (<any>window).userExpandCategory = userExpandCategory;
 
 function userSelectCategory(categoryId: number): void {
+    const categoryKey = categoryId.toString();
     const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
-    const category = taxonomyView.categories[categoryId];
+    const category = taxonomyView.categories.get(categoryKey);
     category.select();
     category.loadSubElements(false, true).then(function () {
         //selection.update();

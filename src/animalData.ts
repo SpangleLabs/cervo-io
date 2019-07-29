@@ -5,7 +5,7 @@ import {promiseGet} from "./utilities";
 
 
 export class AnimalData {
-    species: {[key: number] : SpeciesData};
+    species: Map<number, SpeciesData>;
     categories: Map<number, CategoryData>;
     categoryLevels: Promise<CategoryLevelJson[]>;
     baseCategory: Promise<CategoryData[]>;
@@ -13,7 +13,7 @@ export class AnimalData {
     speciesByLetter: Map<string, Promise<SpeciesData[]>>;
 
     constructor() {
-        this.species = {};
+        this.species = new Map<number, SpeciesData>();
         this.categories = new Map<number, CategoryData>();
         this.speciesByLetter = new Map<string, Promise<SpeciesData[]>>();
     }
@@ -71,11 +71,11 @@ export class AnimalData {
 
     getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {
         const speciesId = speciesData.species_id;
-        if (this.species[speciesId]) {
-            return this.species[speciesId];
+        if (this.species.has(speciesId)) {
+            return this.species.get(speciesId);
         } else {
             const newSpecies = new SpeciesData(speciesData);
-            this.species[speciesId] = newSpecies;
+            this.species.set(speciesId, newSpecies);
             return newSpecies;
         }
     }
