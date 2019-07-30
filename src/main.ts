@@ -1,25 +1,12 @@
+import $ from "jquery";
 import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
-import {SearchView} from "./searchView";
 import {PageMap} from "./pageMap";
 import {ViewSelector} from "./viewSelector";
 import {Map} from "./Map";
 
 let selector: ViewSelector;
 let selection: SelectedSpecies;
-
-function userUpdatePostcode(): void {
-    selection.updateZooDistances();
-}
-
-(<any>window).userUpdatePostcode = userUpdatePostcode;
-
-function userSearchButton(): void {
-    const searchView: SearchView = <SearchView>selector.views["search"];
-    searchView.updateSearchResults();
-}
-
-(<any>window).userSearchButton = userSearchButton;
 
 document.addEventListener("DOMContentLoaded", function () {
     let mapElement = document.getElementById('map');
@@ -31,5 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
         selection = new SelectedSpecies(animalData, map);
         selector = new ViewSelector();
         selector.initialise(animalData, selection);
+
+        $("input#postcode").on("input", () => selection.updateZooDistances());
+        $("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
     });
 });

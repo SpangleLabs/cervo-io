@@ -45,7 +45,7 @@
             <ul id="letter-results"></ul>
         </div>
         <div id="animals-search">
-            <form onsubmit="userSearchButton(); return false;">
+            <form>
                 <label>
                     Search:
                     <input type="text" name="animals-search-input" id="animals-search-input"/>
@@ -56,7 +56,7 @@
         </div>
         <h2>Selected species<span id="selected-species-count"></span></h2>
         <ul id="selected-species"></ul>
-        <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text" oninput="userUpdatePostcode()"/> <span id="invalid-postcode" class="error">Invalid postcode.</span>
+        <label for="postcode">Enter your postcode to get distances to selected zoos: </label><input id="postcode" type="text"/> <span id="invalid-postcode" class="error">Invalid postcode.</span>
         <h2>Zoos with selected species<span id="selected-zoos-count"></span></h2>
         <ul id="selected-zoos"></ul>
     </div>

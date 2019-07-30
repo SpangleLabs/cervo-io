@@ -94,4 +94,8 @@ export class ViewSelector {
             }
         }
     }
+
+    getSearchView(): SearchView {
+        return <SearchView>this.views["search"];
+    }
 }
