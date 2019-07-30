@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseSpinner} from "./utilities";
+import {promiseSpinner, tickboxImageElem} from "./utilities";
 import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 import {View} from "./views";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -96,7 +96,7 @@ class TaxonomyCategory {
         // Create selector element
         const selector = $("<span />").addClass("selector").addClass("clickable")
             .on("click", () => {this.select(); this.loadSubElements(false, true).then();});
-        const img = $(`<img src='images/${this.selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${this.selected ? "✔" : "➕"}'/>`);
+        const img = tickboxImageElem(this.selected);
         selector.append(img);
         // Assemble
         li.append(outerSpan, selector).appendTo(parentUI);
@@ -237,7 +237,7 @@ class TaxonomySpecies {
             .on("click", () => this.taxonomyView.selection.toggleSpecies(this.data.id));
         const speciesName = $("<span />").addClass("species_name").text(this.data.commonName);
         const latinName = $("<span />").addClass("latin_name").text(this.data.latinName);
-        const img = $(`<img src='images/${selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${selected ? "✔" : "➕"}'/>`);
+        const img = tickboxImageElem(selected);
         selector.append(speciesName, latinName, img).appendTo(li);
         li.appendTo(parentUlElement);
         return li;

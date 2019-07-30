@@ -9,12 +9,6 @@ let map: PageMap;
 let selector: ViewSelector;
 let selection: SelectedSpecies;
 
-function userSelectSpecies(speciesId: number): void {
-    selection.toggleSpecies(speciesId);
-}
-
-(<any>window).userSelectSpecies = userSelectSpecies;
-
 function userUpdatePostcode(): void {
     selection.updateZooDistances();
 }

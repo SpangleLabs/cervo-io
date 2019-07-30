@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseSpinner} from "./utilities";
+import {promiseSpinner, tickboxImageElem} from "./utilities";
 import {View} from "./views";
 import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -30,12 +30,14 @@ export class SearchView extends View {
                 const selected = self.selection.containsSpecies(species.id);
                 const commonName = species.commonName.replace(searchRegex,replacement);
                 const latinName = species.latinName.replace(searchRegex,replacement);
-                self.searchResults.append(
-                    `<li class="${speciesClass}">
-<span class='selector' onclick='userSelectSpecies(${species.id})'>
-    ${commonName} (<span class='latin_name'>${latinName}</span>)
-    <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
-</span></li>`);
+                // Construct html elements
+                const li = $("<li />").addClass(speciesClass);
+                const selector = $("<span />").addClass("selector").addClass("clickable").on("click", () => self.selection.toggleSpecies(species.id));
+                const commonNameElem = $("<span />").addClass("common_name").html(commonName);
+                const latinNameElem = $("<span />").addClass("latin_name").html(latinName);
+                const img = tickboxImageElem(selected);
+                selector.append(commonNameElem, latinNameElem, img).appendTo(li);
+                li.appendTo(self.searchResults);
             }
         });
         return promiseSpinner(this.rootElem, getAndRenderResults);

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseSpinner} from "./utilities";
+import {promiseSpinner, tickboxImageElem} from "./utilities";
 import {View} from "./views";
 import {AnimalData, SpeciesData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
@@ -95,11 +95,12 @@ class AlphabetLetter {
         for (const species of animals) {
             const speciesClass = `species-${species.id}`;
             const selected = this.alphabetView.selection.containsSpecies(species.id);
-            this.letterResultsElem.append(`<li class="${speciesClass}">
-                    <span class='selector' onclick='userSelectSpecies(${species.id})'>
-                    ${species.commonName}
-                        <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
-                    </span></li>`);
+            const li = $("<li />").addClass(speciesClass);
+            const selector = $("<span />").addClass("selector").addClass("clickable").text(species.commonName)
+                .on("click", () => this.alphabetView.selection.toggleSpecies(species.id));
+            const img = tickboxImageElem(selected);
+            selector.append(img);
+            li.append(selector).appendTo(this.letterResultsElem);
             const self = this;
             this.letterElem.find(`.${speciesClass}.selector`).click(
                 function() {

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {arrayEquals, promiseGet} from "./utilities";
+import {arrayEquals, promiseGet, tickboxImageElem} from "./utilities";
 import {AnimalData} from "./animalData";
 import {PageMap} from "./pageMap";
 
@@ -110,13 +110,13 @@ export class SelectedSpecies {
         selectedSpeciesElem.empty();
         for(const speciesId of this.selectedSpeciesIds) {
             const species = this.animalData.species.get(speciesId);
-            selectedSpeciesElem.append(`<li>
-<span class='selector' onclick='userSelectSpecies(${speciesId})'>
-    <span class="species_name">${species.commonName}</span>
-    <span class="latin_name">${species.latinName}</span>
-    <img src="images/box_checked.svg" alt="✔"/>
-</span>
-</li>`);
+            const li = $("<li />");
+            const selector = $("<span />").addClass("clickable").on("click", () => this.toggleSpecies(speciesId));
+            const speciesName = $("<span />").addClass("species_name").text(species.commonName);
+            const latinName = $("<span />").addClass("latin_name").text(species.latinName);
+            const img = tickboxImageElem(true);
+            selector.append(speciesName, latinName, img).appendTo(li);
+            li.appendTo(selectedSpeciesElem);
         }
         // Update selected species count
         $("#selected-species-count").text(` (${this.selectedSpeciesIds.length})`);

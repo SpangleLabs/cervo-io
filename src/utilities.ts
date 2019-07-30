@@ -1,4 +1,5 @@
 import config from "./config";
+import $ from "jquery";
 
 const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
@@ -63,4 +64,8 @@ export function promiseSpinner<T>(element: JQuery<Element>, promise: Promise<T>)
         removeSpinner(element);
         return data;
     });
+}
+
+export function tickboxImageElem(selected: boolean): JQuery<HTMLElement> {
+    return $(`<img src='images/${selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${selected ? "✔" : "➕"}'/>`);
 }
