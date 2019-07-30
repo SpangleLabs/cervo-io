@@ -5,7 +5,6 @@ import {PageMap} from "./pageMap";
 import {ViewSelector} from "./viewSelector";
 import {Map} from "./Map";
 
-let map: PageMap;
 let selector: ViewSelector;
 let selection: SelectedSpecies;
 
@@ -27,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     Map.loadGoogleMapsApi().then(function (googleMaps: any) {
         const googleMap = Map.createMap(googleMaps, mapElement);
-        map = new PageMap(googleMap);
+        const map = new PageMap(googleMap);
         const animalData: AnimalData = new AnimalData();
         selection = new SelectedSpecies(animalData, map);
         selector = new ViewSelector();
