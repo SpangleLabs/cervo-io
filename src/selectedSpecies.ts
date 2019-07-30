@@ -135,7 +135,8 @@ export class SelectedSpecies {
             self.map.hideAllMarkers(self.selectedZooIds);
             for (const zooKey in selectedZoos) {
                 const zooData = selectedZoos[zooKey];
-                selectedZoosElem.append(`<li id='selected-zoo-${zooData.zoo_id}' onclick='userToggleInfoWindow(${zooData.zoo_id})'>${zooData.name} <span class='distance'></span></li>`);
+                const li = $("<li />").attr("id", "selected-zoo-"+zooData.zoo_id).text(zooData.name).on("click", () => {self.map.toggleInfoWindow(zooData.zoo_id)});
+                li.append($("<span />").addClass("distance")).appendTo(selectedZoosElem);
                 const marker = self.map.getZooMarker(zooData);
                 marker.setVisible(true);
             }

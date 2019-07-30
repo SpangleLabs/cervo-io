@@ -47,7 +47,8 @@ export class ViewSelector {
             viewSelector.views["search"] = new SearchView(animalData, selection);
         }, function(err) {
             console.log(err);
-            rootElem.append("<span class=\"error\">Failed to connect to API</span>");
+            const errorMsg = $("<span />").addClass("error").text("Failed to connect to API");
+            rootElem.append(errorMsg);
         });
     }
 

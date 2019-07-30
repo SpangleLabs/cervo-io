@@ -22,12 +22,6 @@ function userSearchButton(): void {
 
 (<any>window).userSearchButton = userSearchButton;
 
-function userToggleInfoWindow(zooId: number): void {
-    map.toggleInfoWindow(zooId);
-}
-
-(<any>window).userToggleInfoWindow = userToggleInfoWindow;
-
 document.addEventListener("DOMContentLoaded", function () {
     let mapElement = document.getElementById('map');
 

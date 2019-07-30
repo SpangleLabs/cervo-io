@@ -119,7 +119,8 @@ class TaxonomyCategory {
                 const subCategories = data[0];
                 const species = data[1];
                 // Add base list element
-                self.uiElement.append(`<ul class='${self.isOdd ? "even" : "odd"}' style='display: none;'></ul>`);
+                const ul = $("<ul />").addClass(self.isOdd ? "even" : "odd").hide();
+                self.uiElement.append(ul);
                 // Add subcategories
                 for (const subCategory of subCategories) {
                     const newCategory = new TaxonomyCategory(subCategory, self.taxonomyView);

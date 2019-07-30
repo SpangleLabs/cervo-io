@@ -52,7 +52,8 @@ class AlphabetLetter {
         this.rootElem = alphabetView.rootElem;
         this.letterListElem = $("#letter-list");
         this.letterResultsElem = $("ul#letter-results");
-        this.letterListElem.append(`<span id='letter-list-${letter}' class='letter-list ${odd ? "odd" : "even"}'>${letter.toUpperCase()}</span>`);
+        const letterElem = $("<span />").attr("id", "letter-list-"+letter).addClass("letter-list").addClass(odd ? "odd" : "even").text(letter.toUpperCase());
+        this.letterListElem.append(letterElem);
         this.letterElem = $(`#letter-list-${letter}`);
         this.letterElem.click($.proxy(this.userClick, this));
         // Cache of animal list for this letter
