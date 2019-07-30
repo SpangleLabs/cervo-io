@@ -66,11 +66,6 @@ export class PageMap {
             if (zooInfoWindowId !== zooKey)
                 window.close();
         });
-        // Why a second loop?
-        this.cacheZooInfoWindows.forEach((window, zooInfoWindowId) => {
-            if (zooInfoWindowId !== zooKey)
-                window.close();
-        });
         this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers.get(zooKey));
     }
 
