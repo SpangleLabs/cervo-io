@@ -1,5 +1,4 @@
 import {AnimalData} from "./animalData";
-import {TaxonomyView} from "./taxonomyView";
 import {SelectedSpecies} from "./selectedSpecies";
 import {SearchView} from "./searchView";
 import {PageMap} from "./pageMap";
@@ -9,26 +8,6 @@ import {Map} from "./Map";
 let map: PageMap;
 let selector: ViewSelector;
 let selection: SelectedSpecies;
-
-function userExpandCategory(id: number): void {
-    const categoryKey = id.toString();
-    const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
-    taxonomyView.categories.get(categoryKey).loadSubElements(true, false);
-}
-
-(<any>window).userExpandCategory = userExpandCategory;
-
-function userSelectCategory(categoryId: number): void {
-    const categoryKey = categoryId.toString();
-    const taxonomyView: TaxonomyView = <TaxonomyView>selector.views["taxonomical"];
-    const category = taxonomyView.categories.get(categoryKey);
-    category.select();
-    category.loadSubElements(false, true).then(function () {
-        //selection.update();
-    });
-}
-
-(<any>window).userSelectCategory = userSelectCategory;
 
 function userSelectSpecies(speciesId: number): void {
     selection.toggleSpecies(speciesId);

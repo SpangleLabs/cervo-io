@@ -86,6 +86,8 @@ ul.zoo_species > li {
 /* Styling text in taxonomy category selector, and latin names */
 .latin_name, .category_level {
     font-style: italic;
+    padding-left: 3px;
+    padding-right: 3px;
 }
 /* Styling search term in search results */
 .search_term {
@@ -105,7 +107,7 @@ form {
 }
 
 /* Styling clickable list items and spans */
-span[onclick], li[onclick], .letter-list:not(.disabled) {
+span[onclick], li[onclick], .letter-list:not(.disabled), .category {
     cursor: pointer;
 }
 
