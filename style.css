@@ -97,6 +97,7 @@ ul.zoo_species > li {
     content: ")";
     font-style: normal;
 }
+
 /* Styling search term in search results */
 .search_term {
     font-weight: bold;
@@ -112,6 +113,11 @@ form {
 }
 #invalid-postcode {
     display: none;
+}
+
+/* Styling selected zoos list */
+#selected-zoos .distance {
+    padding-left: 3px;
 }
 
 /* Styling clickable list items and spans */
