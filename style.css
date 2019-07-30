@@ -107,7 +107,7 @@ form {
 }
 
 /* Styling clickable list items and spans */
-span[onclick], li[onclick], .letter-list:not(.disabled), .category {
+span[onclick], li[onclick], .letter-list:not(.disabled), .clickable {
     cursor: pointer;
 }
 

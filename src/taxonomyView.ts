@@ -89,16 +89,14 @@ class TaxonomyCategory {
         // Create li element
         const li = $("<li class='category closed'/>").attr("id", categoryLiId).toggleClass("selected", this.selected);
         // Create expand element
-        const outerSpan = $("<span />").on("click", () => this.loadSubElements(true, false));
+        const outerSpan = $("<span />").addClass("clickable").on("click", () => this.loadSubElements(true, false));
         const categoryName = $("<span />").addClass("category_name").text(this.name);
         const categoryLevel = $("<span />").addClass("category_level").text(this.levelName);
         outerSpan.append(categoryName, " ", categoryLevel);
         // Create selector element
-        const selector = $("<span />").addClass("selector")
-            .on("click", () => {this.select(); this.loadSubElements(false, true)});
-        const img = $("<img />");
-        img.attr("src", "images/" + (this.selected ? "box_checked.svg" : "box_unchecked.svg"))
-            .attr("alt", this.selected ? "✔" : "➕");
+        const selector = $("<span />").addClass("selector").addClass("clickable")
+            .on("click", () => {this.select(); this.loadSubElements(false, true).then();});
+        const img = $(`<img src='images/${this.selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${this.selected ? "✔" : "➕"}'/>`);
         selector.append(img);
         // Assemble
         li.append(outerSpan, selector).appendTo(parentUI);
@@ -234,13 +232,14 @@ class TaxonomySpecies {
     render(selected: boolean): JQuery<HTMLElement> {
         const speciesLiId = `species-${this.data.id}`;
         const parentUlElement = this.parentCategory.uiElement.find("ul");
-        parentUlElement.append(`<li class='species ${selected ? "selected" : ""} ${speciesLiId}'>
-                <span class='selector' onclick='userSelectSpecies(${this.data.id})'>
-                    <span class='species_name'>${this.data.commonName} </span>
-                    <span class='latin_name'>${this.data.latinName}</span>
-                    <img src="images/box_${selected ? "checked" : "unchecked"}.svg" alt="${selected ? "✔" : "➕"}️"/>
-                </span>
-                </li>`);
-        return $(`#${speciesLiId}`);
+        const li = $("<li class='species' />").addClass(speciesLiId).toggleClass("selected", selected);
+        const selector = $("<span />").addClass("selector").addClass("clickable")
+            .on("click", () => this.taxonomyView.selection.toggleSpecies(this.data.id));
+        const speciesName = $("<span />").addClass("species_name").text(this.data.commonName);
+        const latinName = $("<span />").addClass("latin_name").text(this.data.latinName);
+        const img = $(`<img src='images/${selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${selected ? "✔" : "➕"}'/>`);
+        selector.append(speciesName, latinName, img).appendTo(li);
+        li.appendTo(parentUlElement);
+        return li;
     }
 }
