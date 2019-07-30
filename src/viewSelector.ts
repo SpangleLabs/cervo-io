@@ -81,7 +81,7 @@ export class ViewSelector {
     }
 
     wireUpdates() {
-        $("input[name=selector-type]").change($.proxy(this.update, this));
+        $("input[name=selector-type]").on("change", () => this.update());
     }
 
     update() {

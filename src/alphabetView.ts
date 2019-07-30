@@ -52,10 +52,9 @@ class AlphabetLetter {
         this.rootElem = alphabetView.rootElem;
         this.letterListElem = $("#letter-list");
         this.letterResultsElem = $("ul#letter-results");
-        const letterElem = $("<span />").attr("id", "letter-list-"+letter).addClass("letter-list").addClass(odd ? "odd" : "even").text(letter.toUpperCase());
-        this.letterListElem.append(letterElem);
-        this.letterElem = $(`#letter-list-${letter}`);
-        this.letterElem.click($.proxy(this.userClick, this));
+        this.letterElem = $("<span />").attr("id", "letter-list-"+letter).addClass("letter-list").addClass(odd ? "odd" : "even")
+            .text(letter.toUpperCase()).on("click", () => this.userClick());
+        this.letterListElem.append(this.letterElem);
         // Cache of animal list for this letter
         this.animals = null;
     }
@@ -102,12 +101,6 @@ class AlphabetLetter {
             const img = tickboxImageElem(selected);
             selector.append(img);
             li.append(selector).appendTo(this.letterResultsElem);
-            const self = this;
-            this.letterElem.find(`.${speciesClass}.selector`).click(
-                function() {
-                    self.alphabetView.selection.toggleSpecies(species.id);
-                }
-                );
         }
     }
 
