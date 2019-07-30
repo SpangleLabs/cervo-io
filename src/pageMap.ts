@@ -62,31 +62,28 @@ export class PageMap {
 
     toggleInfoWindow(zooId: number): void {
         const zooKey: string = zooId.toString();
-        for (let zooInfoWindowId of this.cacheZooInfoWindows.keys()) {
-            if (zooInfoWindowId !== zooKey) {
-                this.cacheZooInfoWindows.get(zooInfoWindowId).close();
-            }
-        }
+        this.cacheZooInfoWindows.forEach((window, zooInfoWindowId) => {
+            if (zooInfoWindowId !== zooKey)
+                window.close();
+        });
         // Why a second loop?
-        for (let zooInfoWindowId of this.cacheZooInfoWindows.keys()) {
-            if (zooInfoWindowId !== zooKey) {
-                this.cacheZooInfoWindows.get(zooInfoWindowId).close();
-            }
-        }
+        this.cacheZooInfoWindows.forEach((window, zooInfoWindowId) => {
+            if (zooInfoWindowId !== zooKey)
+                window.close();
+        });
         this.getZooInfoWindow(zooId).open(this.googleMap, this.cacheZooMarkers.get(zooKey));
     }
 
     hideAllMarkers(exceptionList: string[]): void {
         // Hide all info windows, except those for zoos currently selected.
-        for (let zooKey of this.cacheZooInfoWindows.keys()) {
-            if (!exceptionList.includes(zooKey)) {
-                this.cacheZooInfoWindows.get(zooKey).close();
-            }
-        }
+        this.cacheZooInfoWindows.forEach((window, zooKey) => {
+            if (!exceptionList.includes(zooKey))
+                window.close();
+        });
         // Hide all markers
-        for (let zooKey of this.cacheZooMarkers.keys()) {
-            this.cacheZooMarkers.get(zooKey).setVisible(false);
-        }
+        this.cacheZooMarkers.forEach((marker) => {
+            marker.setVisible(false);
+        });
         // Unbold species in any zoo marker info windows?
         $("li.zoo_species").removeClass("selected_species");
     }
