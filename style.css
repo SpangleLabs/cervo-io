@@ -86,7 +86,18 @@ ul.zoo_species > li {
 /* Styling text in taxonomy category selector, and latin names */
 .latin_name, .category_level {
     font-style: italic;
+    padding-left: 3px;
+    padding-right: 3px;
 }
+.latin_name::before {
+    content: "(";
+    font-style: normal;
+}
+.latin_name::after {
+    content: ")";
+    font-style: normal;
+}
+
 /* Styling search term in search results */
 .search_term {
     font-weight: bold;
@@ -104,8 +115,13 @@ form {
     display: none;
 }
 
+/* Styling selected zoos list */
+#selected-zoos .distance {
+    padding-left: 3px;
+}
+
 /* Styling clickable list items and spans */
-span[onclick], li[onclick], .letter-list:not(.disabled) {
+span[onclick], li[onclick], .letter-list:not(.disabled), .clickable {
     cursor: pointer;
 }
 
