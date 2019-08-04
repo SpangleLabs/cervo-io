@@ -1,3 +1,5 @@
+import {Application, Request, Response, NextFunction} from "express";
+
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
@@ -13,7 +15,12 @@ const zoo_species = require('./routes/zoo_species');
 const zoo_distances = require('./routes/zoo_distances');
 const session = require('./routes/session');
 
-const app = express();
+// Express errors can have a status code
+interface ResponseError extends Error {
+    status?: number;
+}
+
+const app: Application = express();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -35,12 +42,12 @@ app.use('/session', session);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     const err = new Error('Not Found');
-    err.status = 404;
+    res.status(404);
     next(err);
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function (err: ResponseError, req: Request, res: Response, next: NextFunction) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
