@@ -1,6 +1,7 @@
 import {Application, Request, Response, NextFunction} from "express";
 import {CategoriesRouter} from "./routes/categoriesRouter";
 import {CategoryLevelsRouter} from "./routes/categoryLevelsRouter";
+import {IndexRouter} from "./routes/indexRouter";
 
 const express = require('express');
 const path = require('path');
@@ -8,7 +9,6 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const index = require('./routes/index');
 const zoos = require('./routes/zoos');
 const species = require('./routes/species');
 const zoo_species = require('./routes/zoo_species');
@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);  // TODO: do I need this?
+app.use('/', IndexRouter);
 app.use('/zoos', zoos);
 app.use('/categories', CategoriesRouter);
 app.use('/category_levels', CategoryLevelsRouter);
