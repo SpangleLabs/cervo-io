@@ -5,31 +5,29 @@ const Species = require("../models/Species.js");
 export const CategoriesRouter = Router();
 
 function add_subcategories(rows: CategoryJson[]): Promise<FullCategoryJson[]> {
-    const children_promises: Promise<[CategoryJson[], SpeciesJson[]]>[] = [];
-    for (let a = 0; a < rows.length; a++) {
-        const category_id = rows[a].category_id;
+    const children_promises: Promise<FullCategoryJson>[] = [];
+    for (const category of rows) {
+        const category_id = category.category_id;
         children_promises.push(
             Promise.all([
                 getCategoriesByParentId(category_id),
                 Species.getSpeciesByCategoryId(category_id)
-            ])
+            ]).then(function(children) {
+                const subCategories = children[0];
+                const species = children[1];
+                const row_result: FullCategoryJson = {
+                    category_id: category.category_id,
+                    category_level_id: category.category_level_id,
+                    name: category.name,
+                    parent_category_id: category.parent_category_id,
+                    sub_categories: subCategories,
+                    species: species
+                };
+                return row_result;
+            })
         );
     }
-    return Promise.all(children_promises).then(function (values) {
-        const row_results: FullCategoryJson[] = [];
-        for (let b = 0; b < rows.length; b++) {
-            const row_result: FullCategoryJson = {
-                category_id: rows[b].category_id,
-                category_level_id: rows[b].category_level_id,
-                name: rows[b].name,
-                parent_category_id: rows[b].parent_category_id,
-                sub_categories: values[b][0],
-                species: values[b][1]
-            };
-            row_results.push(row_result);
-        }
-        return row_results;
-    });
+    return Promise.all(children_promises);
 }
 
 /* GET categories listing. */
