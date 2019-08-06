@@ -1,6 +1,6 @@
 var http = require('http');
 
-var app = require('./index').app;
+var app = require('./dist/index').app;
 
 http.createServer(app).listen(3000);
 if (typeof(PhusionPassenger) !== 'undefined') {
