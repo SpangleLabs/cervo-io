@@ -1,7 +1,7 @@
-import {ConnectionConfig, createConnection} from "promise-mysql";
+import {Connection, ConnectionConfig, createConnection} from "promise-mysql";
 import {config} from "./config";
 
-export const connection = () => {
+export function connection(): Promise<Connection> {
 
     const configMysql = config.mysql;
 
@@ -18,4 +18,4 @@ export const connection = () => {
         console.log("Mysql failed to make connection.");
         console.log(err);
     });
-};
+}
