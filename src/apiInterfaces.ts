@@ -37,7 +37,13 @@ interface CategoryLevelJson {
     name: string;
 }
 
-interface CategoryJson {
+interface NewCategoryJson {
+    name: string;
+    category_level_id: number;
+    parent_category_id: number | null;
+}
+
+interface CategoryJson extends NewCategoryJson {
     category_id: number;
     name: string;
     category_level_id: number;
