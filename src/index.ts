@@ -1,5 +1,6 @@
 import {Application, Request, Response, NextFunction} from "express";
 import {CategoriesRouter} from "./routes/categoriesRouter";
+import {CategoryLevelsRouter} from "./routes/categoryLevelsRouter";
 
 const express = require('express');
 const path = require('path');
@@ -9,7 +10,6 @@ const cors = require('cors');
 
 const index = require('./routes/index');
 const zoos = require('./routes/zoos');
-const category_levels = require('./routes/category_levels');
 const species = require('./routes/species');
 const zoo_species = require('./routes/zoo_species');
 const zoo_distances = require('./routes/zoo_distances');
@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);  // TODO: do I need this?
 app.use('/zoos', zoos);
 app.use('/categories', CategoriesRouter);
-app.use('/category_levels', category_levels);
+app.use('/category_levels', CategoryLevelsRouter);
 app.use('/species', species);
 app.use('/zoo_species', zoo_species);
 app.use('/zoo_distances', zoo_distances);

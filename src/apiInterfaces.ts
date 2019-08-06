@@ -32,9 +32,12 @@ interface FullSpeciesJson extends SpeciesJson {
     zoos: ZooJson[];
 }
 
-interface CategoryLevelJson {
-    category_level_id: number;
+interface NewCategoryLevelJson {
     name: string;
+}
+
+interface CategoryLevelJson extends NewCategoryLevelJson {
+    category_level_id: number;
 }
 
 interface NewCategoryJson {
