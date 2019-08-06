@@ -1,7 +1,7 @@
 import {connection} from "../dbconnection";
 
 
-export function getValidPasswordHash(username: string): Promise<string> {
+export function getValidPasswordHash(username: string): Promise<{password: string}[]> {
     return connection().then(function (conn) {
         const timestamp = new Date().toISOString().replace("Z", "").replace("T", " ");
         const result = conn.query("select password from users where username = ? and unlock_time < ?", [username, timestamp]);
@@ -57,7 +57,7 @@ export function getSessionToken(authToken: string, ipAddr: string): Promise<Sess
     });
 }
 
-export function deleteToken(userId: string): Promise<void> {
+export function deleteToken(userId: number): Promise<void> {
     return connection().then(function (conn) {
         conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId]);
         conn.end();

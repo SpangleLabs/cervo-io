@@ -2,6 +2,7 @@ import {Application, Request, Response, NextFunction} from "express";
 import {CategoriesRouter} from "./routes/categoriesRouter";
 import {CategoryLevelsRouter} from "./routes/categoryLevelsRouter";
 import {IndexRouter} from "./routes/indexRouter";
+import {SessionsRouter} from "./routes/sessionsRouter";
 
 const express = require('express');
 const path = require('path');
@@ -13,7 +14,6 @@ const zoos = require('./routes/zoos');
 const species = require('./routes/species');
 const zoo_species = require('./routes/zoo_species');
 const zoo_distances = require('./routes/zoo_distances');
-const session = require('./routes/session');
 
 // Express errors can have a status code
 interface ResponseError extends Error {
@@ -37,7 +37,7 @@ app.use('/category_levels', CategoryLevelsRouter);
 app.use('/species', species);
 app.use('/zoo_species', zoo_species);
 app.use('/zoo_distances', zoo_distances);
-app.use('/session', session);
+app.use('/session', SessionsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
