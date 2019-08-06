@@ -68,3 +68,11 @@ interface ZooDistanceJson extends ZooDistanceCache {
     user_postcode_id: number;  // TODO: this is pointless
     zoo_distance_id: number;
 }
+
+interface SessionTokenJson {
+    user_id: number;
+    username: string;
+    token: string;
+    expiry_time: string;
+    ip_addr: string;
+}
