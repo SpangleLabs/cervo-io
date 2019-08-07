@@ -28,6 +28,15 @@ interface ZooSpeciesJson extends SpeciesJson {
     zoo_id: number;
 }
 
+interface NewZooSpeciesLinkJson {
+    zoo_id: number;
+    species_id: number;
+}
+
+interface ZooSpeciesLinkJson extends NewZooSpeciesLinkJson {
+    zoo_species_id: number;
+}
+
 interface FullSpeciesJson extends SpeciesJson {
     zoos: ZooJson[];
 }

@@ -3,6 +3,7 @@ import {CategoriesRouter} from "./routes/categoriesRouter";
 import {CategoryLevelsRouter} from "./routes/categoryLevelsRouter";
 import {IndexRouter} from "./routes/indexRouter";
 import {SessionsRouter} from "./routes/sessionsRouter";
+import {ZooSpeciesRouter} from "./routes/zooSpeciesRouter";
 
 const express = require('express');
 const path = require('path');
@@ -12,7 +13,6 @@ const cors = require('cors');
 
 const zoos = require('./routes/zoos');
 const species = require('./routes/species');
-const zoo_species = require('./routes/zoo_species');
 const zoo_distances = require('./routes/zoo_distances');
 
 // Express errors can have a status code
@@ -35,7 +35,7 @@ app.use('/zoos', zoos);
 app.use('/categories', CategoriesRouter);
 app.use('/category_levels', CategoryLevelsRouter);
 app.use('/species', species);
-app.use('/zoo_species', zoo_species);
+app.use('/zoo_species', ZooSpeciesRouter);
 app.use('/zoo_distances', zoo_distances);
 app.use('/session', SessionsRouter);
 
