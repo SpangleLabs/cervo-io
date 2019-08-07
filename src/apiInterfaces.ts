@@ -7,13 +7,13 @@ interface ZooJson {
     longitude: number;  // TODO: missing from fullzoo?
 }
 
-interface SpeciesZooJson extends ZooJson {
+interface ZooEntryForSpeciesJson extends ZooJson {
     zoo_species_id: number;
     species_id: number;
 }
 
 interface FullZooJson extends ZooJson {
-    species: ZooSpeciesJson[];
+    species: SpeciesEntryForZooJson[];
 }
 
 interface SpeciesJson {
@@ -23,7 +23,7 @@ interface SpeciesJson {
     category_id: number;
 }
 
-interface ZooSpeciesJson extends SpeciesJson {
+interface SpeciesEntryForZooJson extends SpeciesJson {
     zoo_species_id: number;
     zoo_id: number;
 }
