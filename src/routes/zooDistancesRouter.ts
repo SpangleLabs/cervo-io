@@ -98,10 +98,7 @@ function createZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: numbe
         return queryGoogleForZooDistances(userPostcodeData, zooDataList);
     }).then(function (newZooDistances) {
         // Save google api responses to database
-        const savePromises: Promise<ZooDistanceJson>[] = [];
-        for (let newZooDistance of newZooDistances) {
-            savePromises.push(addZooDistance(newZooDistance));
-        }
+        const savePromises: Promise<ZooDistanceJson>[] = newZooDistances.map(addZooDistance);
         return Promise.all(savePromises);
     });
 }
