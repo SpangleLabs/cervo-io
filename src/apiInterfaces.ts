@@ -2,8 +2,8 @@ interface NewZooJson {
     name: string;
     postcode: string;
     link: string;
-    latitude: number;  // TODO: missing from fullzoo?
-    longitude: number;  // TODO: missing from fullzoo?
+    latitude: number;
+    longitude: number;
 }
 
 interface ZooJson extends NewZooJson {
@@ -80,7 +80,7 @@ interface ZooDistanceCache {
 }
 
 interface NewZooDistanceJson extends ZooDistanceCache {
-    user_postcode_id: number;  // TODO: this is pointless
+    user_postcode_id: number;
 }
 
 interface ZooDistanceJson extends NewZooDistanceJson {
