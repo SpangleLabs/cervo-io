@@ -16,12 +16,18 @@ export function getUserPostcodeByPostcodeSector(sector: string): Promise<UserPos
     });
 }
 
-export function addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<NewEntryData> {
+export function addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<UserPostcodeJson> {
     return connection().then(function (conn) {
         const result = conn.query("insert into user_postcodes (`postcode_sector`) " +
             "values (?)", [newUserPostcode.postcode_sector]);
         conn.end();
-        return result;
+        return result.then(function (data: NewEntryData) {
+            const newRow: UserPostcodeJson = {
+                user_postcode_id: data.insertId,
+                postcode_sector: newUserPostcode.postcode_sector
+            };
+            return newRow;
+        });
     });
 }
 
