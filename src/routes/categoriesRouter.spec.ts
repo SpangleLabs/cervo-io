@@ -1,16 +1,16 @@
 import { App } from "../index";
 import * as chai from 'chai';
-import { expect } from 'chai';
+import { expect, request } from 'chai';
 import chaiHttp = require('chai-http');
 require("../test-setup");
 
 chai.use(chaiHttp);
 
-const request = chai.request(App);
+const appRequest = request(App);
 
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
-        request.get("/categories/").end(function(err, res) {
+        appRequest.get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
@@ -42,7 +42,7 @@ describe("Base category listing", function() {
 
 after(function () {
     return new Promise(function (resolve) {
-        request.close(function() {
+        appRequest.close(function() {
             console.log("Closed server");
             resolve();
         })
