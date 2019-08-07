@@ -9,7 +9,7 @@ interface MySqlConfig {
     password: string
     database: string
 }
-interface Config {
+export interface Config {
     mysql: MySqlConfig
     google_distance_api_key: string
 }

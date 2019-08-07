@@ -1,11 +1,12 @@
-const chai = require('chai');
-const expect = chai.expect;
-const chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-require("../test-setup.spec");
+import { App } from "../index";
+import * as chai from 'chai';
+import { expect } from 'chai';
+import chaiHttp = require('chai-http');
+require("../test-setup");
 
-const server = require("../../index").app;
-const request = chai.request(server);
+chai.use(chaiHttp);
+
+const request = chai.request(App);
 
 describe("Base category listing", function() {
     it("Format is correct", function (done) {

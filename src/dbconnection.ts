@@ -1,9 +1,15 @@
 import {Connection, ConnectionConfig, createConnection} from "promise-mysql";
-import {config} from "./config";
+import {config, Config} from "./config";
 
-export function connection(): Promise<Connection> {
+export function connection(customConfig?: Config): Promise<Connection> {
 
-    const configMysql = config.mysql;
+    let currentConfig = config;
+
+    if(customConfig) {
+        currentConfig = customConfig;
+    }
+
+    const configMysql = currentConfig.mysql;
 
     const mysqlConfig: ConnectionConfig = {
         user: configMysql.username,

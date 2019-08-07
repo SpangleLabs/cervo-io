@@ -1,29 +1,26 @@
 if (!process.env.CONFIG_FILE) {
     process.env.CONFIG_FILE = "config-test.json";
 }
+import {config} from "./config";
+import {connection} from "./dbconnection";
+import * as mysql_import from "mysql-import";
 
-const sinon = require('sinon');
+//const sinon = require('sinon');
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
-const config = require("../config.js");
-const mysql = require("promise-mysql");
 
 before(function () {
     chai.use(sinonChai);
-    return mysql.createConnection({
-        host: config["mysql"]["host"],
-        user: config["mysql"]["username"],
-        password: config["mysql"]["password"]
-    }).then(function(conn) {
-        conn.query("DROP DATABASE IF EXISTS `zoo_species_test`;");
-        conn.query("CREATE DATABASE `zoo_species_test`;");
+    return connection(config).then(function(conn) {
+        conn.query("DROP DATABASE IF EXISTS `?`;", [config.mysql.database]);
+        conn.query("CREATE DATABASE `?`;", [config.mysql.database]);
         return conn.end();
     }).then(function() {
-        const importer = require("mysql-import").config({
-            host: config["mysql"]["host"],
-            user: config["mysql"]["username"],
-            password: config["mysql"]["password"],
-            database: "zoo_species_test"
+        const importer = mysql_import.config({
+            host: config.mysql.host,
+            user: config.mysql.username,
+            password: config.mysql.password,
+            database: config.mysql.database
         });
         return importer.import("sql/zoo_species_test.sql").then(function() { return importer; })
     }).then(function (importer) {
