@@ -17,7 +17,7 @@
     "morgan": "^1.9.1",
     "node-fetch": "^2.6.0",
     "npm": "^6.10.2",
-    "postcode": "^0.2.5",
+    "postcode": "^2.0.0",
     "promise-mysql": "latest",
     "request": "^2.88.0",
     "uuid": "latest"
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.0",
+    "@types/node-fetch": "^2.5.0",
     "@types/uuid": "^3.4.5",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",

@@ -2,7 +2,8 @@ import {Router} from "express";
 import {addUserPostcode, getUserPostcodeByPostcodeSector} from "../models/userPostcode";
 import {addZooDistance, getZooDistanceByZooIdAndUserPostcodeId} from "../models/zooDistances";
 import {getZooById} from "../models/zoos";
-import * as Postcode from "postcode";
+import Postcode from "postcode";
+import fetch from "node-fetch";
 
 const config = require("../config.js");
 
@@ -148,14 +149,14 @@ ZooDistancesRouter.get('/:postcode/:zooIdList', function (req, res, next) {
     const paramPostcode: string = req.params.postcode;
     const paramZooIdList: string = req.params.zooIdList;
     // Parse postcode
-    const postcode = new Postcode(paramPostcode);
+    const postcode = Postcode.parse(paramPostcode);
     // Validate postcode
-    if (!postcode.valid()) {
+    if (!postcode.valid) {
         res.status(404).json({"error": "Invalid postcode"});
         return;
     }
     // Get postcode sector
-    const sector = postcode.sector();
+    const sector = postcode.sector;
     // Split up zoo id list
     const zooIdList: number[] = paramZooIdList.split(",").map(x => parseInt(x));
     const uniqueZooIdList: number[] = [...new Set(zooIdList)];
