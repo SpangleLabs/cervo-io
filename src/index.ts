@@ -19,34 +19,34 @@ interface ResponseError extends Error {
     status?: number;
 }
 
-const app: Application = express();
+export const App: Application = express();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(cors());  // TODO: cut that down to only from cervo.io?
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(express.static(path.join(__dirname, 'public')));
+App.use(cors());  // TODO: cut that down to only from cervo.io?
+App.use(logger('dev'));
+App.use(bodyParser.json());
+App.use(bodyParser.urlencoded({extended: false}));
+App.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', IndexRouter);
-app.use('/zoos', ZoosRouter);
-app.use('/categories', CategoriesRouter);
-app.use('/category_levels', CategoryLevelsRouter);
-app.use('/species', SpeciesRouter);
-app.use('/zoo_species', ZooSpeciesRouter);
-app.use('/zoo_distances', ZooDistancesRouter);
-app.use('/session', SessionsRouter);
+App.use('/', IndexRouter);
+App.use('/zoos', ZoosRouter);
+App.use('/categories', CategoriesRouter);
+App.use('/category_levels', CategoryLevelsRouter);
+App.use('/species', SpeciesRouter);
+App.use('/zoo_species', ZooSpeciesRouter);
+App.use('/zoo_distances', ZooDistancesRouter);
+App.use('/session', SessionsRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+App.use(function (req, res, next) {
     const err = new Error('Not Found');
     res.status(404);
     next(err);
 });
 
 // error handler
-app.use(function (err: ResponseError, req: Request, res: Response, next: NextFunction) {
+App.use(function (err: ResponseError, req: Request, res: Response, next: NextFunction) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -55,5 +55,3 @@ app.use(function (err: ResponseError, req: Request, res: Response, next: NextFun
     res.status(err.status || 500);
     res.json(err);
 });
-
-module.exports = {"app": app};
