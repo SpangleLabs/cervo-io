@@ -43,31 +43,32 @@ SessionsRouter.post('/', function (req, res, next) {
     }).then(function (compareResult) {
         if (!compareResult) {
             return setFailedLogin(username).then(function () {
+                res.status(403).json({"status": "failure", "error": "Password incorrect"});
                 return Promise.reject("Password incorrect");
             });
         } else {
-            return resetFailedLogins(username);
+            return resetFailedLogins(username).then(function() {
+                // Generate auth token
+                const authToken = uuidv4();
+                // Get IP address
+                const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
+                // Create expiry time
+                const expiryTime = new Date();
+                expiryTime.setDate(expiryTime.getDate());
+                const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
+                // Store auth token, IP, etc in database
+                return createSession(username, authToken, expiryTimeStr, ipAddr).then(function () {
+                    const sessionResponse = {
+                        "status": "success",
+                        "auth_token": authToken,
+                        "expiry_date": expiryTime,
+                        "ip_addr": ipAddr,
+                        "username": username
+                    };
+                    res.json(sessionResponse);
+                });
+            });
         }
-    }).then(function () {
-        // Generate auth token
-        const authToken = uuidv4();
-        // Get IP address
-        const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
-        // Create expiry time
-        const expiryTime = new Date();
-        expiryTime.setDate(expiryTime.getDate());
-        const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
-        // Store auth token, IP, etc in database
-        return createSession(username, authToken, expiryTimeStr, ipAddr).then(function () {
-            const sessionResponse = {
-                "status": "success",
-                "auth_token": authToken,
-                "expiry_date": expiryTime,
-                "ip_addr": ipAddr,
-                "username": username
-            };
-            res.json(sessionResponse);
-        });
     }).catch(function (err) {
         console.log(err);
         res.status(403).json({"status": "failure", "error": err});
