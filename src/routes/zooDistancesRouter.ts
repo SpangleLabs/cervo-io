@@ -8,7 +8,7 @@ const config = require("../config.js");
 
 export const ZooDistancesRouter = Router();
 
-function promiseGetOrCreatePostcodeData(postcodeSector: string): Promise<UserPostcodeJson> {
+function getOrCreatePostcode(postcodeSector: string): Promise<UserPostcodeJson> {
     return getUserPostcodeByPostcodeSector(postcodeSector).then(function (data) {
         if (data.length === 0) {
             const userPostcode: NewUserPostcodeJson = {
@@ -20,7 +20,7 @@ function promiseGetOrCreatePostcodeData(postcodeSector: string): Promise<UserPos
     });
 }
 
-function promiseGetCachedDistanceOrNot(postcodeId: number, zooId: number): Promise<ZooDistanceJson | boolean> {
+function getCachedDistanceOrNot(postcodeId: number, zooId: number): Promise<ZooDistanceJson | boolean> {
     return getZooDistanceByZooIdAndUserPostcodeId(zooId, postcodeId).then(function (data) {
         if (data.length !== 0) {
             return data[0];
@@ -31,14 +31,14 @@ function promiseGetCachedDistanceOrNot(postcodeId: number, zooId: number): Promi
     });
 }
 
-function promiseGetZooData(zooId: number): Promise<ZooJson> {
+function getZooData(zooId: number): Promise<ZooJson> {
     return getZooById(zooId).then(function (data) {
         return data[0];
     });
 }
 
-function getGoogleDistancesToAddresses(start: string, destinationList: string[]): Promise<number[]> {
-    // Chunk the postcodes into strings of 25 at a time, with nation selector
+function queryGoogleDistancesToAddresses(start: string, destinationList: string[]): Promise<number[]> {
+    // Chunk the addresses into strings of 25 at a time
     const chunkedDestinations: string[] = [];
     const chunkSize = 25;
     for (let b = 0; b < destinationList.length; b += chunkSize) {
@@ -74,7 +74,7 @@ function getGoogleDistancesToAddresses(start: string, destinationList: string[])
     });
 }
 
-function promiseToGetDistancesFromGoogleMaps(userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]): Promise<NewZooDistanceJson[]> {
+function queryGoogleForZooDistances(userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]): Promise<NewZooDistanceJson[]> {
     // Organise postcodes
     const userPostcode = userPostcodeData.postcode_sector + "AA";
     const zooPostcodeList: string[] = [];
@@ -84,7 +84,7 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData: UserPostcodeJson,
     // Chunk the postcodes into strings of 25 at a time, with nation selector
     const userAddress = userPostcode + ",UK";
     const destinationAddresses = zooPostcodeList.map(x => x + ",UK");
-    return getGoogleDistancesToAddresses(userAddress, destinationAddresses).then(function (allDistances) {
+    return queryGoogleDistancesToAddresses(userAddress, destinationAddresses).then(function (allDistances) {
         const zooDistances = [];
         for (let e = 0; e < allDistances.length; e++) {
             const zooDistance: NewZooDistanceJson = {
@@ -98,10 +98,10 @@ function promiseToGetDistancesFromGoogleMaps(userPostcodeData: UserPostcodeJson,
     });
 }
 
-function promiseCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
-    const zooDataPromises = zooIdList.map(x => promiseGetZooData(x));
+function createZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
+    const zooDataPromises = zooIdList.map(x => getZooData(x));
     return Promise.all(zooDataPromises).then(function (zooDataList) {
-        return promiseToGetDistancesFromGoogleMaps(userPostcodeData, zooDataList);
+        return queryGoogleForZooDistances(userPostcodeData, zooDataList);
     }).then(function (newZooDistances) {
         // Save google api responses to database
         const savePromises: Promise<ZooDistanceJson>[] = [];
@@ -119,8 +119,8 @@ function notBool<T>(value: T | boolean): value is T {
     return value !== false && value !== true;
 }
 
-function promiseGetOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
-    const getCachedPromises = zooIdList.map(x => promiseGetCachedDistanceOrNot(userPostcodeData.user_postcode_id, x));
+function getOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
+    const getCachedPromises = zooIdList.map(x => getCachedDistanceOrNot(userPostcodeData.user_postcode_id, x));
     return Promise.all(getCachedPromises).then(function (resultList) {
         const missingDistances: number[] = resultList.map((result, index) => {
             if (!notBool(result)) {
@@ -132,7 +132,7 @@ function promiseGetOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooI
         const cachedDistances = new Map(
             resultList.filter(notBool).map(x => [x.zoo_id, x])
         )
-        return promiseCreateZooDistances(userPostcodeData, missingDistances).then(function(distances) {
+        return createZooDistances(userPostcodeData, missingDistances).then(function(distances) {
             const newDistances = new Map(
                 distances.map(x => [x.zoo_id, x])
             );
@@ -160,8 +160,8 @@ ZooDistancesRouter.get('/:postcode/:zooIdList', function (req, res, next) {
     const zooIdList: number[] = paramZooIdList.split(",").map(x => parseInt(x));
     const uniqueZooIdList: number[] = [...new Set(zooIdList)];
     // Check for (or create) postcode id
-    promiseGetOrCreatePostcodeData(sector).then(function (postcodeData) {
-        return promiseGetOrCreateZooDistances(postcodeData, uniqueZooIdList);
+    getOrCreatePostcode(sector).then(function (postcodeData) {
+        return getOrCreateZooDistances(postcodeData, uniqueZooIdList);
     }).then(function (zooDistances) {
         const uniqueDistanceMap: Map<number, ZooDistanceJson> = new Map(
             zooDistances.map(x => [x.zoo_id, x])
