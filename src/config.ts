@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 let configFile = "config.json";
 if (process.env.CONFIG_FILE) {
     configFile = process.env.CONFIG_FILE;
@@ -16,4 +14,4 @@ interface Config {
     google_distance_api_key: string
 }
 
-export const config: Config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+export const config: Config = require(configFile);
