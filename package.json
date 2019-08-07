@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc",
     "start": "node ./bin/www",
     "test": "npm run test-unit",
     "test-unit": "mocha --require co-mocha dist/test/*/*.spec.js"
