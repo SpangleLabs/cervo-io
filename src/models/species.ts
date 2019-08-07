@@ -65,12 +65,20 @@ export function getFirstLetters(): Promise<LetterJson[]> {
     })
 }
 
-export function addSpecies(newSpecies: NewSpeciesJson): Promise<void> {
+export function addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
     return connection().then(function (conn) {
-        conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
+        const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
             "values (?,?,?)", [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id]);
         conn.end();
-        return;
+        return result.then(function (data: NewEntryData) {
+            const result: SpeciesJson = {
+                species_id: data.insertId,
+                common_name: newSpecies.common_name,
+                latin_name: newSpecies.latin_name,
+                category_id: newSpecies.category_id
+            };
+            return result;
+        });
     });
 }
 

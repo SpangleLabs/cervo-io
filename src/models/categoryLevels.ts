@@ -16,11 +16,17 @@ export function getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
     });
 }
 
-export function addCategoryLevel(CategoryLevel: NewCategoryLevelJson): Promise<void> {
+export function addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
     return connection().then(function (conn) {
-        conn.query("insert into category_levels (`name`) values (?)", [CategoryLevel.name]);
+        const result = conn.query("insert into category_levels (`name`) values (?)", [newCategoryLevel.name]);
         conn.end();
-        return;
+        return result.then(function(data: NewEntryData) {
+            const result: CategoryLevelJson = {
+                category_level_id: data.insertId,
+                name: newCategoryLevel.name
+            };
+            return result;
+        });
     });
 }
 

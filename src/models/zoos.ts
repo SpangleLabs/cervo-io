@@ -27,12 +27,22 @@ export function getZoosBySpeciesId(species_id: number): Promise<ZooEntryForSpeci
     });
 }
 
-export function addZoo(Zoo: NewZooJson): Promise<void> {
+export function addZoo(newZoo: NewZooJson): Promise<ZooJson> {
     return connection().then(function (conn) {
         const result = conn.query("insert into zoos (`name`,`postcode`,`latitude`,`longitude`,`link`) " +
-            "values (?,?,?,?,?)", [Zoo.name, Zoo.postcode, Zoo.latitude, Zoo.longitude, Zoo.link]);
+            "values (?,?,?,?,?)", [newZoo.name, newZoo.postcode, newZoo.latitude, newZoo.longitude, newZoo.link]);
         conn.end();
-        return result;
+        return result.then(function (data: NewEntryData) {
+            const result: ZooJson = {
+                zoo_id: data.insertId,
+                name: newZoo.name,
+                postcode: newZoo.postcode,
+                latitude: newZoo.latitude,
+                longitude: newZoo.longitude,
+                link: newZoo.link
+            };
+            return result;
+        });
     });
 }
 

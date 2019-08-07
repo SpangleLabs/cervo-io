@@ -24,12 +24,20 @@ export function getCategoriesByParentId(id: number): Promise<CategoryJson[]> {
     });
 }
 
-export function addCategory(newCategory: NewCategoryJson): Promise<void> {
+export function addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
     return connection().then(function (conn) {
-        conn.query("insert into categories (`name`,`category_level_id`,`parent_category_id`) " +
+        const result = conn.query("insert into categories (`name`,`category_level_id`,`parent_category_id`) " +
             "values (?,?,?)", [newCategory.name, newCategory.category_level_id, newCategory.parent_category_id]);
         conn.end();
-        return;
+        return result.then(function (data: NewEntryData) {
+            const result: CategoryJson = {
+                category_id: data.insertId,
+                category_level_id: newCategory.category_level_id,
+                name: newCategory.name,
+                parent_category_id: newCategory.parent_category_id
+            };
+            return result;
+        })
     });
 }
 

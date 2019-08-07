@@ -17,12 +17,19 @@ export function getZooSpeciesBySpeciesId(id: number): Promise<ZooSpeciesLinkJson
     });
 }
 
-export function addZooSpecies(newZooSpecies: NewZooSpeciesLinkJson): Promise<void> {
+export function addZooSpecies(newZooSpecies: NewZooSpeciesLinkJson): Promise<ZooSpeciesLinkJson> {
     return connection().then(function (conn) {
-        conn.query("insert into zoo_species (`zoo_id`,`species_id`) " +
+        const result = conn.query("insert into zoo_species (`zoo_id`,`species_id`) " +
             "values (?,?)", [newZooSpecies.zoo_id, newZooSpecies.species_id]);
         conn.end();
-        return;
+        return result.then(function (data: NewEntryData) {
+            const result: ZooSpeciesLinkJson = {
+                zoo_species_id: data.insertId,
+                zoo_id: newZooSpecies.zoo_id,
+                species_id: newZooSpecies.species_id
+            };
+            return result;
+        })
     });
 }
 
