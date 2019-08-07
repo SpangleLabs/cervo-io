@@ -1,5 +1,4 @@
-interface ZooJson {
-    zoo_id: number;
+interface NewZooJson {
     name: string;
     postcode: string;
     link: string;
@@ -7,23 +6,30 @@ interface ZooJson {
     longitude: number;  // TODO: missing from fullzoo?
 }
 
-interface SpeciesZooJson extends ZooJson {
+interface ZooJson extends NewZooJson {
+    zoo_id: number;
+}
+
+interface ZooEntryForSpeciesJson extends ZooJson {
     zoo_species_id: number;
     species_id: number;
 }
 
 interface FullZooJson extends ZooJson {
-    species: ZooSpeciesJson[];
+    species: SpeciesEntryForZooJson[];
 }
 
-interface SpeciesJson {
-    species_id: number;
+interface NewSpeciesJson {
     common_name: string;
     latin_name: string;
     category_id: number;
 }
 
-interface ZooSpeciesJson extends SpeciesJson {
+interface SpeciesJson extends NewSpeciesJson {
+    species_id: number;
+}
+
+interface SpeciesEntryForZooJson extends SpeciesJson {
     zoo_species_id: number;
     zoo_id: number;
 }
@@ -73,8 +79,11 @@ interface ZooDistanceCache {
     metres: number;
 }
 
-interface ZooDistanceJson extends ZooDistanceCache {
+interface NewZooDistanceJson extends ZooDistanceCache {
     user_postcode_id: number;  // TODO: this is pointless
+}
+
+interface ZooDistanceJson extends NewZooDistanceJson {
     zoo_distance_id: number;
 }
 
@@ -84,4 +93,20 @@ interface SessionTokenJson {
     token: string;
     expiry_time: string;
     ip_addr: string;
+}
+
+interface NewUserPostcodeJson {
+    postcode_sector: string
+}
+
+interface UserPostcodeJson extends NewUserPostcodeJson{
+    user_postcode_id: number
+}
+
+interface LetterJson {
+    letter: string;
+}
+
+interface NewEntryData {
+    insertId: number;
 }

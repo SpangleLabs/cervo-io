@@ -4,16 +4,15 @@ import {CategoryLevelsRouter} from "./routes/categoryLevelsRouter";
 import {IndexRouter} from "./routes/indexRouter";
 import {SessionsRouter} from "./routes/sessionsRouter";
 import {ZooSpeciesRouter} from "./routes/zooSpeciesRouter";
+import {ZoosRouter} from "./routes/zoosRouter";
+import {SpeciesRouter} from "./routes/speciesRouter";
+import {ZooDistancesRouter} from "./routes/zooDistancesRouter";
 
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
-const zoos = require('./routes/zoos');
-const species = require('./routes/species');
-const zoo_distances = require('./routes/zoo_distances');
 
 // Express errors can have a status code
 interface ResponseError extends Error {
@@ -31,12 +30,12 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', IndexRouter);
-app.use('/zoos', zoos);
+app.use('/zoos', ZoosRouter);
 app.use('/categories', CategoriesRouter);
 app.use('/category_levels', CategoryLevelsRouter);
-app.use('/species', species);
+app.use('/species', SpeciesRouter);
 app.use('/zoo_species', ZooSpeciesRouter);
-app.use('/zoo_distances', zoo_distances);
+app.use('/zoo_distances', ZooDistancesRouter);
 app.use('/session', SessionsRouter);
 
 // catch 404 and forward to error handler

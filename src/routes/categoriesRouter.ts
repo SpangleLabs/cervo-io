@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {addCategory, getBaseCategories, getCategoriesByParentId, getCategoryById} from "../models/categories";
-const Species = require("../models/Species.js");
+import {getSpeciesByCategoryId} from "../models/species";
+
 
 export const CategoriesRouter = Router();
 
@@ -11,7 +12,7 @@ function add_subcategories(rows: CategoryJson[]): Promise<FullCategoryJson[]> {
         children_promises.push(
             Promise.all([
                 getCategoriesByParentId(category_id),
-                Species.getSpeciesByCategoryId(category_id)
+                getSpeciesByCategoryId(category_id)
             ]).then(function(children) {
                 const subCategories = children[0];
                 const species = children[1];
