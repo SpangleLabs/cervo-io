@@ -2,10 +2,9 @@ import {Router} from "express";
 import {addUserPostcode, getUserPostcodeByPostcodeSector} from "../models/userPostcode";
 import {addZooDistance, getZooDistanceByZooIdAndUserPostcodeId} from "../models/zooDistances";
 import {getZooById} from "../models/zoos";
+import {config} from "../config";
 import Postcode from "postcode";
 import fetch from "node-fetch";
-
-const config = require("../config.js");
 
 export const ZooDistancesRouter = Router();
 
@@ -46,7 +45,7 @@ function queryGoogleDistancesToAddresses(start: string, destinationList: string[
         chunkedDestinations.push(destinationList.slice(b, b + chunkSize).join("|"));
     }
     // Make all the API requests
-    const googleApiKey = config["google_distance_api_key"]; //Location locked,fine to commit
+    const googleApiKey = config.google_distance_api_key; //Location locked,fine to commit
     const requestPromises: Promise<number[]>[] = [];
     for (let zooPostcodeString of chunkedDestinations) {
         const googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + start + "&destinations=" + zooPostcodeString + "&key=" + googleApiKey;
@@ -56,21 +55,17 @@ function queryGoogleDistancesToAddresses(start: string, destinationList: string[
             if(data.status !== "OK") {
                 throw new Error("Distance metrics API failed, response: " + JSON.stringify(data));
             }
-            const distanceResults = data.rows[0].elements;
+            const distanceResults: {distance: {value: number}}[] = data.rows[0].elements;
             if (distanceResults.length !== destinationList.length) {
                 throw new Error("Incorrect amount of distances returned from google maps API");
             }
-            const rawDistances: number[] = [];
-            for (let distanceResult of distanceResults) {
-                rawDistances.push(distanceResult.distance.value);
-            }
-            return rawDistances;
+            return distanceResults.map(x => x.distance.value);
         }));
     }
     // Flatten list
-    return Promise.all(requestPromises).then(function(values) {
-        const results: number[] = [];
-        values.forEach(x => results.concat(x));
+    return Promise.all(requestPromises).then(function(values: number[][]) {
+        let results: number[] = [];
+        values.forEach(x => results = results.concat(x));
         return results;
     });
 }
@@ -78,28 +73,26 @@ function queryGoogleDistancesToAddresses(start: string, destinationList: string[
 function queryGoogleForZooDistances(userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]): Promise<NewZooDistanceJson[]> {
     // Organise postcodes
     const userPostcode = userPostcodeData.postcode_sector + "AA";
-    const zooPostcodeList: string[] = [];
-    for (let zooData of zooDataList) {
-        zooPostcodeList.push(zooData.postcode);
-    }
+    const zooPostcodeList: string[] = zooDataList.map(x => x.postcode);
     // Chunk the postcodes into strings of 25 at a time, with nation selector
     const userAddress = userPostcode + ",UK";
     const destinationAddresses = zooPostcodeList.map(x => x + ",UK");
     return queryGoogleDistancesToAddresses(userAddress, destinationAddresses).then(function (allDistances) {
-        const zooDistances = [];
-        for (let e = 0; e < allDistances.length; e++) {
-            const zooDistance: NewZooDistanceJson = {
+        const zooDistances: NewZooDistanceJson[] = allDistances.map(function (distance: number, index: number) {
+            return {
                 user_postcode_id: userPostcodeData.user_postcode_id,
-                zoo_id: zooDataList[e].zoo_id,
-                metres: allDistances[e]
-            };
-            zooDistances.push(zooDistance);
-        }
+                zoo_id: zooDataList[index].zoo_id,
+                metres: distance
+            }
+        });
         return zooDistances;
     });
 }
 
 function createZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
+    if (zooIdList.length === 0) {
+        return Promise.all([]);
+    }
     const zooDataPromises = zooIdList.map(x => getZooData(x));
     return Promise.all(zooDataPromises).then(function (zooDataList) {
         return queryGoogleForZooDistances(userPostcodeData, zooDataList);
@@ -116,6 +109,9 @@ function createZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: numbe
 function notEmpty<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }
+function isBool<T>(value: T | boolean): value is boolean {
+    return value === true || value === false;
+}
 function notBool<T>(value: T | boolean): value is T {
     return value !== false && value !== true;
 }
@@ -124,10 +120,10 @@ function getOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: 
     const getCachedPromises = zooIdList.map(x => getCachedDistanceOrNot(userPostcodeData.user_postcode_id, x));
     return Promise.all(getCachedPromises).then(function (resultList) {
         const missingDistances: number[] = resultList.map((result, index) => {
-            if (!notBool(result)) {
-                return null;
-            } else {
+            if (isBool(result)) {
                 return zooIdList[index];
+            } else {
+                return null;
             }
         }).filter(notEmpty);
         const cachedDistances = new Map(
