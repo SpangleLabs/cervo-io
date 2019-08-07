@@ -14,4 +14,4 @@ export interface Config {
     google_distance_api_key: string
 }
 
-export const config: Config = require(configFile);
+export const config: Config = require("../"+configFile);
