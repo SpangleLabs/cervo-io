@@ -3,7 +3,7 @@ import {connection} from "../dbconnection";
 export function getBaseCategories(): Promise<CategoryJson[]> {
     return connection().then(function (conn) {
         const result = conn.query("select * from categories where parent_category_id is null and hidden is false");
-        conn.end()
+        conn.end();
         return result;
     });
 }
