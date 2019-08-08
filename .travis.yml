@@ -4,5 +4,8 @@ node_js:
   - "10"
 services:
   - mysql
+before_script:
+  - npm install
+  - npm run build
 env:
   - CONFIG_FILE=config-travis.json
