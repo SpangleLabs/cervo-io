@@ -40,7 +40,7 @@ const appRequest = request(App);
 
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
-        appRequest.get("categories/").end(function(err, res) {
+        appRequest.get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
             console.log(res.status);
             console.log(res.body);
