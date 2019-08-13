@@ -48,7 +48,8 @@ App.use('/session', SessionsRouter);
 
 // catch 404 and forward to error handler
 export const handler404 = function (req: Request, res: Response, next: NextFunction) {
-    const err = new Error('Not Found');
+    const err: ResponseError = new Error('Not Found');
+    err.status = 404;
     res.status(404);
     next(err);
 };
