@@ -27,7 +27,6 @@ class MockCategoriesProvider extends CategoriesProvider {
     }
 
     getBaseCategories(): Promise<CategoryJson[]> {
-        console.log("hello world");
         return Promise.all([]);
     }
 }
@@ -42,8 +41,6 @@ describe("Base category listing", function() {
     it("Format is correct", function (done) {
         appRequest.get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
-            console.log(res.status);
-            console.log(res.body);
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
             expect(res).to.be.json;
