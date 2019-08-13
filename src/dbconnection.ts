@@ -25,3 +25,5 @@ export function connection(customConfig?: Config): Promise<Connection> {
         console.log(err);
     });
 }
+
+export type ConnectionProvider = (config?: Config | undefined) => Promise<Connection>;

@@ -1,17 +1,49 @@
-import { App } from "../index";
 import * as chai from 'chai';
 import { expect, request } from 'chai';
 import chaiHttp = require('chai-http');
-require("../test-setup");
+import {CategoriesRouter} from "./categoriesRouter";
+import {Application} from "express";
+import {AbstractRouter} from "./abstractRouter";
+import {CategoriesProvider} from "../models/categories";
+import {handler404, handler500} from "../index";
+
+const express = require('express');
 
 chai.use(chaiHttp);
+
+function mockApp(router: AbstractRouter) {
+    const App: Application = express();
+
+    router.register(App);
+
+    App.use(handler404);
+    App.use(handler500);
+    return App;
+}
+
+class MockCategoriesProvider extends CategoriesProvider {
+    constructor() {
+        super(() => { throw new Error("Mock database.");});
+    }
+
+    getBaseCategories(): Promise<CategoryJson[]> {
+        console.log("hello world");
+        return Promise.all([]);
+    }
+}
+
+const mockCategoryProvider = new MockCategoriesProvider();
+const categoryRouter = new CategoriesRouter(mockCategoryProvider);
+const App = mockApp(categoryRouter);
 
 const appRequest = request(App);
 
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
-        appRequest.get("/categories/").end(function(err, res) {
+        appRequest.get("categories/").end(function(err, res) {
             expect(err).to.be.null;
+            console.log(res.status);
+            console.log(res.body);
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
             expect(res).to.be.json;
@@ -34,7 +66,7 @@ describe("Base category listing", function() {
                 expect(category.species).to.be.an("array");
                 expect(category.species.length).to.be.equal(0);
             }
-            expect(res.body)
+            expect(res.body);
             done();
         })
     })
