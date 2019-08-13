@@ -27,7 +27,10 @@ class MockCategoriesProvider extends CategoriesProvider {
     }
 
     getBaseCategories(): Promise<CategoryJson[]> {
-        return Promise.all([]);
+        const fakeCategory: CategoryJson = {
+            category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
+        }
+        return Promise.all([fakeCategory]);
     }
 }
 
@@ -40,6 +43,7 @@ const appRequest = request(App);
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
         appRequest.get("/categories/").end(function(err, res) {
+            console.log(res.body);
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
