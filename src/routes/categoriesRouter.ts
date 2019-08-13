@@ -6,18 +6,15 @@ export class CategoriesRouter extends AbstractRouter {
     categories: CategoriesProvider;
 
     constructor(categoryProvider: CategoriesProvider) {
-        super("categories/");
+        super("/categories/");
         this.categories = categoryProvider;
     }
 
     initialise(): void {
-        console.log("Initialise categories");
         /* GET categories listing. */
         const self = this;
         this.router.get('/:id?', function (req, res, next) {
-            console.log("GET?");
             if (req.params.id) {
-                console.log("Specific category");
                 self.categories.getCategoryById(req.params.id).then(function (rows) {
                     return self.add_subcategories(rows)
                 }).then(function(fullRows) {
@@ -26,7 +23,6 @@ export class CategoriesRouter extends AbstractRouter {
                     res.status(500).json(err);
                 });
             } else {
-                console.log("Base categories");
                 self.categories.getBaseCategories().then(function (rows) {
                     return self.add_subcategories(rows)
                 }).then(function(fullRows) {
