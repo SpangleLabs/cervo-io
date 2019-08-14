@@ -25,9 +25,8 @@ describe("Base category listing", function() {
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
-            expect(res).to.be.json;
             expect(res.body).to.be.an("array");
-            expect(res.body.length).to.be.at.least(1);
+            expect(res.body.length).to.be.equal(1);
             for (let category of res.body) {
                 expect(category.category_id).to.be.a("number");
                 expect(category.name).to.be.a("string");
@@ -49,13 +48,4 @@ describe("Base category listing", function() {
             done();
         })
     })
-});
-
-after(function () {
-    return new Promise(function (resolve) {
-        appRequest.close(function() {
-            console.log("Closed server");
-            resolve();
-        })
-    });
 });
