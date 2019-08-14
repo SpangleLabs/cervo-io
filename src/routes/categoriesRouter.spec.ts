@@ -1,71 +1,19 @@
 import * as chai from 'chai';
 import {expect, request} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
-import {Application} from "express";
-import {AbstractRouter} from "./abstractRouter";
-import {CategoriesProvider} from "../models/categoriesProvider";
-import {handler404, handler500} from "../index";
 import chaiHttp = require('chai-http');
-import {SpeciesProvider} from "../models/speciesProvider";
-
-const express = require('express');
+import {mockApp, MockCategoriesProvider, MockSpeciesProvider} from "../testMocks";
 
 chai.use(chaiHttp);
 
-function mockApp(router: AbstractRouter) {
-    const App: Application = express();
-
-    router.register(App);
-
-    App.use(handler404);
-    App.use(handler500);
-    return App;
-}
-
-class MockCategoriesProvider extends CategoriesProvider {
-    testCategories: CategoryJson[];
-
-    constructor() {
-        super(() => { throw new Error("Mock database.");});
-        this.testCategories = [
-            {
-                category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
-            },
-            {
-                category_id: 2, category_level_id: 2, hidden: false, name: "Sub category", parent_category_id: 1
-            }];
-    }
-
-    getBaseCategories(): Promise<CategoryJson[]> {
-        return Promise.all(
-            this.testCategories.filter( x => x.parent_category_id == null)
-        );
-    }
-
-    getCategoriesByParentId(id:number): Promise<CategoryJson[]> {
-        return Promise.all(
-            this.testCategories.filter(x => x.parent_category_id == id)
-        );
-    }
-}
-
-class MockSpeciesProvider extends SpeciesProvider {
-    testSpecies: SpeciesJson[];
-
-    constructor() {
-        super(() => { throw new Error("Mock database.");});
-        this.testSpecies = [];
-    }
-
-    getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
-        return Promise.all(
-            this.testSpecies.filter(x => x.category_id == id)
-        );
-    }
-}
-
-const mockCategoryProvider = new MockCategoriesProvider();
-const mockSpeciesProvider = new MockSpeciesProvider();
+const mockCategoryProvider = new MockCategoriesProvider([
+    {
+        category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
+    },
+    {
+        category_id: 2, category_level_id: 2, hidden: false, name: "Sub category", parent_category_id: 1
+    }]);
+const mockSpeciesProvider = new MockSpeciesProvider([]);
 const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
 const App = mockApp(categoryRouter);
 
