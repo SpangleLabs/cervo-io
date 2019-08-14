@@ -1,13 +1,15 @@
-import {getSpeciesByCategoryId} from "../models/species";
+import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
-import {CategoriesProvider} from "../models/categories";
+import {CategoriesProvider} from "../models/categoriesProvider";
 
 export class CategoriesRouter extends AbstractRouter {
     categories: CategoriesProvider;
+    species: SpeciesProvider;
 
-    constructor(categoryProvider: CategoriesProvider) {
-        super("/categories/");
+    constructor(categoryProvider: CategoriesProvider, speciesProvider: SpeciesProvider) {
+        super("/categories");
         this.categories = categoryProvider;
+        this.species = speciesProvider;
     }
 
     initialise(): void {
@@ -51,7 +53,7 @@ export class CategoriesRouter extends AbstractRouter {
             children_promises.push(
                 Promise.all([
                     self.categories.getCategoriesByParentId(category_id),
-                    getSpeciesByCategoryId(category_id)
+                    self.species.getSpeciesByCategoryId(category_id)
                 ]).then(function(children) {
                     const subCategories = children[0];
                     const species = children[1];

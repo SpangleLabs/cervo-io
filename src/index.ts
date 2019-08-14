@@ -8,7 +8,14 @@ import {ZoosRouter} from "./routes/zoosRouter";
 import {SpeciesRouter} from "./routes/speciesRouter";
 import {ZooDistancesRouter} from "./routes/zooDistancesRouter";
 import {connection} from "./dbconnection";
-import {CategoriesProvider} from "./models/categories";
+import {CategoriesProvider} from "./models/categoriesProvider";
+import {SpeciesProvider} from "./models/speciesProvider";
+import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
+import {SessionsProvider} from "./models/sessionsProvider";
+import {UserPostcodesProvider} from "./models/userPostcodesProvider";
+import {ZooDistancesProvider} from "./models/zooDistancesProvider";
+import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
+import {ZoosProvider} from "./models/zoosProvider";
 
 const express = require('express');
 const path = require('path');
@@ -33,18 +40,31 @@ App.use(express.static(path.join(__dirname, 'public')));
 
 // Create data providers
 const categoryProvider = new CategoriesProvider(connection);
+const categoryLevelsProvider = new CategoryLevelsProvider(connection);
+const sessionsProvider = new SessionsProvider(connection);
+const speciesProvider = new SpeciesProvider(connection);
+const userPostcodesProvider = new UserPostcodesProvider(connection);
+const zooDistancesProvider = new ZooDistancesProvider(connection);
+const zooSpeciesProvider = new ZooSpeciesProvider(connection);
+const zoosProvider = new ZoosProvider(connection);
 
 // Create and register routers
-const categoryRouter = new CategoriesRouter(categoryProvider);
+const indexRouter = new IndexRouter();
+indexRouter.register(App);
+const categoryRouter = new CategoriesRouter(categoryProvider, speciesProvider);
 categoryRouter.register(App);
-
-App.use('/', IndexRouter);
-App.use('/zoos', ZoosRouter);
-App.use('/category_levels', CategoryLevelsRouter);
-App.use('/species', SpeciesRouter);
-App.use('/zoo_species', ZooSpeciesRouter);
-App.use('/zoo_distances', ZooDistancesRouter);
-App.use('/session', SessionsRouter);
+const categoryLevelsRouter = new CategoryLevelsRouter(categoryLevelsProvider);
+categoryLevelsRouter.register(App);
+const sessionsRouter = new SessionsRouter(sessionsProvider);
+sessionsRouter.register(App);
+const speciesRouter = new SpeciesRouter(speciesProvider, zoosProvider);
+speciesRouter.register(App);
+const zooDistancesRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+zooDistancesRouter.register(App);
+const zooSpeciesRouter = new ZooSpeciesRouter(zooSpeciesProvider);
+zooSpeciesRouter.register(App);
+const zoosRouter = new ZoosRouter(zoosProvider, speciesProvider);
+zoosRouter.register(App);
 
 // catch 404 and forward to error handler
 export const handler404 = function (req: Request, res: Response, next: NextFunction) {

@@ -1,8 +1,15 @@
-import {Router} from "express";
+import {AbstractRouter} from "./abstractRouter";
 
-export const IndexRouter = Router();
+export class IndexRouter extends AbstractRouter {
 
-/* GET home page. */
-IndexRouter.get('/', function (req, res, next) {
-    res.json({});
-});
+    constructor() {
+        super("/");
+    }
+
+    initialise() {
+        /* GET home page. */
+        this.router.get('/', function (req, res, next) {
+            res.json({});
+        });
+    }
+}
