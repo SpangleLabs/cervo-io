@@ -1,11 +1,12 @@
 import * as chai from 'chai';
-import { expect, request } from 'chai';
-import chaiHttp = require('chai-http');
+import {expect, request} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
 import {Application} from "express";
 import {AbstractRouter} from "./abstractRouter";
 import {CategoriesProvider} from "../models/categories";
 import {handler404, handler500} from "../index";
+import chaiHttp = require('chai-http');
+import {SpeciesProvider} from "../models/species";
 
 const express = require('express');
 
@@ -22,20 +23,50 @@ function mockApp(router: AbstractRouter) {
 }
 
 class MockCategoriesProvider extends CategoriesProvider {
+    testCategories: CategoryJson[];
+
     constructor() {
         super(() => { throw new Error("Mock database.");});
+        this.testCategories = [
+            {
+                category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
+            },
+            {
+                category_id: 2, category_level_id: 2, hidden: false, name: "Sub category", parent_category_id: 1
+            }];
     }
 
     getBaseCategories(): Promise<CategoryJson[]> {
-        const fakeCategory: CategoryJson = {
-            category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
-        }
-        return Promise.all([fakeCategory]);
+        return Promise.all(
+            this.testCategories.filter( x => x.parent_category_id == null)
+        );
+    }
+
+    getCategoriesByParentId(id:number): Promise<CategoryJson[]> {
+        return Promise.all(
+            this.testCategories.filter(x => x.parent_category_id == id)
+        );
+    }
+}
+
+class MockSpeciesProvider extends SpeciesProvider {
+    testSpecies: SpeciesJson[];
+
+    constructor() {
+        super(() => { throw new Error("Mock database.");});
+        this.testSpecies = [];
+    }
+
+    getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
+        return Promise.all(
+            this.testSpecies.filter(x => x.category_id == id)
+        );
     }
 }
 
 const mockCategoryProvider = new MockCategoriesProvider();
-const categoryRouter = new CategoriesRouter(mockCategoryProvider);
+const mockSpeciesProvider = new MockSpeciesProvider();
+const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
 const App = mockApp(categoryRouter);
 
 const appRequest = request(App);
@@ -43,7 +74,6 @@ const appRequest = request(App);
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
         appRequest.get("/categories/").end(function(err, res) {
-            console.log(res.body);
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");

@@ -9,6 +9,7 @@ import {SpeciesRouter} from "./routes/speciesRouter";
 import {ZooDistancesRouter} from "./routes/zooDistancesRouter";
 import {connection} from "./dbconnection";
 import {CategoriesProvider} from "./models/categories";
+import {SpeciesProvider} from "./models/species";
 
 const express = require('express');
 const path = require('path');
@@ -33,9 +34,10 @@ App.use(express.static(path.join(__dirname, 'public')));
 
 // Create data providers
 const categoryProvider = new CategoriesProvider(connection);
+const speciesProvider = new SpeciesProvider(connection);
 
 // Create and register routers
-const categoryRouter = new CategoriesRouter(categoryProvider);
+const categoryRouter = new CategoriesRouter(categoryProvider, speciesProvider);
 categoryRouter.register(App);
 
 App.use('/', IndexRouter);
