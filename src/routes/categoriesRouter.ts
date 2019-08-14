@@ -1,13 +1,13 @@
-import {SpeciesProvider} from "../models/species";
+import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
-import {CategoriesProvider} from "../models/categories";
+import {CategoriesProvider} from "../models/categoriesProvider";
 
 export class CategoriesRouter extends AbstractRouter {
     categories: CategoriesProvider;
     species: SpeciesProvider;
 
     constructor(categoryProvider: CategoriesProvider, speciesProvider: SpeciesProvider) {
-        super("/categories/");
+        super("/categories");
         this.categories = categoryProvider;
         this.species = speciesProvider;
     }

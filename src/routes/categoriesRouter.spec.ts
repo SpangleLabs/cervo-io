@@ -3,10 +3,10 @@ import {expect, request} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
 import {Application} from "express";
 import {AbstractRouter} from "./abstractRouter";
-import {CategoriesProvider} from "../models/categories";
+import {CategoriesProvider} from "../models/categoriesProvider";
 import {handler404, handler500} from "../index";
 import chaiHttp = require('chai-http');
-import {SpeciesProvider} from "../models/species";
+import {SpeciesProvider} from "../models/speciesProvider";
 
 const express = require('express');
 

@@ -1,4 +1,4 @@
-import {connection, ConnectionProvider} from "../dbconnection";
+import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 
 export class SpeciesProvider extends AbstractProvider {
@@ -105,12 +105,3 @@ export class SpeciesProvider extends AbstractProvider {
         });
     }
 }
-
-const speciesProvider = new SpeciesProvider(connection);
-export const addSpecies = speciesProvider.addSpecies;
-export const getAllSpecies = speciesProvider.getAllSpecies;
-export const getFirstLetters = speciesProvider.getFirstLetters;
-export const getSpeciesByCommonName = speciesProvider.getSpeciesByCommonName;
-export const getSpeciesById = speciesProvider.getSpeciesById;
-export const getSpeciesByName = speciesProvider.getSpeciesByName;
-export const getSpeciesByZooId = speciesProvider.getSpeciesByZooId;
