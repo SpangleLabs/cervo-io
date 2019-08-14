@@ -3,6 +3,7 @@ import {Application} from "express";
 import {handler404, handler500} from "./index";
 import {CategoriesProvider} from "./models/categoriesProvider";
 import {SpeciesProvider} from "./models/speciesProvider";
+import {request} from "chai";
 
 const express = require('express');
 
@@ -15,6 +16,11 @@ export function mockApp(router: AbstractRouter) {
     App.use(handler404);
     App.use(handler500);
     return App;
+}
+
+export function requestRouter(router: AbstractRouter) {
+    const App = mockApp(router);
+    return request(App);
 }
 
 export class MockCategoriesProvider extends CategoriesProvider {

@@ -1,27 +1,24 @@
 import * as chai from 'chai';
-import {expect, request} from 'chai';
+import {expect} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
-import {mockApp, MockCategoriesProvider, MockSpeciesProvider} from "../testMocks";
+import {requestRouter, MockCategoriesProvider, MockSpeciesProvider} from "../testMocks";
 
 chai.use(chaiHttp);
 
-const mockCategoryProvider = new MockCategoriesProvider([
-    {
-        category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
-    },
-    {
-        category_id: 2, category_level_id: 2, hidden: false, name: "Sub category", parent_category_id: 1
-    }]);
-const mockSpeciesProvider = new MockSpeciesProvider([]);
-const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
-const App = mockApp(categoryRouter);
-
-const appRequest = request(App);
-
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
-        appRequest.get("/categories/").end(function(err, res) {
+        const mockCategoryProvider = new MockCategoriesProvider([
+            {
+                category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
+            },
+            {
+                category_id: 2, category_level_id: 2, hidden: false, name: "Sub category", parent_category_id: 1
+            }]);
+        const mockSpeciesProvider = new MockSpeciesProvider([]);
+        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+
+        requestRouter(categoryRouter).get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
