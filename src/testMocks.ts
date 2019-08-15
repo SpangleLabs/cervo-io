@@ -37,10 +37,28 @@ export class MockCategoriesProvider extends CategoriesProvider {
         );
     }
 
+    getCategoryById(id: number): Promise<CategoryJson[]> {
+        return Promise.all(
+            this.testCategories.filter( x => x.category_id == id)
+        );
+    }
+
     getCategoriesByParentId(id:number): Promise<CategoryJson[]> {
         return Promise.all(
             this.testCategories.filter(x => x.parent_category_id == id)
         );
+    }
+
+    addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
+        const newId = Math.max(...this.testCategories.map(x => x.category_id))+1;
+        const result: CategoryJson = {
+            category_id: newId,
+            category_level_id: newCategory.category_level_id,
+            name: newCategory.name,
+            parent_category_id: newCategory.parent_category_id
+        }
+        this.testCategories.push(result);
+        return new Promise(() => result);
     }
 }
 

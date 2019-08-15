@@ -27,6 +27,14 @@ const BaseCategory = Record({
     sub_categories: Array(SubCategory),
     species: Array(Species)
 });
+const FullCategory = Record({
+    category_id: Number,
+    name: String,
+    category_level_id: Number,
+    parent_category_id: Number,
+    sub_categories: Array(SubCategory),
+    species: Array(Species)
+});
 
 describe("Base category listing", function() {
     it("Format is correct", function (done) {
@@ -113,7 +121,6 @@ describe("Base category listing", function() {
                 Species.check(species);
                 expect(species.category_id).to.be.equal(category2.category_id);
             }
-            expect(res.body);
             done();
         })
     });
@@ -130,6 +137,84 @@ describe("Base category listing", function() {
             expect(res.body).to.be.an("array");
             expect(res.body.length).to.be.equal(0);
             done();
+        })
+    });
+});
+
+describe("View specific category", function() {
+    it("Shows just one category", function(done) {
+        const mockCategoryProvider = new MockCategoriesProvider([
+            {
+                category_id: 1, category_level_id: 1, name: "Test category1", parent_category_id: null
+            },
+            {
+                category_id: 2, category_level_id: 2, name: "Sub category", parent_category_id: 1
+            },
+            {
+                category_id: 3, category_level_id: 2, name: "Sub category2", parent_category_id: 1
+            },
+            {
+                category_id: 4, category_level_id: 3, name: "Sub sub category", parent_category_id: 2
+            }]);
+        const mockSpeciesProvider = new MockSpeciesProvider([
+            {
+                species_id: 1, common_name: "Test species", latin_name: "Examplera testus", "category_id": 2
+            },
+            {
+                species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3
+            }
+        ]);
+        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+
+        requestRouter(categoryRouter).get("/categories/2").end(function(err, res) {
+            expect(err).to.be.null;
+            expect(res.status).to.be.equal(200);
+            expect(res.type).to.be.equal("application/json");
+            expect(res.body).to.be.an("array");
+            expect(res.body.length).to.be.equal(1);
+            const category = res.body[0];
+            FullCategory.check(category);
+            expect(category.category_id).to.be.equal(2);
+            expect(category.sub_categories.length).to.be.equal(1);
+            for (let subCategory of category.sub_categories) {
+                SubCategory.check(subCategory);
+                expect(subCategory.parent_category_id).to.be.equal(category.category_id);
+            }
+            expect(category.species.length).to.be.equal(1);
+            const species = category.species[0];
+            Species.check(species);
+            done();
+        })
+    })
+});
+
+describe('Add new category', function () {
+    it('should add the category', function (done) {
+        const mockCategoryProvider = new MockCategoriesProvider([
+            {
+                category_id: 1, category_level_id: 1, name: "Test category", parent_category_id: null
+            }]);
+        const mockSpeciesProvider = new MockSpeciesProvider([]);
+        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+
+        const newCategory: NewCategoryJson = {
+            category_level_id: 2,
+            name: "sub category",
+            parent_category_id: 1
+        }
+
+        requestRouter(categoryRouter)
+            .post("/categories/")
+            .set("content-type", "application/json")
+            .send(newCategory)
+            .end(function(err, res) {
+                console.log(res.body);
+                expect(err).to.be.null;
+                expect(res.status).to.be.equal(200);
+                expect(res.type).to.be.equal("application/json");
+                const category = res.body;
+                SubCategory.check(category);
+                done();
         })
     });
 });
