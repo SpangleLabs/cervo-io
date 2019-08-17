@@ -4,6 +4,7 @@ import {handler404} from "./index";
 import {CategoriesProvider} from "./models/categoriesProvider";
 import {SpeciesProvider} from "./models/speciesProvider";
 import {request} from "chai";
+import bodyParser = require("body-parser");
 
 const express = require('express');
 
@@ -16,6 +17,8 @@ const handler500Testing = function (err: Error, req: Request, res: Response, nex
 
 function mockApp(router: AbstractRouter) {
     const App: Application = express();
+    App.use(bodyParser.json());
+    App.use(bodyParser.urlencoded({extended: false}));
 
     router.register(App);
 
@@ -64,7 +67,7 @@ export class MockCategoriesProvider extends CategoriesProvider {
             parent_category_id: newCategory.parent_category_id
         }
         this.testCategories.push(result);
-        return new Promise(() => result);
+        return Promise.resolve(result);
     }
 }
 
