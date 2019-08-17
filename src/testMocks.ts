@@ -1,20 +1,26 @@
 import {AbstractRouter} from "./routes/abstractRouter";
-import {Application} from "express";
-import {handler404, handler500} from "./index";
+import {Application, NextFunction, Request, Response} from "express";
+import {handler404} from "./index";
 import {CategoriesProvider} from "./models/categoriesProvider";
 import {SpeciesProvider} from "./models/speciesProvider";
 import {request} from "chai";
 
 const express = require('express');
 
+const handler500Testing = function (err: Error, req: Request, res: Response, next: NextFunction) {
+    console.log(err);
+    // render the error page
+    res.status(500);
+    res.json(err);
+};
 
-export function mockApp(router: AbstractRouter) {
+function mockApp(router: AbstractRouter) {
     const App: Application = express();
 
     router.register(App);
 
     App.use(handler404);
-    App.use(handler500);
+    App.use(handler500Testing);
     return App;
 }
 
