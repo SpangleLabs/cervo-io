@@ -37,8 +37,8 @@ export class CategoriesRouter extends AbstractRouter {
 
         /* POST new category */
         this.router.post('/', function (req, res, next) {
-            self.categories.addCategory(req.body).then(function () {
-                res.json(req.body);
+            self.categories.addCategory(req.body).then(function (newCategory: CategoryJson) {
+                res.json(newCategory);
             }).catch(function (err) {
                 res.status(500).json(err);
             });
