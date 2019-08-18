@@ -5,6 +5,7 @@ import {CategoriesProvider} from "./models/categoriesProvider";
 import {SpeciesProvider} from "./models/speciesProvider";
 import {request} from "chai";
 import bodyParser = require("body-parser");
+import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
 
 const express = require('express');
 
@@ -82,6 +83,27 @@ export class MockSpeciesProvider extends SpeciesProvider {
     getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
         return Promise.all(
             this.testSpecies.filter(x => x.category_id == id)
+        );
+    }
+}
+
+export class MockCategoryLevelsProvider extends CategoryLevelsProvider {
+    testCategoryLevels: CategoryLevelJson[];
+
+    constructor(testCategoryLevels: CategoryLevelJson[]) {
+        super(() => { throw new Error("Mock database."); });
+        this.testCategoryLevels = testCategoryLevels
+    }
+
+    getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
+        return Promise.all(
+            this.testCategoryLevels
+        );
+    }
+
+    getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
+        return Promise.all(
+            this.testCategoryLevels.filter(x => x.category_level_id == id)
         );
     }
 }
