@@ -5,7 +5,7 @@ export class CategoryLevelsRouter extends AbstractRouter {
     categoryLevels: CategoryLevelsProvider;
 
     constructor(categoryLevelsProvider: CategoryLevelsProvider) {
-        super("/category_levels/");
+        super("/category_levels");
         this.categoryLevels = categoryLevelsProvider;
     }
 
