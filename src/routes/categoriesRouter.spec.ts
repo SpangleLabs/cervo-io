@@ -208,7 +208,6 @@ describe('Add new category', function () {
             .set("content-type", "application/json")
             .send(newCategory)
             .end(function(err, res) {
-                console.log(res.body);
                 expect(err).to.be.null;
                 expect(res.status).to.be.equal(200);
                 expect(res.type).to.be.equal("application/json");
