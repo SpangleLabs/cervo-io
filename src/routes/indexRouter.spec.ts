@@ -15,6 +15,7 @@ describe("Index endpoint", function() {
             expect(res.type).to.be.equal("application/json");
             expect(res.body).to.be.an("object");
             expect(Object.keys(res.body).length).to.be.equal(0);
+            done();
         })
     });
 });
