@@ -6,6 +6,7 @@ import {SpeciesProvider} from "./models/speciesProvider";
 import {request} from "chai";
 import bodyParser = require("body-parser");
 import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
+import {ZoosProvider} from "./models/zoosProvider";
 
 const express = require('express');
 
@@ -74,16 +75,75 @@ export class MockCategoriesProvider extends CategoriesProvider {
 
 export class MockSpeciesProvider extends SpeciesProvider {
     testSpecies: SpeciesJson[];
+    testZooSpecies: ZooSpeciesLinkJson[];
 
-    constructor(testSpecies: SpeciesJson[]) {
+    constructor(testSpecies: SpeciesJson[], testZooSpecies?: ZooSpeciesLinkJson[]) {
         super(() => { throw new Error("Mock database.");});
         this.testSpecies = testSpecies;
+        if (!testZooSpecies) {
+            testZooSpecies = [];
+        }
+        this.testZooSpecies = testZooSpecies;
     }
 
     getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
         return Promise.all(
             this.testSpecies.filter(x => x.category_id == id)
         );
+    }
+
+    getSpeciesByZooId(zoo_id: number): Promise<SpeciesEntryForZooJson[]> {
+        const speciesLinksForZoo = this.testZooSpecies.filter(x => x.zoo_id == zoo_id);
+        const results: SpeciesEntryForZooJson[] = [];
+        for (let speciesLink of speciesLinksForZoo) {
+            const species = this.testSpecies.filter(x => speciesLinksForZoo.map(x => x.species_id).indexOf(x.species_id) !== -1)[0];
+            results.push(
+                {
+                    species_id: species.species_id,
+                    category_id: species.category_id,
+                    common_name: species.common_name,
+                    latin_name: species.latin_name,
+                    zoo_species_id: speciesLink.zoo_species_id,
+                    zoo_id: zoo_id
+                }
+            )
+        }
+        return Promise.all(results);
+    }
+}
+
+export class MockZoosProvider extends ZoosProvider {
+    testZoos: ZooJson[];
+
+    constructor(testZoos: ZooJson[]) {
+        super(() => { throw new Error("Mock database.");});
+        this.testZoos = testZoos;
+    }
+
+    getAllZoos(): Promise<ZooJson[]> {
+        return Promise.all(
+            this.testZoos
+        );
+    }
+
+    getZooById(id: number): Promise<ZooJson[]> {
+        return Promise.all(
+            this.testZoos.filter(x => x.zoo_id == id)
+        );
+    }
+
+    addZoo(newZoo: NewZooJson): Promise<ZooJson> {
+        const newId = Math.max(...this.testZoos.map(x => x.zoo_id))+1;
+        const result: ZooJson = {
+            zoo_id: newId,
+            name: newZoo.name,
+            postcode: newZoo.postcode,
+            link: newZoo.link,
+            latitude: newZoo.latitude,
+            longitude: newZoo.longitude
+        }
+        this.testZoos.push(result);
+        return Promise.resolve(result);
     }
 }
 
