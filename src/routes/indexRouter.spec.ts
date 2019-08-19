@@ -1,7 +1,10 @@
+import * as chai from 'chai';
+import chaiHttp = require('chai-http');
 import {requestRouter} from "../testMocks";
 import {IndexRouter} from "./indexRouter";
 import {expect} from "chai";
 
+chai.use(chaiHttp);
 
 describe("Index endpoint", function() {
     it('should return an empty object', function (done) {
