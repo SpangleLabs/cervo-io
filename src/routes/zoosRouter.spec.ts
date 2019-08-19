@@ -27,7 +27,7 @@ const FullZoo = Record({
     zoo_id: Number,
     name: String,
     link: String,
-    post: String,
+    postcode: String,
     latitude: Number,
     longitude: Number,
     species: Array(SpeciesEntryForZoo)
