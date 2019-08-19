@@ -1,0 +1,34 @@
+import {CategoryLevelsProvider} from "../models/categoryLevelsProvider";
+import {AbstractRouter} from "./abstractRouter";
+
+export class CategoryLevelsRouter extends AbstractRouter {
+    categoryLevels: CategoryLevelsProvider;
+
+    constructor(categoryLevelsProvider: CategoryLevelsProvider) {
+        super("/category_levels");
+        this.categoryLevels = categoryLevelsProvider;
+    }
+
+    initialise(): void {
+        const self = this;
+        this.router.get('/:id?', function (req, res, next) {
+                if (req.params.id) {
+                    self.categoryLevels.getCategoryLevelById(req.params.id).then(function (rows) {
+                        res.json(rows);
+                    }).catch(function (err) {
+                        res.status(500).json(err);
+                    });
+                } else {
+                    self.categoryLevels.getAllCategoryLevels().then(function (rows) {
+                        res.json(rows);
+                    }).catch(function (err) {
+                        res.status(500).json(err);
+                    });
+                }
+            }
+        );
+    }
+
+    /* GET category levels listing. */
+
+}

@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const app = require('../index').app;
+const app = require('../dist/index').App;
 const debug = require('debug')('zooapi:server');
 const http = require('http');
 
