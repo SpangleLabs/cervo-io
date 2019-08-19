@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 describe("Index endpoint", function() {
     it('should return an empty object', function (done) {
         const indexRouter = new IndexRouter();
-        requestRouter(indexRouter).end(function(err, res) {
+        requestRouter(indexRouter).get("/").end(function(err, res) {
             expect(err).to.be.null;
             expect(res.status).to.be.equal(200);
             expect(res.type).to.be.equal("application/json");
