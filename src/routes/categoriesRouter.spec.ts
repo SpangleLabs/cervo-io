@@ -201,7 +201,7 @@ describe('Add new category', function () {
             category_level_id: 2,
             name: "sub category",
             parent_category_id: 1
-        }
+        };
 
         requestRouter(categoryRouter)
             .post("/categories/")
