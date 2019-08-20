@@ -12,7 +12,16 @@ export class ZooDistancesProvider extends AbstractProvider {
             const result = conn.query("select * from zoo_distances where zoo_id=? and user_postcode_id=?", [zoo_id, user_postcode_id]);
             conn.end();
             return result;
-        });
+        }).then(function (data: ZooDistanceJson[]) {
+            return data.map(function (datum: ZooDistanceJson) {
+                return {
+                    zoo_distance_id: datum.zoo_distance_id,
+                    user_postcode_id: datum.user_postcode_id,
+                    zoo_id: datum.zoo_id,
+                    metres: datum.metres
+                }
+            })
+        })
     }
 
     addZooDistance(ZooDistance: NewZooDistanceJson): Promise<ZooDistanceJson> {

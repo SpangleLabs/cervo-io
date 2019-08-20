@@ -1,6 +1,17 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 
+function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {
+    return data.map(function (datum: CategoryJson | any) {
+        return {
+            category_id: datum.category_id,
+            name: datum.name,
+            category_level_id: datum.category_level_id,
+            parent_category_id: datum.parent_category_id
+        }
+    });
+}
+
 export class CategoriesProvider extends AbstractProvider {
 
     constructor (connection: ConnectionProvider) {
@@ -12,7 +23,7 @@ export class CategoriesProvider extends AbstractProvider {
             const result = conn.query("select * from categories where parent_category_id is null and hidden is false");
             conn.end();
             return result;
-        });
+        }).then(processIntoCategoryJson);
     }
 
     getCategoryById(id: number): Promise<CategoryJson[]> {
@@ -20,7 +31,7 @@ export class CategoriesProvider extends AbstractProvider {
             const result = conn.query("select * from categories where category_id=?", [id]);
             conn.end();
             return result;
-        });
+        }).then(processIntoCategoryJson);
     }
 
     getCategoriesByParentId(id: number): Promise<CategoryJson[]> {
@@ -28,7 +39,7 @@ export class CategoriesProvider extends AbstractProvider {
             const result = conn.query("select * from categories where parent_category_id=? and hidden is false", [id]);
             conn.end();
             return result;
-        });
+        }).then(processIntoCategoryJson);
     }
 
     addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {

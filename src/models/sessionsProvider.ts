@@ -13,7 +13,9 @@ export class SessionsProvider extends AbstractProvider {
             const result = conn.query("select password from users where username = ? and unlock_time < ?", [username, timestamp]);
             conn.end();
             return result;
-        })
+        }).then(function (data: { password: string }[]) {
+            return data.map(x => {return {password: x.password}});
+        });
     }
 
     setFailedLogin(username: string): Promise<void> {
@@ -60,6 +62,16 @@ export class SessionsProvider extends AbstractProvider {
                 [authToken, ipAddr, currentTime]);
             conn.end();
             return result;
+        }).then(function (data: SessionTokenJson[] | any) {
+            return data.map(function (datum: SessionTokenJson | any) {
+                return {
+                    user_id: datum.user_id,
+                    username: datum.username,
+                    token: datum.token,
+                    expiry_time: datum.expiry_time,
+                    ip_addr: datum.ip_addr
+                }
+            })
         });
     }
 

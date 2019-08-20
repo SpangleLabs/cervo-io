@@ -66,7 +66,6 @@ interface CategoryJson extends NewCategoryJson {
     name: string;
     category_level_id: number;
     parent_category_id: number | null;
-    hidden?: boolean;  // TODO: seems to be in subcategories?
 }
 
 interface FullCategoryJson extends CategoryJson {

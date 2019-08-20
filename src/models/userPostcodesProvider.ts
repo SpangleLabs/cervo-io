@@ -1,6 +1,15 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 
+function processIntoUserPostcodeJson(data: UserPostcodeJson[] | any): UserPostcodeJson[] {
+    return data.map(function (datum: UserPostcodeJson | any) {
+        return {
+            user_postcode_id: datum.user_postcode_id,
+            postcode_sector: datum.postcode_sector
+        }
+    });
+}
+
 export class UserPostcodesProvider extends AbstractProvider {
 
     constructor(connection: ConnectionProvider) {
@@ -13,7 +22,7 @@ export class UserPostcodesProvider extends AbstractProvider {
             const result = conn.query("select * from user_postcodes where user_postcode_id=?", [id]);
             conn.end();
             return result;
-        });
+        }).then(processIntoUserPostcodeJson);
     }
 
     getUserPostcodeByPostcodeSector(sector: string): Promise<UserPostcodeJson[]> {
@@ -21,7 +30,7 @@ export class UserPostcodesProvider extends AbstractProvider {
             const result = conn.query("select * from user_postcodes where postcode_sector=?", [sector]);
             conn.end();
             return result;
-        });
+        }).then(processIntoUserPostcodeJson);
     }
 
     addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<UserPostcodeJson> {
