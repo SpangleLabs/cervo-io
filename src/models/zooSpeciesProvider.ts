@@ -5,6 +5,16 @@ function hasUniqueId(arg: any): arg is ZooSpeciesLinkJson {
     return arg.zoo_species_id !== undefined;
 }
 
+function processIntoZooSpeciesLinkJson(data: ZooSpeciesLinkJson[] | any): ZooSpeciesLinkJson[] {
+    return data.map(function (datum: ZooSpeciesLinkJson | any) {
+        return {
+            zoo_species_id: datum.zoo_species_id,
+            zoo_id: datum.zoo_id,
+            species_id: datum.species_id
+        }
+    });
+}
+
 export class ZooSpeciesProvider extends AbstractProvider {
 
     constructor(connection: ConnectionProvider) {
@@ -16,7 +26,7 @@ export class ZooSpeciesProvider extends AbstractProvider {
             const result = conn.query("select * from zoo_species where zoo_id=?", [id]);
             conn.end();
             return result;
-        });
+        }).then(processIntoZooSpeciesLinkJson);
     }
 
     getZooSpeciesBySpeciesId(id: number): Promise<ZooSpeciesLinkJson[]> {
@@ -24,7 +34,7 @@ export class ZooSpeciesProvider extends AbstractProvider {
             const result = conn.query("select * from zoo_species where species_id=?", [id]);
             conn.end();
             return result;
-        });
+        }).then(processIntoZooSpeciesLinkJson);
     }
 
     addZooSpecies(newZooSpecies: NewZooSpeciesLinkJson): Promise<ZooSpeciesLinkJson> {

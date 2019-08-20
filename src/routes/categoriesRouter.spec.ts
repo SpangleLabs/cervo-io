@@ -40,10 +40,10 @@ describe("Base category listing", function() {
     it("Format is correct", function (done) {
         const mockCategoryProvider = new MockCategoriesProvider([
             {
-                category_id: 1, category_level_id: 1, hidden: false, name: "Test category", parent_category_id: null
+                category_id: 1, category_level_id: 1, name: "Test category", parent_category_id: null
             },
             {
-                category_id: 2, category_level_id: 2, hidden: false, name: "Sub category", parent_category_id: 1
+                category_id: 2, category_level_id: 2, name: "Sub category", parent_category_id: 1
             }]);
         const mockSpeciesProvider = new MockSpeciesProvider([
             {
