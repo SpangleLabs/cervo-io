@@ -70,6 +70,18 @@ describe("checkToken() method", function() {
     });
 });
 
+describe('checkPassword() method', function() {
+
+});
+
+describe('failedLogin() method', function() {
+
+});
+
+describe('successfulLogin() method', function() {
+
+});
+
 describe('endpoints' , function () {
     describe('GET /', function () {
         it('should return session token when valid auth token given', function (done) {
