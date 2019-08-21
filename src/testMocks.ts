@@ -170,8 +170,16 @@ export class MockCategoryLevelsProvider extends CategoryLevelsProvider {
 }
 
 export class MockSessionsProvider extends SessionsProvider {
+    sessionTokens: SessionTokenJson[];
 
-    constructor() {
+    constructor(sessionTokens: SessionTokenJson[]) {
         super(() => { throw new Error("Mock database."); });
+        this.sessionTokens = sessionTokens;
+    }
+
+    getSessionToken(authToken: string, ipAddr: string): Promise<SessionTokenJson[]> {
+        return Promise.all(
+            this.sessionTokens.filter(x => x.token == authToken && x.ip_addr == ipAddr)
+        );
     }
 }
