@@ -17,7 +17,6 @@ export class SessionsRouter extends AbstractRouter {
         const self = this;
         /* GET home page. */
         this.router.get('/', function (req, res, next) {
-            res.render('index', {title: 'Express'});
             // Return the current session status if logged in
             self.checkLogin(req).then(function (tokenData) {
                 res.json({
@@ -25,10 +24,10 @@ export class SessionsRouter extends AbstractRouter {
                     "user_id": tokenData.user_id,
                     "username": tokenData.username,
                     "token": tokenData.token,
-                    "expiry_date": tokenData.expiry_time
+                    "expiry_time": tokenData.expiry_time
                 });
-            }).catch(function (err) {
-                res.status(403).json({"status": "failure", "error": err});
+            }).catch(function (err: Error) {
+                res.status(403).json({"status": "failure", "error": err.message});
             });
         });
 
@@ -64,7 +63,7 @@ export class SessionsRouter extends AbstractRouter {
                             const sessionResponse = {
                                 "status": "success",
                                 "auth_token": authToken,
-                                "expiry_date": expiryTime,
+                                "expiry_time": expiryTime,
                                 "ip_addr": ipAddr,
                                 "username": username
                             };
@@ -92,7 +91,7 @@ export class SessionsRouter extends AbstractRouter {
 
     //Handy check login function?
     checkLogin(req: Request): Promise<SessionTokenJson> {
-        const authToken = <string>req.headers['Authorization'];
+        const authToken = <string>req.headers['authorization'];
         const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
         // Check auth header is provided
         if (!authToken) {
