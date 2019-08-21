@@ -29,7 +29,7 @@ describe("checkLogin() method", function() {
             }
         };
 
-        sessionsRouter.checkLogin(request).then(function (token) {
+        sessionsRouter.checkLogin(request).then(function () {
             done(new Error("Should not have returned token."));
         }).catch(function (err) {
             expect(err.toString()).to.be.equal("Error: No auth token provided.");
@@ -56,7 +56,7 @@ describe("checkLogin() method", function() {
             }
         };
 
-        sessionsRouter.checkLogin(request).then(function (token) {
+        sessionsRouter.checkLogin(request).then(function () {
             done(new Error("Should not have returned token."));
         }).catch(function (err) {
             expect(err.toString()).to.be.equal("Error: User is not logged in.");
@@ -77,7 +77,7 @@ describe("checkLogin() method", function() {
             }
         };
 
-        sessionsRouter.checkLogin(request).then(function (token) {
+        sessionsRouter.checkLogin(request).then(function () {
             done(new Error("Should not have returned token."));
         }).catch(function (err) {
             expect(err.toString()).to.be.equal("Error: User is not logged in.");
