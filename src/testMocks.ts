@@ -7,6 +7,7 @@ import {request} from "chai";
 import bodyParser = require("body-parser");
 import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
 import {ZoosProvider} from "./models/zoosProvider";
+import {SessionsProvider} from "./models/sessionsProvider";
 
 const express = require('express');
 
@@ -67,7 +68,7 @@ export class MockCategoriesProvider extends CategoriesProvider {
             category_level_id: newCategory.category_level_id,
             name: newCategory.name,
             parent_category_id: newCategory.parent_category_id
-        }
+        };
         this.testCategories.push(result);
         return Promise.resolve(result);
     }
@@ -141,7 +142,7 @@ export class MockZoosProvider extends ZoosProvider {
             link: newZoo.link,
             latitude: newZoo.latitude,
             longitude: newZoo.longitude
-        }
+        };
         this.testZoos.push(result);
         return Promise.resolve(result);
     }
@@ -165,5 +166,12 @@ export class MockCategoryLevelsProvider extends CategoryLevelsProvider {
         return Promise.all(
             this.testCategoryLevels.filter(x => x.category_level_id == id)
         );
+    }
+}
+
+export class MockSessionsProvider extends SessionsProvider {
+
+    constructor() {
+        super(() => { throw new Error("Mock database."); });
     }
 }
