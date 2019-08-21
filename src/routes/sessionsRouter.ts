@@ -17,7 +17,6 @@ export class SessionsRouter extends AbstractRouter {
         const self = this;
         /* GET home page. */
         this.router.get('/', function (req, res, next) {
-            res.render('index', {title: 'Express'});
             // Return the current session status if logged in
             self.checkLogin(req).then(function (tokenData) {
                 res.json({
