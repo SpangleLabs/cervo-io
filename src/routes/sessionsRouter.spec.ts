@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 import {SessionsRouter} from "./sessionsRouter";
 import {Request} from "express";
-import {MockSessionsProvider} from "../testMocks";
+import {MockSessionsProvider, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {Number, Record, String} from "runtypes";
 
@@ -13,8 +13,7 @@ const SessionToken = Record({
     user_id: Number,
     username: String,
     token: String,
-    expiry_time: String,
-    ip_addr: String
+    expiry_time: String
 });
 
 describe("checkLogin() method", function() {
@@ -49,7 +48,7 @@ describe("checkLogin() method", function() {
         const sessionsRouter = new SessionsRouter(sessionsProvider);
         const request = <Request><unknown>{
             headers: {
-                Authorization: "authToken"
+                authorization: "authToken"
             },
             connection: {
                 remoteAddress: "127.0.0.1"
@@ -70,7 +69,7 @@ describe("checkLogin() method", function() {
         const sessionsRouter = new SessionsRouter(sessionsProvider);
         const request = <Request><unknown>{
             headers: {
-                Authorization: "authToken"
+                authorization: "authToken"
             },
             connection: {
                 remoteAddress: "127.0.0.1"
@@ -94,7 +93,7 @@ describe("checkLogin() method", function() {
         const sessionsRouter = new SessionsRouter(sessionsProvider);
         const request = <Request><unknown>{
             headers: {
-                Authorization: "authToken"
+                authorization: "authToken"
             },
             connection: {
                 remoteAddress: "127.0.0.1"
@@ -117,7 +116,7 @@ describe("checkLogin() method", function() {
         const sessionsRouter = new SessionsRouter(sessionsProvider);
         const request = <Request><unknown>{
             headers: {
-                Authorization: "authToken",
+                authorization: "authToken",
                 "x-forwarded-for": "127.0.0.1"
             },
             connection: {
@@ -130,5 +129,41 @@ describe("checkLogin() method", function() {
             SessionToken.check(token);
             done();
         })
+    });
+});
+
+describe('endpoints' , function () {
+    describe('GET /', function () {
+        it('should return session token when valid auth token given', function (done) {
+            const sessionsProvider = new MockSessionsProvider([
+                {
+                    user_id: 1, username: "Test 1", token: "authToken", expiry_time: "2019-08-21T12:50:00", ip_addr: "127.0.0.1"
+                }
+            ]);
+            const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+            requestRouter(sessionsRouter)
+                .get("/session/")
+                .set("authorization", "authToken")
+                .set("x-forwarded-for", "127.0.0.1")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    //expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.a("object");
+                    expect(res.body).to.have.property("status");
+                    expect(res.body.status).to.be.equal("success");
+                    console.log(res.body);
+                    SessionToken.check(res.body);
+                    done();
+                });
+        });
+    });
+
+    describe('POST /', function () {
+
+    });
+
+    describe('DELETE /', function () {
+
     });
 });
