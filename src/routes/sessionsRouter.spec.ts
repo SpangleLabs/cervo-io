@@ -1,7 +1,6 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 import {SessionsRouter} from "./sessionsRouter";
-import {Request} from "express";
 import {MockSessionsProvider, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {Number, Record, String} from "runtypes";
@@ -15,27 +14,14 @@ const SessionToken = Record({
     token: String,
     expiry_time: String
 });
+const TokenResponse = Record({
+    username: String,
+    token: String,
+    expiry_time: String,
+    ip_addr: String
+})
 
-describe("checkLogin() method", function() {
-    it('should raise error if auth token is not provided', function (done) {
-        const sessionsProvider = new MockSessionsProvider([]);
-        const sessionsRouter = new SessionsRouter(sessionsProvider);
-        const request = <Request><unknown>{
-            headers: {
-            },
-            connection: {
-                remoteAddress: "127.0.0.1"
-            }
-        };
-
-        sessionsRouter.checkLogin(request).then(function () {
-            done(new Error("Should not have returned token."));
-        }).catch(function (err) {
-            expect(err.toString()).to.be.equal("Error: No auth token provided.");
-            done();
-        })
-    });
-
+describe("checkToken() method", function() {
     it('should raise error if multiple session tokens are returned', function (done) {
         const sessionsProvider = new MockSessionsProvider([
             {
@@ -46,16 +32,8 @@ describe("checkLogin() method", function() {
             }
         ]);
         const sessionsRouter = new SessionsRouter(sessionsProvider);
-        const request = <Request><unknown>{
-            headers: {
-                authorization: "authToken"
-            },
-            connection: {
-                remoteAddress: "127.0.0.1"
-            }
-        };
 
-        sessionsRouter.checkLogin(request).then(function () {
+        sessionsRouter.checkToken("authToken", "127.0.0.1").then(function () {
             done(new Error("Should not have returned token."));
         }).catch(function (err) {
             expect(err.toString()).to.be.equal("Error: User is not logged in.");
@@ -67,16 +45,8 @@ describe("checkLogin() method", function() {
         const sessionsProvider = new MockSessionsProvider([
         ]);
         const sessionsRouter = new SessionsRouter(sessionsProvider);
-        const request = <Request><unknown>{
-            headers: {
-                authorization: "authToken"
-            },
-            connection: {
-                remoteAddress: "127.0.0.1"
-            }
-        };
 
-        sessionsRouter.checkLogin(request).then(function () {
+        sessionsRouter.checkToken("authToken", "127.0.0.1").then(function () {
             done(new Error("Should not have returned token."));
         }).catch(function (err) {
             expect(err.toString()).to.be.equal("Error: User is not logged in.");
@@ -91,40 +61,8 @@ describe("checkLogin() method", function() {
             }
         ]);
         const sessionsRouter = new SessionsRouter(sessionsProvider);
-        const request = <Request><unknown>{
-            headers: {
-                authorization: "authToken"
-            },
-            connection: {
-                remoteAddress: "127.0.0.1"
-            }
-        };
 
-        sessionsRouter.checkLogin(request).then(function (token) {
-            expect(token).to.be.a("object");
-            SessionToken.check(token);
-            done();
-        })
-    });
-
-    it('should get IP address from header, if available', function (done) {
-        const sessionsProvider = new MockSessionsProvider([
-            {
-                user_id: 1, username: "Test 1", token: "authToken", expiry_time: "2019-08-21T12:50:00", ip_addr: "127.0.0.1"
-            }
-        ]);
-        const sessionsRouter = new SessionsRouter(sessionsProvider);
-        const request = <Request><unknown>{
-            headers: {
-                authorization: "authToken",
-                "x-forwarded-for": "127.0.0.1"
-            },
-            connection: {
-                remoteAddress: "192.168.0.4"
-            }
-        };
-
-        sessionsRouter.checkLogin(request).then(function (token) {
+        sessionsRouter.checkToken("authToken", "127.0.0.1").then(function (token) {
             expect(token).to.be.a("object");
             SessionToken.check(token);
             done();
@@ -148,11 +86,28 @@ describe('endpoints' , function () {
                 .set("x-forwarded-for", "127.0.0.1")
                 .end(function (err, res) {
                     expect(err).to.be.null;
-                    //expect(res.status).to.be.equal(200);
+                    expect(res.status).to.be.equal(200);
                     expect(res.body).to.be.a("object");
-                    expect(res.body).to.have.property("status");
-                    expect(res.body.status).to.be.equal("success");
-                    SessionToken.check(res.body);
+                    TokenResponse.check(res.body);
+                    done();
+                });
+        });
+
+        it('should get IP address from connection, if header not available');
+
+        it('should return error if auth token is not provided', function (done) {
+            const sessionsProvider = new MockSessionsProvider([]);
+            const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+            requestRouter(sessionsRouter)
+                .get("/session/")
+                .set("x-forwarded-for", "127.0.0.1")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.be.a("object");
+                    expect(res.body).to.have.property("error");
+                    expect(res.body.error).to.be.equal("No auth token provided.");
                     done();
                 });
         });

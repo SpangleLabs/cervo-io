@@ -1,8 +1,8 @@
-import {Request} from "express";
 import * as bcrypt from "bcryptjs";
 import * as uuid from "uuid";
 import {AbstractRouter} from "./abstractRouter";
 import {SessionsProvider} from "../models/sessionsProvider";
+
 const uuidv4 = uuid.v4;
 
 export class SessionsRouter extends AbstractRouter {
@@ -17,17 +17,18 @@ export class SessionsRouter extends AbstractRouter {
         const self = this;
         /* GET home page. */
         this.router.get('/', function (req, res, next) {
+            const authToken = <string>req.headers['authorization'];
+            const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
             // Return the current session status if logged in
-            self.checkLogin(req).then(function (tokenData) {
+            self.checkToken(authToken, ipAddr).then(function (tokenData) {
                 res.json({
-                    "status": "success",
-                    "user_id": tokenData.user_id,
                     "username": tokenData.username,
                     "token": tokenData.token,
-                    "expiry_time": tokenData.expiry_time
+                    "expiry_time": tokenData.expiry_time,
+                    "ip_addr": ipAddr
                 });
             }).catch(function (err: Error) {
-                res.status(403).json({"status": "failure", "error": err.message});
+                res.status(403).json({"error": err.message});
             });
         });
 
@@ -35,64 +36,80 @@ export class SessionsRouter extends AbstractRouter {
             // Get password from post data
             const username = req.body.username;
             const password = req.body.password;
+            // Get IP address
+            const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
             // Get hashed password from database, provided it's not locked
-            self.sessions.getValidPasswordHash(username).then(function (storeResult) {
-                if (storeResult.length !== 1 || !storeResult[0]["password"]) {
-                    return Promise.reject("User not in database or locked out.");
-                }
-                // Check password against stored hash
-                return bcrypt.compare(password, storeResult[0]["password"]);
+            self.sessions.getValidPasswordHash(username).then(function (storeResults) {
+                return self.checkPassword(password, storeResults);
             }).then(function (compareResult) {
                 if (!compareResult) {
-                    return self.sessions.setFailedLogin(username).then(function () {
-                        res.status(403).json({"status": "failure", "error": "Password incorrect"});
-                        return Promise.reject("Password incorrect");
+                    return self.failedLogin(username).then(function () {
+                        res.status(403).json({"error": "Password incorrect"});
                     });
                 } else {
-                    return self.sessions.resetFailedLogins(username).then(function() {
-                        // Generate auth token
-                        const authToken = uuidv4();
-                        // Get IP address
-                        const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
-                        // Create expiry time
-                        const expiryTime = new Date();
-                        expiryTime.setDate(expiryTime.getDate());
-                        const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
-                        // Store auth token, IP, etc in database
-                        return self.sessions.createSession(username, authToken, expiryTimeStr, ipAddr).then(function () {
-                            const sessionResponse = {
-                                "status": "success",
-                                "auth_token": authToken,
-                                "expiry_time": expiryTime,
-                                "ip_addr": ipAddr,
-                                "username": username
-                            };
-                            res.json(sessionResponse);
-                        });
+                    return self.successfulLogin(username, ipAddr).then(function (tokenData) {
+                        const sessionResponse = {
+                            "auth_token": tokenData.token,
+                            "expiry_time": tokenData.expiry_time,
+                            "ip_addr": ipAddr,
+                            "username": username
+                        };
+                        res.json(sessionResponse);
                     });
                 }
             }).catch(function (err) {
                 console.log(err);
-                res.status(403).json({"status": "failure", "error": err});
+                res.status(403).json({"error": err});
             });
         });
 
         this.router.delete('/', function (req, res, next) {
+            const authToken = <string>req.headers['authorization'];
+            const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
             // Blank token, password in database
-            self.checkLogin(req).then(function (userId) {
+            self.checkToken(authToken, ipAddr).then(function (userId) {
                 return self.sessions.deleteToken(userId.user_id)
             }).then(function () {
                 res.status(204);
             }).catch(function (err) {
-                res.status(403).json({"status": "failure", "error": err});
+                res.status(403).json({"error": err});
             })
         });
     }
 
+    checkPassword(password: string, passwordHashResults: {password: string}[]): Promise<boolean> {
+        if (passwordHashResults.length !== 1 || !passwordHashResults[0]["password"]) {
+            throw new Error("User not in database or locked out.");
+        }
+        // Check password against stored hash
+        return bcrypt.compare(password, passwordHashResults[0]["password"]);
+    }
+
+    failedLogin(username: string): Promise<void> {
+        return this.sessions.setFailedLogin(username);
+    }
+
+    successfulLogin(username: string, ipAddr: string): Promise<{token: string, expiry_time: string}> {
+        const self = this;
+        return this.sessions.resetFailedLogins(username).then(function() {
+            // Generate auth token
+            const authToken = uuidv4();
+            // Create expiry time
+            const expiryTime = new Date();
+            expiryTime.setDate(expiryTime.getDate());
+            const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
+            // Store auth token, IP, etc in database
+            return self.sessions.createSession(username, authToken, expiryTimeStr, ipAddr).then(function () {
+                return {
+                    "token": authToken,
+                    "expiry_time": expiryTimeStr
+                };
+            });
+        });
+    }
+
     //Handy check login function?
-    checkLogin(req: Request): Promise<SessionTokenJson> {
-        const authToken = <string>req.headers['authorization'];
-        const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
+    checkToken(authToken: string, ipAddr: string): Promise<SessionTokenJson> {
         // Check auth header is provided
         if (!authToken) {
             return Promise.reject(new Error("No auth token provided."));
