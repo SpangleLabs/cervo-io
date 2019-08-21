@@ -11,12 +11,16 @@
 <body>
     <form id="login_form" method="post">
         <label>
+            Username:
+            <input type="text" name="username" id="form_username" />
+        </label><br />
+        <label>
             Password:
-            <input type="password" name="password" id="form_password"/>
+            <input type="password" name="password" id="form_password" />
         </label>
-        <span id="failed-login">Failed to login</span>
         <br />
         <input type="submit" value="Login" />
+        <span id="failed-login">Failed to login</span>
     </form>
 <script>
 
@@ -33,12 +37,13 @@
     }
 
     function login() {
+        const username = $("input#form_username").val();
         const password = $("input#form_password").val();
         // Post to API
         new Promise(function (resolve, reject) {
             // Do the usual XHR stuff
             let req = new XMLHttpRequest();
-            req.open('POST', config["api_url"]+"session");
+            req.open('POST', config["api_url"]+"sessions");
             req.setRequestHeader("Content-type", "application/json");
             req.onload = function () {
                 // This is called even on 404 etc
@@ -58,7 +63,7 @@
             };
             // Make the request
             const passObj = {
-                "username": "admin",
+                "username": username,
                 "password": password
             };
             req.send(JSON.stringify(passObj));
