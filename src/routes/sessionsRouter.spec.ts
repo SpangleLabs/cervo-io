@@ -152,7 +152,6 @@ describe('endpoints' , function () {
                     expect(res.body).to.be.a("object");
                     expect(res.body).to.have.property("status");
                     expect(res.body.status).to.be.equal("success");
-                    console.log(res.body);
                     SessionToken.check(res.body);
                     done();
                 });
