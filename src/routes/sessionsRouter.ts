@@ -79,7 +79,7 @@ export class SessionsRouter extends AbstractRouter {
 
     checkPassword(password: string, passwordHashResults: {password: string}[]): Promise<boolean> {
         if (passwordHashResults.length !== 1 || !passwordHashResults[0]["password"]) {
-            throw new Error("User not in database or locked out.");
+            throw new Error("User not in database or is locked out.");
         }
         // Check password against stored hash
         return bcrypt.compare(password, passwordHashResults[0]["password"]);
