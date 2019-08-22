@@ -18,7 +18,7 @@ export class SessionsRouter extends AbstractRouter {
         /* GET home page. */
         this.router.get('/', function (req, res, next) {
             const authToken = <string>req.headers['authorization'];
-            const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
+            const ipAddr = <string>req.ip;
             // Return the current session status if logged in
             self.checkToken(authToken, ipAddr).then(function (tokenData) {
                 res.json({
@@ -37,7 +37,7 @@ export class SessionsRouter extends AbstractRouter {
             const username = req.body.username;
             const password = req.body.password;
             // Get IP address
-            const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
+            const ipAddr = <string>req.ip;
             // Get hashed password from database, provided it's not locked
             self.sessions.getValidPasswordHash(username).then(function (storeResults) {
                 return self.checkPassword(password, storeResults);
@@ -65,7 +65,7 @@ export class SessionsRouter extends AbstractRouter {
 
         this.router.delete('/', function (req, res, next) {
             const authToken = <string>req.headers['authorization'];
-            const ipAddr = <string>(req.headers["x-forwarded-for"] || req.connection.remoteAddress);
+            const ipAddr = <string>req.ip;
             // Blank token, password in database
             self.checkToken(authToken, ipAddr).then(function (userId) {
                 return self.sessions.deleteToken(userId.user_id)

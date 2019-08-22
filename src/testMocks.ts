@@ -22,6 +22,7 @@ function mockApp(router: AbstractRouter) {
     const App: Application = express();
     App.use(bodyParser.json());
     App.use(bodyParser.urlencoded({extended: false}));
+    App.enable('trust proxy');
 
     router.register(App);
 

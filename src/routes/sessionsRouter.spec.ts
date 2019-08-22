@@ -217,8 +217,6 @@ describe('endpoints' , function () {
                 });
         });
 
-        it('should get IP address from connection, if header not available');
-
         it('should return error if auth token is not provided', function (done) {
             const sessionsProvider = new MockSessionsProvider([]);
             const sessionsRouter = new SessionsRouter(sessionsProvider);

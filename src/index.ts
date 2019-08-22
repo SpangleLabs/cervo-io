@@ -37,6 +37,7 @@ App.use(logger('dev'));
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({extended: false}));
 App.use(express.static(path.join(__dirname, 'public')));
+App.enable('trust proxy');
 
 // Create data providers
 const categoryProvider = new CategoriesProvider(connection);
