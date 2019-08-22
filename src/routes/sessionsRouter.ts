@@ -96,7 +96,7 @@ export class SessionsRouter extends AbstractRouter {
             const authToken = uuidv4();
             // Create expiry time
             const expiryTime = new Date();
-            expiryTime.setDate(expiryTime.getDate());
+            expiryTime.setHours(expiryTime.getHours()+10);
             const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
             // Store auth token, IP, etc in database
             return self.sessions.createSession(username, authToken, expiryTimeStr, ipAddr).then(function () {

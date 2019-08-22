@@ -194,4 +194,16 @@ export class MockSessionsProvider extends SessionsProvider {
         }
         return Promise.resolve();
     }
+
+    resetFailedLogins(username: string): Promise<void> {
+        this.failedLogins.set(username, 0);
+        return Promise.resolve();
+    }
+
+    createSession(username: string, authToken: string, expiryTime: string, ipAddr: string): Promise<void> {
+        this.sessionTokens.push({
+            expiry_time: expiryTime, ip_addr: ipAddr, token: authToken, user_id: 0, username: username
+        })
+        return Promise.resolve();
+    }
 }

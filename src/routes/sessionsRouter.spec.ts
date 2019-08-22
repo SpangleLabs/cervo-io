@@ -145,9 +145,53 @@ describe('failedLogin() method', function() {
 });
 
 describe('successfulLogin() method', function() {
-    it("should reset failed login count");
-    it("should create a new session with a random token");
-    it("should create a new session with an expiry time in the future");
+    it("should reset failed login count", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+        const testUser = "username";
+        sessionsProvider.failedLogins.set(testUser, 3);
+
+        sessionsRouter.successfulLogin(testUser, "127.0.0.1").then(function () {
+            expect(sessionsProvider.failedLogins.get(testUser)).to.be.equal(0);
+            done();
+        }).catch(function (err) {
+            done(err);
+        });
+    });
+
+    it("should create a new session with a random token", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+        const testUser = "username";
+
+        let authToken1: string | null = null;
+        sessionsRouter.successfulLogin(testUser, "127.0.0.1").then(function (token1) {
+            expect(token1.token).not.to.be.equal("");
+            authToken1 = token1.token;
+            return sessionsRouter.successfulLogin(testUser, "127.0.0.1");
+        }).then(function (token2) {
+            expect(token2.token).not.to.be.equal("");
+            expect(token2.token).not.to.be.equal(authToken1);
+            done();
+        }).catch(function (err) {
+            done(err);
+        });
+    });
+
+    it("should create a new session with an expiry time in the future", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+        const testUser = "username";
+
+        sessionsRouter.successfulLogin(testUser, "127.0.0.1").then(function (token1) {
+            const expiryDate = new Date(Date.parse(token1.expiry_time));
+            expect(expiryDate).not.to.be.null;
+            expect(expiryDate).to.be.above(new Date());
+            done();
+        }).catch(function (err) {
+            done(err);
+        });
+    });
 });
 
 describe('endpoints' , function () {
