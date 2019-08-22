@@ -44,7 +44,7 @@ export class SessionsRouter extends AbstractRouter {
             }).then(function (compareResult) {
                 if (!compareResult) {
                     return self.failedLogin(username).then(function () {
-                        res.status(403).json({"error": "Password incorrect"});
+                        res.status(403).json({"error": "Password incorrect."});
                     });
                 } else {
                     return self.successfulLogin(username, ipAddr).then(function (tokenData) {
@@ -59,7 +59,7 @@ export class SessionsRouter extends AbstractRouter {
                 }
             }).catch(function (err) {
                 console.log(err);
-                res.status(403).json({"error": err});
+                res.status(403).json({"error": err.message});
             });
         });
 
@@ -72,7 +72,7 @@ export class SessionsRouter extends AbstractRouter {
             }).then(function () {
                 res.status(204);
             }).catch(function (err) {
-                res.status(403).json({"error": err});
+                res.status(403).json({"error": err.message});
             })
         });
     }

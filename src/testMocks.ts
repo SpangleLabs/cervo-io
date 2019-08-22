@@ -172,18 +172,29 @@ export class MockCategoryLevelsProvider extends CategoryLevelsProvider {
 
 export class MockSessionsProvider extends SessionsProvider {
     sessionTokens: SessionTokenJson[];
+    validPasswordHashes: Map<string, {password: string}[]>;
     failedLogins: Map<string, number>;
 
     constructor(sessionTokens: SessionTokenJson[]) {
         super(() => { throw new Error("Mock database."); });
         this.sessionTokens = sessionTokens;
         this.failedLogins = new Map<string, number>();
+        this.validPasswordHashes = new Map<string, {password: string}[]>();
     }
 
     getSessionToken(authToken: string, ipAddr: string): Promise<SessionTokenJson[]> {
         return Promise.all(
             this.sessionTokens.filter(x => x.token == authToken && x.ip_addr == ipAddr)
         );
+    }
+
+    getValidPasswordHash(username: string): Promise<{ password: string }[]> {
+        const hashes = this.validPasswordHashes.get(username);
+        if(hashes != undefined) {
+            return Promise.resolve(hashes);
+        } else {
+            return Promise.resolve([]);
+        }
     }
 
     setFailedLogin(username: string): Promise<void> {

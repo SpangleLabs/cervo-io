@@ -20,6 +20,12 @@ const TokenResponse = Record({
     expiry_time: String,
     ip_addr: String
 });
+const SessionResponse = Record({
+    auth_token: String,
+    expiry_time: String,
+    ip_addr: String,
+    username: String
+})
 
 describe("checkToken() method", function() {
     it('should raise error if multiple session tokens are returned', function (done) {
@@ -236,9 +242,78 @@ describe('endpoints' , function () {
     });
 
     describe('POST /', function () {
-        it("should fail if username does not exist");
-        it("should fail login if given the wrong password");
-        it("should login and return a token when given the correct password");
+        it("should fail if username does not exist", function(done) {
+            const sessionsProvider = new MockSessionsProvider([]);
+            const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+            requestRouter(sessionsRouter)
+                .post("/session/")
+                .set("x-forwarded-for", "127.0.0.1")
+                .send({
+                    username: "testUser",
+                    password: "password"
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.be.a("object");
+                    expect(res.body).to.have.property("error");
+                    expect(res.body.error).to.be.equal("User not in database or is locked out.");
+                    done();
+                });
+        });
+
+        it("should fail login if given the wrong password", function(done) {
+            const sessionsProvider = new MockSessionsProvider([]);
+            const testUser = "testUser";
+            sessionsProvider.validPasswordHashes.set(
+                testUser,
+                [{password: "$2a$10$sa9TlNOJtMeNEkDMNGzsLebuc9HFZ1D6eCsGTdP6KQvn5h08br.O."}]
+            );
+            const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+            requestRouter(sessionsRouter)
+                .post("/session/")
+                .set("x-forwarded-for", "127.0.0.1")
+                .send({
+                    username: "testUser",
+                    password: "password123"
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.be.a("object");
+                    expect(res.body).to.have.property("error");
+                    expect(res.body.error).to.be.equal("Password incorrect.");
+                    done();
+                });
+        });
+
+        it("should login and return a token when given the correct password", function(done) {
+            const sessionsProvider = new MockSessionsProvider([]);
+            const testUser = "testUser";
+            sessionsProvider.validPasswordHashes.set(
+                testUser,
+                [{password: "$2a$10$sa9TlNOJtMeNEkDMNGzsLebuc9HFZ1D6eCsGTdP6KQvn5h08br.O."}]
+            );
+            const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+            requestRouter(sessionsRouter)
+                .post("/session/")
+                .set("x-forwarded-for", "127.0.0.1")
+                .send({
+                    username: "testUser",
+                    password: "password"
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.a("object");
+                    expect(res.body).not.to.have.property("error");
+                    SessionResponse.check(res.body);
+                    done();
+                });
+        });
     });
 
     describe('DELETE /', function () {
