@@ -106,8 +106,29 @@ describe('checkPassword() method', function() {
         done();
     });
 
-    it("should return true when given password matching the given hash");
-    it("should return false when password doesn't match hash");
+    it("should return true when given password matching the given hash", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+        sessionsRouter.checkPassword("password", [
+            {password: "$2a$10$sa9TlNOJtMeNEkDMNGzsLebuc9HFZ1D6eCsGTdP6KQvn5h08br.O."}
+        ]).then(function(isCorrect) {
+            expect(isCorrect).to.be.true;
+            done();
+        });
+    });
+
+    it("should return false when password doesn't match hash", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+        sessionsRouter.checkPassword("password123", [
+            {password: "$2a$10$sa9TlNOJtMeNEkDMNGzsLebuc9HFZ1D6eCsGTdP6KQvn5h08br.O."}
+        ]).then(function(isCorrect) {
+            expect(isCorrect).to.be.false;
+            done();
+        });
+    });
 });
 
 describe('failedLogin() method', function() {
