@@ -19,7 +19,7 @@ const TokenResponse = Record({
     token: String,
     expiry_time: String,
     ip_addr: String
-})
+});
 
 describe("checkToken() method", function() {
     it('should raise error if multiple session tokens are returned', function (done) {
@@ -71,15 +71,21 @@ describe("checkToken() method", function() {
 });
 
 describe('checkPassword() method', function() {
-
+    it("should throw an error if no password hashes are given");
+    it("should throw an error if multiple password hashes are given");
+    it("should throw an error if hash result doesn't have a value");
+    it("should return true when given password matching the given hash");
+    it("should return false when password doesn't match hash");
 });
 
 describe('failedLogin() method', function() {
-
+    it("should update the failed logins for the given user");
 });
 
 describe('successfulLogin() method', function() {
-
+    it("should reset failed login count");
+    it("should create a new session with a random token");
+    it("should create a new session with an expiry time in the future");
 });
 
 describe('endpoints' , function () {
@@ -126,10 +132,13 @@ describe('endpoints' , function () {
     });
 
     describe('POST /', function () {
-
+        it("should fail if username does not exist");
+        it("should fail login if given the wrong password");
+        it("should login and return a token when given the correct password");
     });
 
     describe('DELETE /', function () {
-
+        it("should return an error if there is no matching token");
+        it("should delete the matching session token");
     });
 });
