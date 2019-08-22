@@ -71,9 +71,41 @@ describe("checkToken() method", function() {
 });
 
 describe('checkPassword() method', function() {
-    it("should throw an error if no password hashes are given");
-    it("should throw an error if multiple password hashes are given");
-    it("should throw an error if hash result doesn't have a value");
+    it("should throw an error if no password hashes are given", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+        expect(function () {
+            sessionsRouter.checkPassword("password", []);
+        }).to.throw("User not in database or is locked out.");
+        done();
+    });
+
+    it("should throw an error if multiple password hashes are given", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+        expect(function () {
+            sessionsRouter.checkPassword("password", [
+                {password: "hash1"},
+                {password: "hash2"}
+            ]);
+        }).to.throw("User not in database or is locked out.");
+        done();
+    });
+
+    it("should throw an error if hash result doesn't have a value", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+        expect(function () {
+            sessionsRouter.checkPassword("password", [
+                {password: ""}
+            ]);
+        }).to.throw("User not in database or is locked out.");
+        done();
+    });
+
     it("should return true when given password matching the given hash");
     it("should return false when password doesn't match hash");
 });
