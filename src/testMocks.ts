@@ -171,15 +171,27 @@ export class MockCategoryLevelsProvider extends CategoryLevelsProvider {
 
 export class MockSessionsProvider extends SessionsProvider {
     sessionTokens: SessionTokenJson[];
+    failedLogins: Map<string, number>;
 
     constructor(sessionTokens: SessionTokenJson[]) {
         super(() => { throw new Error("Mock database."); });
         this.sessionTokens = sessionTokens;
+        this.failedLogins = new Map<string, number>();
     }
 
     getSessionToken(authToken: string, ipAddr: string): Promise<SessionTokenJson[]> {
         return Promise.all(
             this.sessionTokens.filter(x => x.token == authToken && x.ip_addr == ipAddr)
         );
+    }
+
+    setFailedLogin(username: string): Promise<void> {
+        let userFailedLogins = this.failedLogins.get(username);
+        if (userFailedLogins) {
+            this.failedLogins.set(username, userFailedLogins + 1);
+        } else {
+            this.failedLogins.set(username, 1);
+        }
+        return Promise.resolve();
     }
 }

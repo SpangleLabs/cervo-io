@@ -132,7 +132,16 @@ describe('checkPassword() method', function() {
 });
 
 describe('failedLogin() method', function() {
-    it("should update the failed logins for the given user");
+    it("should update the failed logins for the given user", function(done) {
+        const sessionsProvider = new MockSessionsProvider([]);
+        const sessionsRouter = new SessionsRouter(sessionsProvider);
+        const testUser = "username";
+
+        sessionsRouter.failedLogin(testUser).then(function () {
+            expect(sessionsProvider.failedLogins.get(testUser)).to.be.equal(1);
+            done();
+        });
+    });
 });
 
 describe('successfulLogin() method', function() {
