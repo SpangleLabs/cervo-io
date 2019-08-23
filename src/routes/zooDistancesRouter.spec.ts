@@ -1,9 +1,9 @@
 import * as chai from 'chai';
-import chaiHttp = require('chai-http');
+import {expect} from 'chai';
 import {ZooDistancesRouter} from "./zooDistancesRouter";
 import {MockUserPostcodeProvider, MockZooDistanceProvider, MockZoosProvider} from "../testMocks";
-import {expect} from "chai";
 import {Number, Record, String} from "runtypes";
+import chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
 
@@ -147,10 +147,121 @@ describe("getZooData()", function () {
 });
 
 describe("queryGoogleDistancesToAddress()", function () {
-    it("should split destination list into chunks");
-    it("should handle failure from the distance matrix API");
-    it("should parse distances from distance matrix API");
-    it("should flatten distances into a single list");
+    it("should split destination list into chunks", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldFetch = zooDistanceRouter.fetchGoogleResponse;
+        let urls: string[] = [];
+        zooDistanceRouter.fetchGoogleResponse = function (url: string) {
+            urls.push(url);
+            return Promise.resolve({
+                status: "mock",
+                rows: []
+            });
+        };
+        const testDestination = "SA2 1AA, UK";
+        const testDestRegex = new RegExp(testDestination, "g");
+        const destinations = Array(30).fill(testDestination);
+
+        zooDistanceRouter.queryGoogleDistancesToAddresses("SA1 1AA, UK", destinations).then(function(data) {
+            done(new Error("Should have failed to get response"));
+        }).catch(function (err) {
+            expect(urls).to.be.length(2);
+            expect(urls[0].match(testDestRegex) || []).to.be.length(25);
+            expect(urls[1].match(testDestRegex) || []).to.be.length(5);
+            done();
+        }).then(function() {
+            zooDistanceRouter.fetchGoogleResponse = oldFetch;
+        });
+    });
+
+    it("should handle failure from the distance matrix API", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldFetch = zooDistanceRouter.fetchGoogleResponse;
+        zooDistanceRouter.fetchGoogleResponse = function (url: string) {
+            return Promise.resolve({
+                status: "failure testing",
+                rows: []
+            });
+        };
+
+        zooDistanceRouter.queryGoogleDistancesToAddresses("SA1 1AA, UK", ["SA2 1AA, UK"]).then(function() {
+            done(new Error("Should have failed to get distances."));
+        }).catch(function (err) {
+            expect(err).to.be.a("Error");
+            expect(err.message).to.include("Distance metrics API failed, response:");
+            expect(err.message).to.include("failure testing");
+            done();
+        }).then(function() {
+            zooDistanceRouter.fetchGoogleResponse = oldFetch;
+        });
+    });
+
+    it("should parse distances from distance matrix API", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldFetch = zooDistanceRouter.fetchGoogleResponse;
+        zooDistanceRouter.fetchGoogleResponse = function (url: string) {
+            return Promise.resolve({
+                status: "OK",
+                rows: [{elements: [{distance: {value: 567}}]}]
+            });
+        };
+
+        zooDistanceRouter.queryGoogleDistancesToAddresses("SA1 1AA, UK", ["SA2 1AA, UK"]).then(function(distances) {
+            expect(distances).to.be.an("array");
+            expect(distances).to.be.length(1);
+            expect(distances[0]).to.be.equal(567);
+            done();
+        }).catch(function (err) {
+            done(err);
+        }).then(function() {
+            zooDistanceRouter.fetchGoogleResponse = oldFetch;
+        });
+    });
+
+    it("should flatten distances into a single list", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const testDestination = "SA2 1AA, UK";
+        const testDestRegex = new RegExp(testDestination, "g");
+        const oldFetch = zooDistanceRouter.fetchGoogleResponse;
+        zooDistanceRouter.fetchGoogleResponse = function (url: string) {
+            const count = (url.match(testDestRegex) || []).length;
+            console.log(count);
+            const distances = Array(count).fill({distance: {value: 567}});
+            return Promise.resolve({
+                status: "OK",
+                rows: [{elements: distances}]
+            });
+        };
+
+        zooDistanceRouter.queryGoogleDistancesToAddresses("SA1 1AA, UK", Array(30).fill(testDestination)).then(function(distances) {
+            expect(distances).to.be.an("array");
+            expect(distances).to.be.length(30);
+            for(let distance of distances) {
+                expect(distance).to.be.equal(567);
+            }
+            done();
+        }).catch(function (err) {
+            done(err);
+        }).then(function() {
+            zooDistanceRouter.fetchGoogleResponse = oldFetch;
+        });
+    });
 });
 
 describe("queryGoogleForZooDistances()", function () {

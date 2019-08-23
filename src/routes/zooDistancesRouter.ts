@@ -83,26 +83,29 @@ export class ZooDistancesRouter extends AbstractRouter {
         });
     }
 
+    async fetchGoogleResponse(url: string): Promise<{status: string, rows: {elements: {distance: {value: number}}[]}[]}> {
+        return (await fetch(url)).json();
+    }
+
     queryGoogleDistancesToAddresses(start: string, destinationList: string[]): Promise<number[]> {
         // Chunk the addresses into strings of 25 at a time
-        const chunkedDestinations: string[] = [];
+        const chunkedDestinations: string[][] = [];
         const chunkSize = 25;
         for (let b = 0; b < destinationList.length; b += chunkSize) {
-            chunkedDestinations.push(destinationList.slice(b, b + chunkSize).join("|"));
+            chunkedDestinations.push(destinationList.slice(b, b + chunkSize));
         }
         // Make all the API requests
         const googleApiKey = config.google_distance_api_key; //Location locked,fine to commit
         const requestPromises: Promise<number[]>[] = [];
-        for (let zooPostcodeString of chunkedDestinations) {
+        for (let zooPostcodeListChunk of chunkedDestinations) {
+            const zooPostcodeString = zooPostcodeListChunk.join("|");
             const googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + start + "&destinations=" + zooPostcodeString + "&key=" + googleApiKey;
-            requestPromises.push(fetch(googleApiString).then(function (response) {
-                return response.json();
-            }).then(function (data) {
+            requestPromises.push(this.fetchGoogleResponse(googleApiString).then(function (data) {
                 if(data.status !== "OK") {
                     throw new Error("Distance metrics API failed, response: " + JSON.stringify(data));
                 }
                 const distanceResults: {distance: {value: number}}[] = data.rows[0].elements;
-                if (distanceResults.length !== destinationList.length) {
+                if (distanceResults.length !== zooPostcodeListChunk.length) {
                     throw new Error("Incorrect amount of distances returned from google maps API");
                 }
                 return distanceResults.map(x => x.distance.value);
