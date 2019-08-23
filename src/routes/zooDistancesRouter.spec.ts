@@ -20,6 +20,8 @@ describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function() {
     it("should return 404 if given invalid postcode");
     it("should return an error if given an empty list of zoos");
     it("should return an error if given invalid zoo id list");
+    it("should handle duplicate zoo ids without making duplicate requests");
+    it("should return specified zoo distances");
 });
 
 describe("getOrCreatePostcode()", function() {
