@@ -1,8 +1,20 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
-//import {expect} from "chai";
+import {ZooDistancesRouter} from "./zooDistancesRouter";
+import {MockUserPostcodeProvider, MockZooDistanceProvider, MockZoosProvider} from "../testMocks";
+import {expect} from "chai";
+import {Number, Record, String} from "runtypes";
 
 chai.use(chaiHttp);
+
+const Zoo = Record({
+    zoo_id: Number,
+    name: String,
+    link: String,
+    postcode: String,
+    latitude: Number,
+    longitude: Number
+});
 
 describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function() {
     it("should return 404 if given invalid postcode");
@@ -20,9 +32,37 @@ describe("getCachedDistanceOrNot()", function () {
     it("should return false if zoo distance is not in the database");
 });
 
-describe("gteZooData()", function () {
-    it("should get zoo data for a specified zoo");
-    it("should raise error if zoo does not exist");
+describe("getZooData()", function () {
+    it("should get zoo data for a specified zoo", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 1, name: "Test zoo", link: "http://example.com", postcode: "SA1 1AA", latitude: 47.74, longitude: -59.65}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        zooDistanceRouter.getZooData(1).then(function (zooData) {
+            expect(zooData).to.be.an("object");
+            Zoo.check(zooData);
+            done();
+        }).catch(function(err) {
+            done(err);
+        });
+    });
+
+    it("should return undefined if zoo does not exist", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        zooDistanceRouter.getZooData(1).then(function (zooData) {
+            expect(zooData).to.be.undefined;
+            done();
+        }).catch(function(err) {
+            done(err);
+        });
+    });
 });
 
 describe("queryGoogleDistancesToAddress()", function () {

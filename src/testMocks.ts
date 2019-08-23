@@ -8,6 +8,8 @@ import bodyParser = require("body-parser");
 import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
 import {ZoosProvider} from "./models/zoosProvider";
 import {SessionsProvider} from "./models/sessionsProvider";
+import {ZooDistancesProvider} from "./models/zooDistancesProvider";
+import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 
 const express = require('express');
 
@@ -146,6 +148,24 @@ export class MockZoosProvider extends ZoosProvider {
         };
         this.testZoos.push(result);
         return Promise.resolve(result);
+    }
+}
+
+export class MockZooDistanceProvider extends ZooDistancesProvider {
+    testZooDistances: ZooDistanceJson[];
+
+    constructor(testZooDistances: ZooDistanceJson[]) {
+        super(() => { throw new Error("Mock database."); });
+        this.testZooDistances = testZooDistances
+    }
+}
+
+export class MockUserPostcodeProvider extends UserPostcodesProvider {
+    testUserPostcodes: UserPostcodeJson[];
+
+    constructor(testUserPostcodes: UserPostcodeJson[]) {
+        super(() => { throw new Error("Mock database."); });
+        this.testUserPostcodes = testUserPostcodes
     }
 }
 
