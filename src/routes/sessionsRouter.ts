@@ -67,9 +67,9 @@ export class SessionsRouter extends AbstractRouter {
             const ipAddr = <string>req.ip;
             // Blank token, password in database
             self.checkToken(authToken, ipAddr).then(function (userId) {
-                return self.sessions.deleteToken(userId.username)
+                return self.sessions.deleteToken(userId.username);
             }).then(function () {
-                res.status(204);
+                res.status(204).json();
             }).catch(function (err) {
                 res.status(403).json({"error": err.message});
             })
