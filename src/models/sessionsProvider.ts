@@ -75,9 +75,9 @@ export class SessionsProvider extends AbstractProvider {
         });
     }
 
-    deleteToken(userId: number): Promise<void> {
+    deleteToken(username: string): Promise<void> {
         return this.connection().then(function (conn) {
-            conn.query("DELETE FROM user_sessions WHERE user_id = ?", [userId]);
+            conn.query("DELETE user_sessions FROM user_sessions LEFT JOIN users ON user_sessions.user_id = users.user_id WHERE users.username = ?", [username]);
             conn.end();
             return;
         });

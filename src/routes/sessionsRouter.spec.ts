@@ -25,7 +25,7 @@ const SessionResponse = Record({
     expiry_time: String,
     ip_addr: String,
     username: String
-})
+});
 
 describe("checkToken() method", function() {
     it('should raise error if multiple session tokens are returned', function (done) {
@@ -314,6 +314,38 @@ describe('endpoints' , function () {
                     done();
                 });
         });
+
+        it("should remove the old session token when a new one is created", function (done) {
+            const testUser = "testUser";
+            const expiryTime = new Date();
+            const oldToken = "oldToken";
+            expiryTime.setMinutes(expiryTime.getMinutes()+20);
+            const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
+            const sessionsProvider = new MockSessionsProvider([
+                {user_id: 0, username: testUser, ip_addr: "127.0.0.1", expiry_time: expiryTimeStr, token: oldToken}
+            ]);
+            sessionsProvider.validPasswordHashes.set(
+                testUser,
+                [{password: "$2a$10$sa9TlNOJtMeNEkDMNGzsLebuc9HFZ1D6eCsGTdP6KQvn5h08br.O."}]
+            );
+            const sessionsRouter = new SessionsRouter(sessionsProvider);
+
+            requestRouter(sessionsRouter)
+                .post("/session/")
+                .set("x-forwarded-for", "127.0.0.1")
+                .send({
+                    username: "testUser",
+                    password: "password"
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    SessionResponse.check(res.body);
+                    expect(sessionsProvider.sessionTokens).to.be.length(1);
+                    expect(sessionsProvider.sessionTokens[0].token).not.to.be.equal(oldToken);
+                    done();
+                });
+        })
     });
 
     describe('DELETE /', function () {

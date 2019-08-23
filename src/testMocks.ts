@@ -215,7 +215,12 @@ export class MockSessionsProvider extends SessionsProvider {
     createSession(username: string, authToken: string, expiryTime: string, ipAddr: string): Promise<void> {
         this.sessionTokens.push({
             expiry_time: expiryTime, ip_addr: ipAddr, token: authToken, user_id: 0, username: username
-        })
+        });
+        return Promise.resolve();
+    }
+
+    deleteToken(username: string): Promise<void> {
+        this.sessionTokens = this.sessionTokens.filter(x => x.username != username);
         return Promise.resolve();
     }
 }
