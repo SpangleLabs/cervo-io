@@ -55,7 +55,7 @@ export class SessionsProvider extends AbstractProvider {
     getSessionToken(authToken: string, ipAddr: string): Promise<SessionTokenJson[]> {
         return this.connection().then(function (conn) {
             const currentTime = new Date().toISOString().replace("Z", "").replace("T", " ");
-            const result = conn.query("SELECT user_id, users.username, token, expiry_time, ip_addr " +
+            const result = conn.query("SELECT users.user_id, users.username, user_sessions.token, user_sessions.expiry_time, user_sessions.ip_addr " +
                 "FROM user_sessions " +
                 "LEFT JOIN users ON user_sessions.user_id = users.user_id " +
                 "WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
