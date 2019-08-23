@@ -162,6 +162,10 @@ export class MockZooDistanceProvider extends ZooDistancesProvider {
         super(() => { throw new Error("Mock database."); });
         this.testZooDistances = testZooDistances
     }
+
+    getZooDistanceByZooIdAndUserPostcodeId(zoo_id: number, user_postcode_id: number): Promise<ZooDistanceJson[]> {
+        return Promise.all(this.testZooDistances.filter(x => x.zoo_id == zoo_id && x.user_postcode_id == user_postcode_id));
+    }
 }
 
 export class MockUserPostcodeProvider extends UserPostcodesProvider {

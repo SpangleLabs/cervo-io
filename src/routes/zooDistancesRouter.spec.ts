@@ -19,6 +19,12 @@ const UserPostcode = Record({
     user_postcode_id: Number,
     postcode_sector: String
 });
+const ZooDistance = Record({
+    zoo_id: Number,
+    metres: Number,
+    user_postcode_id: Number,
+    zoo_distance_id: Number
+});
 
 describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function() {
     it("should return 404 if given invalid postcode");
@@ -64,8 +70,47 @@ describe("getOrCreatePostcode()", function() {
 });
 
 describe("getCachedDistanceOrNot()", function () {
-    it("should get a zoo distance from the database where available");
-    it("should return false if zoo distance is not in the database");
+    it("should get a zoo distance from the database where available", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([
+            {zoo_distance_id: 1, user_postcode_id: 1, zoo_id: 3, metres: 789}
+        ]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([
+            {user_postcode_id: 1, postcode_sector: "SA1 1"}
+        ]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 3, name: "Zoo of tests", link: "http://example.com", postcode: "SA3 4AA", latitude: 87.23, longitude: 67.33}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        zooDistanceRouter.getCachedDistanceOrNot(1, 3).then(function(distance) {
+            expect(distance).not.to.be.false;
+            ZooDistance.check(distance);
+            done();
+        }).catch(function(err) {
+            done(err);
+        })
+    });
+
+    it("should return false if zoo distance is not in the database", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([
+            {zoo_distance_id: 1, user_postcode_id: 1, zoo_id: 3, metres: 789}
+        ]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([
+            {user_postcode_id: 1, postcode_sector: "SA1 1"}
+        ]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 2, name: "Mystery park", link: "http://example.com/404.html", postcode: "NN14 1AA", latitude: 45.23, longitude: -14.57},
+            {zoo_id: 3, name: "Zoo of tests", link: "http://example.com", postcode: "SA3 4AA", latitude: 87.23, longitude: 67.33}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        zooDistanceRouter.getCachedDistanceOrNot(1, 2).then(function(distance) {
+            expect(distance).to.be.false;
+            done();
+        }).catch(function(err) {
+            done(err);
+        })
+    });
 });
 
 describe("getZooData()", function () {
