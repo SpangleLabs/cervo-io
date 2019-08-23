@@ -58,7 +58,6 @@ export class SessionsRouter extends AbstractRouter {
                     });
                 }
             }).catch(function (err) {
-                console.log(err);
                 res.status(403).json({"error": err.message});
             });
         });
@@ -68,9 +67,9 @@ export class SessionsRouter extends AbstractRouter {
             const ipAddr = <string>req.ip;
             // Blank token, password in database
             self.checkToken(authToken, ipAddr).then(function (userId) {
-                return self.sessions.deleteToken(userId.user_id)
+                return self.sessions.deleteToken(userId.username);
             }).then(function () {
-                res.status(204);
+                res.status(204).json();
             }).catch(function (err) {
                 res.status(403).json({"error": err.message});
             })
@@ -92,6 +91,8 @@ export class SessionsRouter extends AbstractRouter {
     successfulLogin(username: string, ipAddr: string): Promise<{token: string, expiry_time: string}> {
         const self = this;
         return this.sessions.resetFailedLogins(username).then(function() {
+            return self.sessions.deleteToken(username);
+        }).then(function() {
             // Generate auth token
             const authToken = uuidv4();
             // Create expiry time

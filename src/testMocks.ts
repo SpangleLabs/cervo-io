@@ -8,6 +8,8 @@ import bodyParser = require("body-parser");
 import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
 import {ZoosProvider} from "./models/zoosProvider";
 import {SessionsProvider} from "./models/sessionsProvider";
+import {ZooDistancesProvider} from "./models/zooDistancesProvider";
+import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 
 const express = require('express');
 
@@ -29,6 +31,10 @@ function mockApp(router: AbstractRouter) {
     App.use(handler404);
     App.use(handler500Testing);
     return App;
+}
+
+function createNewId(currentIds: number[]) {
+    return currentIds.length == 0 ? 1 : Math.max(...currentIds) + 1;
 }
 
 export function requestRouter(router: AbstractRouter) {
@@ -63,7 +69,7 @@ export class MockCategoriesProvider extends CategoriesProvider {
     }
 
     addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
-        const newId = Math.max(...this.testCategories.map(x => x.category_id))+1;
+        const newId = createNewId(this.testCategories.map(x => x.category_id));
         const result: CategoryJson = {
             category_id: newId,
             category_level_id: newCategory.category_level_id,
@@ -135,7 +141,7 @@ export class MockZoosProvider extends ZoosProvider {
     }
 
     addZoo(newZoo: NewZooJson): Promise<ZooJson> {
-        const newId = Math.max(...this.testZoos.map(x => x.zoo_id))+1;
+        const newId = createNewId(this.testZoos.map(x => x.zoo_id));
         const result: ZooJson = {
             zoo_id: newId,
             name: newZoo.name,
@@ -146,6 +152,46 @@ export class MockZoosProvider extends ZoosProvider {
         };
         this.testZoos.push(result);
         return Promise.resolve(result);
+    }
+}
+
+export class MockZooDistanceProvider extends ZooDistancesProvider {
+    testZooDistances: ZooDistanceJson[];
+
+    constructor(testZooDistances: ZooDistanceJson[]) {
+        super(() => { throw new Error("Mock database."); });
+        this.testZooDistances = testZooDistances
+    }
+
+    getZooDistanceByZooIdAndUserPostcodeId(zoo_id: number, user_postcode_id: number): Promise<ZooDistanceJson[]> {
+        return Promise.all(this.testZooDistances.filter(x => x.zoo_id == zoo_id && x.user_postcode_id == user_postcode_id));
+    }
+}
+
+export class MockUserPostcodeProvider extends UserPostcodesProvider {
+    testUserPostcodes: UserPostcodeJson[];
+
+    constructor(testUserPostcodes: UserPostcodeJson[]) {
+        super(() => { throw new Error("Mock database."); });
+        this.testUserPostcodes = testUserPostcodes
+    }
+
+    getUserPostcodeByPostcodeSector(sector: string): Promise<UserPostcodeJson[]> {
+        return Promise.all(this.testUserPostcodes.filter(x => x.postcode_sector == sector));
+    }
+
+    getUserPostcodeById(id: number): Promise<UserPostcodeJson[]> {
+        return Promise.all(this.testUserPostcodes.filter(x => x.user_postcode_id == id));
+    }
+
+    addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<UserPostcodeJson> {
+        const newId = createNewId(this.testUserPostcodes.map(x => x.user_postcode_id));
+        const newResult = {
+            user_postcode_id: newId,
+            postcode_sector: newUserPostcode.postcode_sector
+        };
+        this.testUserPostcodes.push(newResult);
+        return Promise.resolve(newResult);
     }
 }
 
@@ -215,7 +261,12 @@ export class MockSessionsProvider extends SessionsProvider {
     createSession(username: string, authToken: string, expiryTime: string, ipAddr: string): Promise<void> {
         this.sessionTokens.push({
             expiry_time: expiryTime, ip_addr: ipAddr, token: authToken, user_id: 0, username: username
-        })
+        });
+        return Promise.resolve();
+    }
+
+    deleteToken(username: string): Promise<void> {
+        this.sessionTokens = this.sessionTokens.filter(x => x.username != username);
         return Promise.resolve();
     }
 }
