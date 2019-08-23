@@ -33,6 +33,10 @@ function mockApp(router: AbstractRouter) {
     return App;
 }
 
+function createNewId(currentIds: number[]) {
+    return currentIds.length == 0 ? 1 : Math.max(...currentIds) + 1;
+}
+
 export function requestRouter(router: AbstractRouter) {
     const App = mockApp(router);
     return request(App);
@@ -65,7 +69,7 @@ export class MockCategoriesProvider extends CategoriesProvider {
     }
 
     addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
-        const newId = Math.max(...this.testCategories.map(x => x.category_id))+1;
+        const newId = createNewId(this.testCategories.map(x => x.category_id));
         const result: CategoryJson = {
             category_id: newId,
             category_level_id: newCategory.category_level_id,
@@ -137,7 +141,7 @@ export class MockZoosProvider extends ZoosProvider {
     }
 
     addZoo(newZoo: NewZooJson): Promise<ZooJson> {
-        const newId = Math.max(...this.testZoos.map(x => x.zoo_id))+1;
+        const newId = createNewId(this.testZoos.map(x => x.zoo_id));
         const result: ZooJson = {
             zoo_id: newId,
             name: newZoo.name,
@@ -166,6 +170,24 @@ export class MockUserPostcodeProvider extends UserPostcodesProvider {
     constructor(testUserPostcodes: UserPostcodeJson[]) {
         super(() => { throw new Error("Mock database."); });
         this.testUserPostcodes = testUserPostcodes
+    }
+
+    getUserPostcodeByPostcodeSector(sector: string): Promise<UserPostcodeJson[]> {
+        return Promise.all(this.testUserPostcodes.filter(x => x.postcode_sector == sector));
+    }
+
+    getUserPostcodeById(id: number): Promise<UserPostcodeJson[]> {
+        return Promise.all(this.testUserPostcodes.filter(x => x.user_postcode_id == id));
+    }
+
+    addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<UserPostcodeJson> {
+        const newId = createNewId(this.testUserPostcodes.map(x => x.user_postcode_id));
+        const newResult = {
+            user_postcode_id: newId,
+            postcode_sector: newUserPostcode.postcode_sector
+        };
+        this.testUserPostcodes.push(newResult);
+        return Promise.resolve(newResult);
     }
 }
 

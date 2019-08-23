@@ -15,6 +15,10 @@ const Zoo = Record({
     latitude: Number,
     longitude: Number
 });
+const UserPostcode = Record({
+    user_postcode_id: Number,
+    postcode_sector: String
+});
 
 describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function() {
     it("should return 404 if given invalid postcode");
@@ -25,8 +29,38 @@ describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function() {
 });
 
 describe("getOrCreatePostcode()", function() {
-    it("should retrieve an ID for an existing postcode sector");
-    it("should create a new postcode sector entry if one does not exist");
+    it("should retrieve an ID for an existing postcode sector", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([
+            {user_postcode_id: 1, postcode_sector: "SA1 1"}
+        ]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        zooDistanceRouter.getOrCreatePostcode("SA1 1").then(function(postcodeData) {
+            UserPostcode.check(postcodeData);
+            expect(postcodeData.user_postcode_id).to.be.equal(1);
+            done();
+        }).catch(function(err) {
+            done(err);
+        });
+    });
+
+    it("should create a new postcode sector entry if one does not exist", function (done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        zooDistanceRouter.getOrCreatePostcode("SA1 1").then(function(postcodeData) {
+            UserPostcode.check(postcodeData);
+            expect(userPostcodesProvider.testUserPostcodes).to.be.length(1);
+            expect(postcodeData.user_postcode_id).to.be.equal(1);
+            done();
+        }).catch(function(err) {
+            done(err);
+        });
+    });
 });
 
 describe("getCachedDistanceOrNot()", function () {
