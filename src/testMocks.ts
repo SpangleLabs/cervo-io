@@ -232,12 +232,14 @@ export class MockSessionsProvider extends SessionsProvider {
     sessionTokens: SessionTokenJson[];
     validPasswordHashes: Map<string, {password: string}[]>;
     failedLogins: Map<string, number>;
+    users: {user_id: number, username: string, is_admin: boolean}[];
 
     constructor(sessionTokens: SessionTokenJson[]) {
         super(() => { throw new Error("Mock database."); });
         this.sessionTokens = sessionTokens;
         this.failedLogins = new Map<string, number>();
         this.validPasswordHashes = new Map<string, {password: string}[]>();
+        this.users = sessionTokens.map(x => { return {user_id: x.user_id, username: x.username, is_admin: x.is_admin}});
     }
 
     getSessionToken(authToken: string, ipAddr: string): Promise<SessionTokenJson[]> {
@@ -253,6 +255,12 @@ export class MockSessionsProvider extends SessionsProvider {
         } else {
             return Promise.resolve([]);
         }
+    }
+
+    getUserData(username: string): Promise<{ user_id: number; username: string; is_admin: boolean }[]> {
+        return Promise.all(
+            this.users.filter(x => x.username == username)
+        );
     }
 
     setFailedLogin(username: string): Promise<void> {
@@ -272,7 +280,7 @@ export class MockSessionsProvider extends SessionsProvider {
 
     createSession(username: string, authToken: string, expiryTime: string, ipAddr: string): Promise<void> {
         this.sessionTokens.push({
-            expiry_time: expiryTime, ip_addr: ipAddr, token: authToken, user_id: 0, username: username
+            expiry_time: expiryTime, ip_addr: ipAddr, token: authToken, user_id: 0, username: username, is_admin: false
         });
         return Promise.resolve();
     }

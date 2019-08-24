@@ -16,6 +16,7 @@ import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 import {ZooDistancesProvider} from "./models/zooDistancesProvider";
 import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
 import {ZoosProvider} from "./models/zoosProvider";
+import {AuthChecker} from "./authChecker";
 
 const express = require('express');
 const path = require('path');
@@ -44,6 +45,9 @@ const zooDistancesProvider = new ZooDistancesProvider(connection);
 const zooSpeciesProvider = new ZooSpeciesProvider(connection);
 const zoosProvider = new ZoosProvider(connection);
 
+// Create auth checker
+const authChecker = new AuthChecker(sessionsProvider);
+
 // Create and register routers
 const indexRouter = new IndexRouter();
 indexRouter.register(App);
@@ -51,7 +55,7 @@ const categoryRouter = new CategoriesRouter(categoryProvider, speciesProvider);
 categoryRouter.register(App);
 const categoryLevelsRouter = new CategoryLevelsRouter(categoryLevelsProvider);
 categoryLevelsRouter.register(App);
-const sessionsRouter = new SessionsRouter(sessionsProvider);
+const sessionsRouter = new SessionsRouter(authChecker, sessionsProvider);
 sessionsRouter.register(App);
 const speciesRouter = new SpeciesRouter(speciesProvider, zoosProvider);
 speciesRouter.register(App);

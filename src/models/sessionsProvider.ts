@@ -55,7 +55,8 @@ export class SessionsProvider extends AbstractProvider {
     getSessionToken(authToken: string, ipAddr: string): Promise<SessionTokenJson[]> {
         return this.connection().then(function (conn) {
             const currentTime = new Date().toISOString().replace("Z", "").replace("T", " ");
-            const result = conn.query("SELECT users.user_id, users.username, user_sessions.token, user_sessions.expiry_time, user_sessions.ip_addr " +
+            const result = conn.query(
+                "SELECT users.user_id, users.username, user_sessions.token, user_sessions.expiry_time, user_sessions.ip_addr, users.is_admin " +
                 "FROM user_sessions " +
                 "LEFT JOIN users ON user_sessions.user_id = users.user_id " +
                 "WHERE token = ? AND ip_addr = ? AND expiry_time > ?",
@@ -69,9 +70,26 @@ export class SessionsProvider extends AbstractProvider {
                     username: datum.username,
                     token: datum.token,
                     expiry_time: datum.expiry_time,
-                    ip_addr: datum.ip_addr
-                }
-            })
+                    ip_addr: datum.ip_addr,
+                    is_admin: datum.is_admin
+                };
+            });
+        });
+    }
+
+    getUserData(username: string): Promise<{user_id: number, username: string, is_admin: boolean}[]> {
+        return this.connection().then(function (conn) {
+            const result = conn.query("SELECT user_id, username, is_admin FROM users WHERE username = ?", [username]);
+            conn.end();
+            return result;
+        }).then(function(data) {
+            return data.map(function (datum: any) {
+                return {
+                    user_id: datum.user_id,
+                    username: datum.username,
+                    is_admin: datum.is_admin
+                };
+            });
         });
     }
 

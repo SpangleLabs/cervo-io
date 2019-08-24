@@ -2,14 +2,17 @@ import * as bcrypt from "bcryptjs";
 import * as uuid from "uuid";
 import {AbstractRouter} from "./abstractRouter";
 import {SessionsProvider} from "../models/sessionsProvider";
+import {AuthChecker} from "../authChecker";
 
 const uuidv4 = uuid.v4;
 
 export class SessionsRouter extends AbstractRouter {
+    authChecker: AuthChecker;
     sessions: SessionsProvider;
 
-    constructor(sessionsProvider: SessionsProvider) {
+    constructor(authChecker: AuthChecker, sessionsProvider: SessionsProvider) {
         super("/session");
+        this.authChecker = authChecker;
         this.sessions = sessionsProvider;
     }
 
@@ -20,12 +23,14 @@ export class SessionsRouter extends AbstractRouter {
             const authToken = <string>req.headers['authorization'];
             const ipAddr = <string>req.ip;
             // Return the current session status if logged in
-            self.checkToken(authToken, ipAddr).then(function (tokenData) {
+            self.authChecker.checkToken(authToken, ipAddr).then(function (tokenData) {
                 res.json({
+                    "user_id": tokenData.user_id,
                     "username": tokenData.username,
                     "token": tokenData.token,
                     "expiry_time": tokenData.expiry_time,
-                    "ip_addr": ipAddr
+                    "ip_addr": ipAddr,
+                    "is_admin": tokenData.is_admin
                 });
             }).catch(function (err: Error) {
                 res.status(403).json({"error": err.message});
@@ -49,10 +54,11 @@ export class SessionsRouter extends AbstractRouter {
                 } else {
                     return self.successfulLogin(username, ipAddr).then(function (tokenData) {
                         const sessionResponse = {
-                            "auth_token": tokenData.token,
+                            "username": username,
+                            "token": tokenData.token,
                             "expiry_time": tokenData.expiry_time,
                             "ip_addr": ipAddr,
-                            "username": username
+                            "is_admin": tokenData.is_admin
                         };
                         res.json(sessionResponse);
                     });
@@ -66,7 +72,7 @@ export class SessionsRouter extends AbstractRouter {
             const authToken = <string>req.headers['authorization'];
             const ipAddr = <string>req.ip;
             // Blank token, password in database
-            self.checkToken(authToken, ipAddr).then(function (userId) {
+            self.authChecker.checkToken(authToken, ipAddr).then(function (userId) {
                 return self.sessions.deleteToken(userId.username);
             }).then(function () {
                 res.status(204).json();
@@ -88,7 +94,7 @@ export class SessionsRouter extends AbstractRouter {
         return this.sessions.setFailedLogin(username);
     }
 
-    successfulLogin(username: string, ipAddr: string): Promise<{token: string, expiry_time: string}> {
+    successfulLogin(username: string, ipAddr: string): Promise<{token: string, expiry_time: string, is_admin: boolean}> {
         const self = this;
         return this.sessions.resetFailedLogins(username).then(function() {
             return self.sessions.deleteToken(username);
@@ -101,28 +107,14 @@ export class SessionsRouter extends AbstractRouter {
             const expiryTimeStr = expiryTime.toISOString().replace("Z", "").replace("T", " ");
             // Store auth token, IP, etc in database
             return self.sessions.createSession(username, authToken, expiryTimeStr, ipAddr).then(function () {
+                return self.sessions.getUserData(username);
+            }).then(function(userData) {
                 return {
                     "token": authToken,
-                    "expiry_time": expiryTimeStr
+                    "expiry_time": expiryTimeStr,
+                    "is_admin": userData[0].is_admin
                 };
             });
-        });
-    }
-
-    //Handy check login function?
-    checkToken(authToken: string, ipAddr: string): Promise<SessionTokenJson> {
-        // Check auth header is provided
-        if (!authToken) {
-            return Promise.reject(new Error("No auth token provided."));
-        }
-        // Check expiry isn't in the past
-        // Check auth header token matches database token
-        return this.sessions.getSessionToken(authToken, ipAddr).then(function (storeResult) {
-            if (storeResult.length !== 1 || !storeResult[0]["user_id"]) {
-                throw new Error("User is not logged in.");
-            } else {
-                return storeResult[0];
-            }
         });
     }
 }

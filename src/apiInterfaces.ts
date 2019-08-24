@@ -92,6 +92,7 @@ interface SessionTokenJson {
     token: string;
     expiry_time: string;
     ip_addr: string;
+    is_admin: boolean
 }
 
 interface NewUserPostcodeJson {
