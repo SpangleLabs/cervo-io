@@ -441,7 +441,111 @@ describe("createZooDistances()", function () {
 });
 
 describe("getOrCreateZooDistances()", function () {
-    it("should get distances from cache");
-    it("should create distances which are not in cache");
-    it("should combine the lists of cached and new distances");
+    it("should get distances from cache", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([
+            {zoo_distance_id: 1, user_postcode_id: 1, zoo_id: 1, metres: 27293},
+            {zoo_distance_id: 2, user_postcode_id: 1, zoo_id: 3, metres: 34029},
+            {zoo_distance_id: 3, user_postcode_id: 1, zoo_id: 4, metres: 124}
+        ]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldFetch = zooDistanceRouter.queryGoogleForZooDistances;
+        zooDistanceRouter.queryGoogleForZooDistances = function (userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]) {
+            return Promise.reject(new Error("should not be called"));
+        };
+
+        zooDistanceRouter.getOrCreateZooDistances({user_postcode_id: 1, postcode_sector: "SA1 1"}, [1,3,4]).then(function (data) {
+            expect(data).to.be.an("array");
+            for(let distance of data) {
+                ZooDistance.check(distance);
+            }
+            done();
+        }).catch(function(err) {
+            done(err);
+        }).then(function() {
+            zooDistanceRouter.queryGoogleForZooDistances = oldFetch;
+        });
+    });
+
+    it("should create distances which are not in cache", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 4, name: "Test zoo", link: "http://example.com", postcode: "SA3 1AA", latitude: -67.34, longitude: -123.47}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldFetch = zooDistanceRouter.createZooDistances;
+        let zoosToQuery: number[] | null = null;
+        zooDistanceRouter.createZooDistances = function (userPostcodeData: UserPostcodeJson, zooIdList: number[]) {
+            zoosToQuery = zooIdList;
+            return Promise.resolve([
+                {zoo_distance_id: 5, zoo_id: 4, user_postcode_id: 1, metres: 12345}
+            ])
+        };
+
+        zooDistanceRouter.getOrCreateZooDistances({user_postcode_id: 1, postcode_sector: "SA1 1"}, [4]).then(function (data) {
+            expect(zoosToQuery).not.to.be.null;
+            expect(zoosToQuery).to.be.length(1);
+            expect(zoosToQuery).to.contain(4);
+            expect(data).to.be.an("array")
+            expect(data).to.be.length(1);
+            for(let distance of data) {
+                ZooDistance.check(distance);
+            }
+            expect(data.map(x => x.metres)).to.contain(12345);
+            done();
+        }).catch(function(err) {
+            done(err);
+        }).then(function() {
+            zooDistanceRouter.createZooDistances = oldFetch;
+        });
+    });
+
+    it("should combine the lists of cached and new distances", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([
+            {zoo_distance_id: 1, user_postcode_id: 1, zoo_id: 1, metres: 27293},
+            {zoo_distance_id: 2, user_postcode_id: 1, zoo_id: 3, metres: 34029}
+        ]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 4, name: "Test zoo", link: "http://example.com", postcode: "SA3 1AA", latitude: -67.34, longitude: -123.47}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldFetch = zooDistanceRouter.createZooDistances;
+        zooDistanceRouter.createZooDistances = function (userPostcodeData: UserPostcodeJson, zooIdList: number[]) {
+            return Promise.resolve([
+                {zoo_distance_id: 5, zoo_id: 4, user_postcode_id: 1, metres: 12345}
+            ])
+        };
+
+        zooDistanceRouter.getOrCreateZooDistances({user_postcode_id: 1, postcode_sector: "SA1 1"}, [1,3,4]).then(function (data) {
+            expect(data).to.be.an("array");
+            expect(data).to.be.length(3);
+            for(let distance of data) {
+                ZooDistance.check(distance);
+                expect(distance.user_postcode_id).to.be.equal(1);
+            }
+            const distance1 = data.filter(x => x.zoo_id == 1);
+            const distance2 = data.filter(x => x.zoo_id == 3);
+            const distance3 = data.filter(x => x.zoo_id == 4);
+            expect(distance1).to.be.length(1);
+            expect(distance2).to.be.length(1);
+            expect(distance3).to.be.length(1);
+            expect(distance1[0].zoo_id).to.be.equal(1);
+            expect(distance2[0].zoo_id).to.be.equal(3);
+            expect(distance3[0].zoo_id).to.be.equal(4);
+            expect(distance1[0].metres).to.be.equal(27293);
+            expect(distance2[0].metres).to.be.equal(34029);
+            expect(distance3[0].metres).to.be.equal(12345);
+            done();
+        }).catch(function(err) {
+            done(err);
+        }).then(function() {
+            zooDistanceRouter.createZooDistances = oldFetch;
+        });
+    });
 });
