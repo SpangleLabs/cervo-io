@@ -148,7 +148,7 @@ export class ZooDistancesRouter extends AbstractRouter {
             return self.queryGoogleForZooDistances(userPostcodeData, zooDataList);
         }).then(function (newZooDistances) {
             // Save google api responses to database
-            const savePromises: Promise<ZooDistanceJson>[] = newZooDistances.map(self.zooDistances.addZooDistance);
+            const savePromises: Promise<ZooDistanceJson>[] = newZooDistances.map(x => self.zooDistances.addZooDistance(x));
             return Promise.all(savePromises);
         });
     }

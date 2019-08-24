@@ -166,6 +166,18 @@ export class MockZooDistanceProvider extends ZooDistancesProvider {
     getZooDistanceByZooIdAndUserPostcodeId(zoo_id: number, user_postcode_id: number): Promise<ZooDistanceJson[]> {
         return Promise.all(this.testZooDistances.filter(x => x.zoo_id == zoo_id && x.user_postcode_id == user_postcode_id));
     }
+
+    addZooDistance(ZooDistance: NewZooDistanceJson): Promise<ZooDistanceJson> {
+        const newId = createNewId(this.testZooDistances.map(x => x.zoo_distance_id));
+        const result = {
+            zoo_distance_id: newId,
+            zoo_id: ZooDistance.zoo_id,
+            user_postcode_id: ZooDistance.user_postcode_id,
+            metres: ZooDistance.metres
+        }
+        this.testZooDistances.push(result);
+        return Promise.resolve(result);
+    }
 }
 
 export class MockUserPostcodeProvider extends UserPostcodesProvider {
