@@ -29,7 +29,7 @@ export class ZooDistancesRouter extends AbstractRouter {
             const postcode = Postcode.parse(paramPostcode);
             // Validate postcode
             if (!postcode.valid) {
-                res.status(404).json({"error": "Invalid postcode"});
+                res.status(404).json({"error": "Invalid postcode."});
                 return;
             }
             // Get postcode sector

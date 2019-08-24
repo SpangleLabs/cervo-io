@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
 import {ZooDistancesRouter} from "./zooDistancesRouter";
-import {MockUserPostcodeProvider, MockZooDistanceProvider, MockZoosProvider} from "../testMocks";
+import {MockUserPostcodeProvider, MockZooDistanceProvider, MockZoosProvider, requestRouter} from "../testMocks";
 import {Number, Record, String} from "runtypes";
 import chaiHttp = require('chai-http');
 
@@ -32,11 +32,134 @@ const NewZooDistance = Record({
 })
 
 describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function() {
-    it("should return 404 if given invalid postcode");
-    it("should return an error if given an empty list of zoos");
-    it("should return an error if given invalid zoo id list");
-    it("should handle duplicate zoo ids without making duplicate requests");
-    it("should return specified zoo distances");
+    it("should return 404 if given invalid postcode", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        requestRouter(zooDistanceRouter)
+            .get("/zoo_distances/not a postcode/1,5,16")
+            .end(function (err, res) {
+                expect(res.status).to.be.equal(404);
+                expect(res.body).to.haveOwnProperty("error");
+                expect(res.body.error).to.be.equal("Invalid postcode.");
+                done();
+            });
+    });
+
+    it("should return 404 if given an empty list of zoos", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        requestRouter(zooDistanceRouter)
+            .get("/zoo_distances/SA1 1RT/")
+            .end(function (err, res) {
+                expect(res.status).to.be.equal(404);
+                done();
+            });
+    });
+
+    it("should return an error if given invalid zoo id list", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([]);
+        const zoosProvider = new MockZoosProvider([]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        requestRouter(zooDistanceRouter)
+            .get("/zoo_distances/SA1 1RT/12")
+            .end(function (err, res) {
+                expect(res.status).to.be.equal(500);
+                expect(res.body).to.haveOwnProperty("error");
+                expect(res.body.error).to.be.equal("Failure to determine distances.");
+                done();
+            });
+    });
+
+    it("should handle duplicate zoo ids without making duplicate requests", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([
+            {zoo_distance_id: 1, user_postcode_id: 1, zoo_id: 1, metres: 15}
+        ]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([
+            {user_postcode_id: 1, postcode_sector: "SA1 1"}
+        ]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 1, name: "Test 1", link: "http://example.com/1", postcode: "SA3 1AA", longitude: 124.21, latitude: -53.2},
+            {zoo_id: 2, name: "Test 2", link: "http://example.com/2", postcode: "SA2 1AA", longitude: 76.23, latitude: 82.12}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        const oldMethod = zooDistanceRouter.fetchGoogleResponse;
+        let callCount = 0;
+        zooDistanceRouter.fetchGoogleResponse = function(url: string) {
+            callCount ++;
+            return Promise.resolve(
+                {
+                    status: "OK",
+                    rows: [
+                        {
+                            elements: [
+                                {distance: {value: 127}}
+                            ]
+                        }
+                    ]
+                }
+            );
+        }
+
+        requestRouter(zooDistanceRouter)
+            .get("/zoo_distances/SA1 1RT/1,2,2")
+            .end(function (err, res) {
+                expect(res.status).to.be.equal(200);
+                expect(res.body).to.be.an("array");
+                expect(res.body).to.be.length(3);
+                expect(res.body[0].zoo_id).to.be.equal(1);
+                expect(res.body[1].zoo_id).to.be.equal(2);
+                expect(res.body[2].zoo_id).to.be.equal(2);
+                expect(res.body[1].metres).to.be.equal(127);
+                expect(res.body[2].metres).to.be.equal(127);
+                expect(callCount).to.be.equal(1);
+                expect(zooDistancesProvider.testZooDistances).to.be.length(2);
+                expect(zooDistancesProvider.testZooDistances[1].metres).to.be.equal(127);
+                expect(zooDistancesProvider.testZooDistances[1].zoo_id).to.be.equal(2);
+                expect(zooDistancesProvider.testZooDistances[1].user_postcode_id).to.be.equal(1);
+                done();
+                zooDistanceRouter.fetchGoogleResponse = oldMethod;
+            });
+    });
+
+    it("should return specified zoo distances", function(done) {
+        const zooDistancesProvider = new MockZooDistanceProvider([
+            {zoo_distance_id: 1, user_postcode_id: 1, zoo_id: 1, metres: 15},
+            {zoo_distance_id: 2, user_postcode_id: 1, zoo_id: 2, metres: 127}
+        ]);
+        const userPostcodesProvider = new MockUserPostcodeProvider([
+            {user_postcode_id: 1, postcode_sector: "SA1 1"}
+        ]);
+        const zoosProvider = new MockZoosProvider([
+            {zoo_id: 1, name: "Test 1", link: "http://example.com/1", postcode: "SA3 1AA", longitude: 124.21, latitude: -53.2},
+            {zoo_id: 2, name: "Test 2", link: "http://example.com/2", postcode: "SA2 1AA", longitude: 76.23, latitude: 82.12}
+        ]);
+        const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+
+        requestRouter(zooDistanceRouter)
+            .get("/zoo_distances/SA1 1RT/1,2")
+            .end(function (err, res) {
+                expect(res.status).to.be.equal(200);
+                expect(res.body).to.be.an("array");
+                expect(res.body).to.be.length(2);
+                for(let distance of res.body) {
+                    ZooDistance.check(distance);
+                }
+                expect(res.body[0].zoo_id).to.be.equal(1);
+                expect(res.body[0].metres).to.be.equal(15);
+                expect(res.body[1].zoo_id).to.be.equal(2);
+                expect(res.body[1].metres).to.be.equal(127);
+                done();
+            });
+    });
 });
 
 describe("getOrCreatePostcode()", function() {
