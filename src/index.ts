@@ -23,11 +23,6 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-// Express errors can have a status code
-interface ResponseError extends Error {
-    status?: number;
-}
-
 export const App: Application = express();
 
 // uncomment after placing your favicon in /public
@@ -69,21 +64,20 @@ zoosRouter.register(App);
 
 // catch 404 and forward to error handler
 export const handler404 = function (req: Request, res: Response, next: NextFunction) {
-    const err: ResponseError = new Error('Not Found');
-    err.status = 404;
+    const err: Error = new Error('Not Found');
     res.status(404);
     next(err);
 };
 App.use(handler404);
 
 // error handler
-export const handler500 = function (err: ResponseError, req: Request, res: Response, next: NextFunction) {
+export const handler500 = function (err: Error, req: Request, res: Response, next: NextFunction) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
-    res.status(err.status || 500);
+    res.status(res.statusCode || 500);
     res.json(err);
 };
 App.use(handler500);

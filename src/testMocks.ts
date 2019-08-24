@@ -16,7 +16,7 @@ const express = require('express');
 const handler500Testing = function (err: Error, req: Request, res: Response, next: NextFunction) {
     console.log(err);
     // render the error page
-    res.status(500);
+    res.status(res.statusCode || 500);
     res.json(err);
 };
 
