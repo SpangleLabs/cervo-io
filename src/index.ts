@@ -51,7 +51,7 @@ const authChecker = new AuthChecker(sessionsProvider);
 // Create and register routers
 const indexRouter = new IndexRouter();
 indexRouter.register(App);
-const categoryRouter = new CategoriesRouter(categoryProvider, speciesProvider);
+const categoryRouter = new CategoriesRouter(authChecker, categoryProvider, speciesProvider);
 categoryRouter.register(App);
 const categoryLevelsRouter = new CategoryLevelsRouter(categoryLevelsProvider);
 categoryLevelsRouter.register(App);

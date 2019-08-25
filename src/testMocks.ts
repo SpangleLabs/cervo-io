@@ -10,6 +10,7 @@ import {ZoosProvider} from "./models/zoosProvider";
 import {SessionsProvider} from "./models/sessionsProvider";
 import {ZooDistancesProvider} from "./models/zooDistancesProvider";
 import {UserPostcodesProvider} from "./models/userPostcodesProvider";
+import {AuthChecker} from "./authChecker";
 
 const express = require('express');
 
@@ -289,4 +290,25 @@ export class MockSessionsProvider extends SessionsProvider {
         this.sessionTokens = this.sessionTokens.filter(x => x.username != username);
         return Promise.resolve();
     }
+}
+
+export class MockAuthChecker extends AuthChecker {
+    is_admin: boolean;
+    is_logged_in: boolean;
+
+    constructor() {
+        const sessionsProvider = new MockSessionsProvider([]);
+        super(sessionsProvider);
+        this.is_admin = true;
+        this.is_logged_in = true;
+    }
+
+    isLoggedIn(req: Request): Promise<boolean> {
+        return Promise.resolve(this.is_logged_in);
+    }
+
+    isAdmin(req: Request): Promise<boolean> {
+        return Promise.resolve(this.is_admin);
+    }
+
 }

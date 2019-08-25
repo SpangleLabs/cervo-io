@@ -1,13 +1,16 @@
 import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {CategoriesProvider} from "../models/categoriesProvider";
+import {AuthChecker} from "../authChecker";
 
 export class CategoriesRouter extends AbstractRouter {
+    authChecker: AuthChecker;
     categories: CategoriesProvider;
     species: SpeciesProvider;
 
-    constructor(categoryProvider: CategoriesProvider, speciesProvider: SpeciesProvider) {
+    constructor(authChecker: AuthChecker, categoryProvider: CategoriesProvider, speciesProvider: SpeciesProvider) {
         super("/categories");
+        this.authChecker = authChecker;
         this.categories = categoryProvider;
         this.species = speciesProvider;
     }

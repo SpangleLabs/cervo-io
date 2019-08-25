@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import {expect} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
-import {requestRouter, MockCategoriesProvider, MockSpeciesProvider} from "../testMocks";
+import {requestRouter, MockCategoriesProvider, MockSpeciesProvider, MockAuthChecker} from "../testMocks";
 import {Null, Number, String, Record, Array} from "runtypes";
 
 chai.use(chaiHttp);
@@ -50,7 +50,8 @@ describe("Base category listing", function() {
                 species_id: 1, common_name: "Test species", latin_name: "Examplera testus", "category_id": 1
             }
         ]);
-        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+        const authChecker = new MockAuthChecker();
+        const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
 
         requestRouter(categoryRouter).get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
@@ -95,7 +96,8 @@ describe("Base category listing", function() {
                 species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3
             }
         ]);
-        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+        const authChecker = new MockAuthChecker();
+        const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
 
         requestRouter(categoryRouter).get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
@@ -128,7 +130,8 @@ describe("Base category listing", function() {
     it("Handles having no base categories", function(done) {
         const mockCategoryProvider = new MockCategoriesProvider([]);
         const mockSpeciesProvider = new MockSpeciesProvider([]);
-        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+        const authChecker = new MockAuthChecker();
+        const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
 
         requestRouter(categoryRouter).get("/categories/").end(function(err, res) {
             expect(err).to.be.null;
@@ -164,7 +167,8 @@ describe("View specific category", function() {
                 species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3
             }
         ]);
-        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+        const authChecker = new MockAuthChecker();
+        const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
 
         requestRouter(categoryRouter).get("/categories/2").end(function(err, res) {
             expect(err).to.be.null;
@@ -195,7 +199,8 @@ describe('Add new category', function () {
                 category_id: 1, category_level_id: 1, name: "Test category", parent_category_id: null
             }]);
         const mockSpeciesProvider = new MockSpeciesProvider([]);
-        const categoryRouter = new CategoriesRouter(mockCategoryProvider, mockSpeciesProvider);
+        const authChecker = new MockAuthChecker();
+        const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
 
         const newCategory: NewCategoryJson = {
             category_level_id: 2,
