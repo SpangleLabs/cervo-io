@@ -1,6 +1,6 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
-import {requestRouter} from "../testMocks";
+import {MockAuthChecker, requestRouter} from "../testMocks";
 import {IndexRouter} from "./indexRouter";
 import {expect} from "chai";
 
@@ -9,7 +9,8 @@ chai.use(chaiHttp);
 describe("Index router", function() {
     describe("Index endpoint", function () {
         it('should return an empty object', function (done) {
-            const indexRouter = new IndexRouter();
+            const authChecker = new MockAuthChecker();
+            const indexRouter = new IndexRouter(authChecker);
             requestRouter(indexRouter).get("/").end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res.status).to.be.equal(200);

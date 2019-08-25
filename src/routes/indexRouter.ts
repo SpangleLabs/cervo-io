@@ -1,9 +1,10 @@
 import {AbstractRouter} from "./abstractRouter";
+import {AuthChecker} from "../authChecker";
 
 export class IndexRouter extends AbstractRouter {
 
-    constructor() {
-        super("/");
+    constructor(authChecker: AuthChecker) {
+        super("/", authChecker);
     }
 
     initialise() {

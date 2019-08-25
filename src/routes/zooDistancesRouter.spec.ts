@@ -1,7 +1,13 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
 import {ZooDistancesRouter} from "./zooDistancesRouter";
-import {MockUserPostcodeProvider, MockZooDistanceProvider, MockZoosProvider, requestRouter} from "../testMocks";
+import {
+    MockAuthChecker,
+    MockUserPostcodeProvider,
+    MockZooDistanceProvider,
+    MockZoosProvider,
+    requestRouter
+} from "../testMocks";
 import {Number, Record, String} from "runtypes";
 import chaiHttp = require('chai-http');
 
@@ -37,7 +43,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             requestRouter(zooDistanceRouter)
                 .get("/zoo_distances/not a postcode/1,5,16")
@@ -53,7 +60,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             requestRouter(zooDistanceRouter)
                 .get("/zoo_distances/SA1 1RT/")
@@ -67,7 +75,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             requestRouter(zooDistanceRouter)
                 .get("/zoo_distances/SA1 1RT/12")
@@ -104,7 +113,8 @@ describe("Zoo distances router", function () {
                     latitude: 82.12
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldMethod = zooDistanceRouter.fetchGoogleResponse;
             let callCount = 0;
@@ -171,7 +181,8 @@ describe("Zoo distances router", function () {
                     latitude: 82.12
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             requestRouter(zooDistanceRouter)
                 .get("/zoo_distances/SA1 1RT/1,2")
@@ -198,7 +209,8 @@ describe("Zoo distances router", function () {
                 {user_postcode_id: 1, postcode_sector: "SA1 1"}
             ]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.getOrCreatePostcode("SA1 1").then(function (postcodeData) {
                 UserPostcode.check(postcodeData);
@@ -213,7 +225,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.getOrCreatePostcode("SA1 1").then(function (postcodeData) {
                 UserPostcode.check(postcodeData);
@@ -244,7 +257,8 @@ describe("Zoo distances router", function () {
                     longitude: 67.33
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.getCachedDistanceOrNot(1, 3).then(function (distance) {
                 expect(distance).not.to.be.false;
@@ -280,7 +294,8 @@ describe("Zoo distances router", function () {
                     longitude: 67.33
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.getCachedDistanceOrNot(1, 2).then(function (distance) {
                 expect(distance).to.be.false;
@@ -305,7 +320,8 @@ describe("Zoo distances router", function () {
                     longitude: -59.65
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.getZooData(1).then(function (zooData) {
                 expect(zooData).to.be.an("object");
@@ -320,7 +336,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.getZooData(1).then(function (zooData) {
                 expect(zooData).to.be.undefined;
@@ -336,7 +353,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.fetchGoogleResponse;
             let urls: string[] = [];
@@ -367,7 +385,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.fetchGoogleResponse;
             zooDistanceRouter.fetchGoogleResponse = function (url: string) {
@@ -393,7 +412,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.fetchGoogleResponse;
             zooDistanceRouter.fetchGoogleResponse = function (url: string) {
@@ -419,7 +439,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const testDestination = "SA2 1AA,UK";
             const testDestRegex = new RegExp(testDestination, "g");
@@ -453,7 +474,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.queryGoogleDistancesToAddresses;
             let valStart: string | null = null;
@@ -488,7 +510,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.queryGoogleDistancesToAddresses;
             let valDestinationList: string[] | null = null;
@@ -533,7 +556,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.queryGoogleDistancesToAddresses;
             zooDistanceRouter.queryGoogleDistancesToAddresses = function (start: string, destinationList: string[]) {
@@ -582,7 +606,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             zooDistanceRouter.createZooDistances({
                 user_postcode_id: 1,
@@ -600,7 +625,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.queryGoogleForZooDistances;
             let called = false;
@@ -635,7 +661,8 @@ describe("Zoo distances router", function () {
             const zooDistancesProvider = new MockZooDistanceProvider([]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.queryGoogleForZooDistances;
             zooDistanceRouter.queryGoogleForZooDistances = function (userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]) {
@@ -673,7 +700,8 @@ describe("Zoo distances router", function () {
             ]);
             const userPostcodesProvider = new MockUserPostcodeProvider([]);
             const zoosProvider = new MockZoosProvider([]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.queryGoogleForZooDistances;
             zooDistanceRouter.queryGoogleForZooDistances = function (userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]) {
@@ -709,7 +737,8 @@ describe("Zoo distances router", function () {
                     longitude: -123.47
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.createZooDistances;
             let zoosToQuery: number[] | null = null;
@@ -757,7 +786,8 @@ describe("Zoo distances router", function () {
                     longitude: -123.47
                 }
             ]);
-            const zooDistanceRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+            const authChecker = new MockAuthChecker();
+            const zooDistanceRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 
             const oldFetch = zooDistanceRouter.createZooDistances;
             zooDistanceRouter.createZooDistances = function (userPostcodeData: UserPostcodeJson, zooIdList: number[]) {

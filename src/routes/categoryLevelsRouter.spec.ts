@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
 import chaiHttp = require('chai-http');
-import {requestRouter, MockCategoryLevelsProvider} from "../testMocks";
+import {requestRouter, MockCategoryLevelsProvider, MockAuthChecker} from "../testMocks";
 import {Number, String, Record} from "runtypes";
 import {CategoryLevelsRouter} from "./categoryLevelsRouter";
 
@@ -22,7 +22,8 @@ describe("Category levels router", function() {
                 {
                     category_level_id: 2, name: "Level 2"
                 }]);
-            const categoryLevelRouter = new CategoryLevelsRouter(mockCategoryLevelsProvider);
+            const authChecker = new MockAuthChecker();
+            const categoryLevelRouter = new CategoryLevelsRouter(authChecker, mockCategoryLevelsProvider);
 
             requestRouter(categoryLevelRouter).get("/category_levels/").end(function (err, res) {
                 expect(err).to.be.null;
@@ -47,7 +48,8 @@ describe("Category levels router", function() {
                 {
                     category_level_id: 2, name: "Level 2"
                 }]);
-            const categoryLevelRouter = new CategoryLevelsRouter(mockCategoryLevelsProvider);
+            const authChecker = new MockAuthChecker();
+            const categoryLevelRouter = new CategoryLevelsRouter(authChecker, mockCategoryLevelsProvider);
 
             requestRouter(categoryLevelRouter).get("/category_levels/2").end(function (err, res) {
                 expect(err).to.be.null;

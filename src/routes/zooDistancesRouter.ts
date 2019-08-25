@@ -5,14 +5,15 @@ import {AbstractRouter} from "./abstractRouter";
 import {UserPostcodesProvider} from "../models/userPostcodesProvider";
 import {ZooDistancesProvider} from "../models/zooDistancesProvider";
 import {ZoosProvider} from "../models/zoosProvider";
+import {AuthChecker} from "../authChecker";
 
 export class ZooDistancesRouter extends AbstractRouter {
     zooDistances: ZooDistancesProvider;
     userPostcodes: UserPostcodesProvider;
     zoos: ZoosProvider;
 
-    constructor(zooDistancesProvider: ZooDistancesProvider, userPostcodesProvider: UserPostcodesProvider, zoosProvider: ZoosProvider) {
-        super("/zoo_distances");
+    constructor(authChecker: AuthChecker, zooDistancesProvider: ZooDistancesProvider, userPostcodesProvider: UserPostcodesProvider, zoosProvider: ZoosProvider) {
+        super("/zoo_distances", authChecker);
         this.zooDistances = zooDistancesProvider;
         this.userPostcodes = userPostcodesProvider;
         this.zoos = zoosProvider;

@@ -49,21 +49,21 @@ const zoosProvider = new ZoosProvider(connection);
 const authChecker = new AuthChecker(sessionsProvider);
 
 // Create and register routers
-const indexRouter = new IndexRouter();
+const indexRouter = new IndexRouter(authChecker);
 indexRouter.register(App);
 const categoryRouter = new CategoriesRouter(authChecker, categoryProvider, speciesProvider);
 categoryRouter.register(App);
-const categoryLevelsRouter = new CategoryLevelsRouter(categoryLevelsProvider);
+const categoryLevelsRouter = new CategoryLevelsRouter(authChecker, categoryLevelsProvider);
 categoryLevelsRouter.register(App);
 const sessionsRouter = new SessionsRouter(authChecker, sessionsProvider);
 sessionsRouter.register(App);
-const speciesRouter = new SpeciesRouter(speciesProvider, zoosProvider);
+const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
 speciesRouter.register(App);
-const zooDistancesRouter = new ZooDistancesRouter(zooDistancesProvider, userPostcodesProvider, zoosProvider);
+const zooDistancesRouter = new ZooDistancesRouter(authChecker, zooDistancesProvider, userPostcodesProvider, zoosProvider);
 zooDistancesRouter.register(App);
-const zooSpeciesRouter = new ZooSpeciesRouter(zooSpeciesProvider);
+const zooSpeciesRouter = new ZooSpeciesRouter(authChecker, zooSpeciesProvider);
 zooSpeciesRouter.register(App);
-const zoosRouter = new ZoosRouter(zoosProvider, speciesProvider);
+const zoosRouter = new ZoosRouter(authChecker, zoosProvider, speciesProvider);
 zoosRouter.register(App);
 
 // catch 404 and forward to error handler

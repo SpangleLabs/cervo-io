@@ -1,13 +1,14 @@
 import {ZoosProvider} from "../models/zoosProvider";
 import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
+import {AuthChecker} from "../authChecker";
 
 export class ZoosRouter extends AbstractRouter {
     zoos: ZoosProvider;
     species: SpeciesProvider;
 
-    constructor(zoosProvider: ZoosProvider, speciesProvider: SpeciesProvider) {
-        super("/zoos");
+    constructor(authChecker: AuthChecker, zoosProvider: ZoosProvider, speciesProvider: SpeciesProvider) {
+        super("/zoos", authChecker);
         this.zoos = zoosProvider;
         this.species = speciesProvider;
     }

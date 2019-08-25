@@ -1,12 +1,15 @@
 import {Application, Router} from "express";
+import {AuthChecker} from "../authChecker";
 
 export abstract class AbstractRouter {
     router: Router;
     path: string;
+    authChecker: AuthChecker;
 
-    protected constructor(path: string) {
+    protected constructor(path: string, authChecker: AuthChecker) {
         this.router = Router();
         this.path = path;
+        this.authChecker = authChecker;
         this.initialise();
     }
 

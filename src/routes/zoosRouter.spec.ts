@@ -1,6 +1,6 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
-import {MockSpeciesProvider, MockZoosProvider, requestRouter} from "../testMocks";
+import {MockAuthChecker, MockSpeciesProvider, MockZoosProvider, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
 import {Number, String, Record, Array} from "runtypes";
@@ -63,7 +63,8 @@ describe("Zoos Router", function () {
                 }
             ]);
             const mockSpeciesProvider = new MockSpeciesProvider([]);
-            const zoosRouter = new ZoosRouter(mockZoosProvider, mockSpeciesProvider);
+            const authChecker = new MockAuthChecker();
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
             requestRouter(zoosRouter).get("/zoos/").end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res.status).to.be.equal(200);
@@ -107,7 +108,8 @@ describe("Zoos Router", function () {
                 }
             ]);
             const mockSpeciesProvider = new MockSpeciesProvider([]);
-            const zoosRouter = new ZoosRouter(mockZoosProvider, mockSpeciesProvider);
+            const authChecker = new MockAuthChecker();
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
             requestRouter(zoosRouter).get("/zoos/2").end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res.status).to.be.equal(200);
@@ -160,7 +162,8 @@ describe("Zoos Router", function () {
                     {zoo_id: 3, species_id: 1, zoo_species_id: 4}
                 ]
             );
-            const zoosRouter = new ZoosRouter(mockZoosProvider, mockSpeciesProvider);
+            const authChecker = new MockAuthChecker();
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
             requestRouter(zoosRouter).get("/zoos/2").end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res.status).to.be.equal(200);

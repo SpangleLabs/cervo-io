@@ -7,12 +7,10 @@ import {AuthChecker} from "../authChecker";
 const uuidv4 = uuid.v4;
 
 export class SessionsRouter extends AbstractRouter {
-    authChecker: AuthChecker;
     sessions: SessionsProvider;
 
     constructor(authChecker: AuthChecker, sessionsProvider: SessionsProvider) {
-        super("/session");
-        this.authChecker = authChecker;
+        super("/session", authChecker);
         this.sessions = sessionsProvider;
     }
 

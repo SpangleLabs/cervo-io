@@ -1,11 +1,12 @@
 import {CategoryLevelsProvider} from "../models/categoryLevelsProvider";
 import {AbstractRouter} from "./abstractRouter";
+import {AuthChecker} from "../authChecker";
 
 export class CategoryLevelsRouter extends AbstractRouter {
     categoryLevels: CategoryLevelsProvider;
 
-    constructor(categoryLevelsProvider: CategoryLevelsProvider) {
-        super("/category_levels");
+    constructor(authChecker: AuthChecker, categoryLevelsProvider: CategoryLevelsProvider) {
+        super("/category_levels", authChecker);
         this.categoryLevels = categoryLevelsProvider;
     }
 
