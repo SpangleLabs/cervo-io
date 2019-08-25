@@ -11,6 +11,7 @@ import {SessionsProvider} from "./models/sessionsProvider";
 import {ZooDistancesProvider} from "./models/zooDistancesProvider";
 import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 import {AuthChecker} from "./authChecker";
+import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
 
 const express = require('express');
 
@@ -288,6 +289,31 @@ export class MockSessionsProvider extends SessionsProvider {
 
     deleteToken(username: string): Promise<void> {
         this.sessionTokens = this.sessionTokens.filter(x => x.username != username);
+        return Promise.resolve();
+    }
+}
+
+export class MockZooSpeciesProvider extends ZooSpeciesProvider {
+    testZooSpeciesLinks: ZooSpeciesLinkJson[];
+
+    constructor(testZooSpeciesLinks: ZooSpeciesLinkJson[]) {
+        super(() => { throw new Error("Mock database."); });
+        this.testZooSpeciesLinks = testZooSpeciesLinks;
+    }
+
+    addZooSpecies(newZooSpecies: NewZooSpeciesLinkJson): Promise<ZooSpeciesLinkJson> {
+        const newId = createNewId(this.testZooSpeciesLinks.map(x => x.zoo_species_id));
+        const result = {
+            zoo_species_id: newId,
+            species_id: newZooSpecies.species_id,
+            zoo_id: newZooSpecies.zoo_id
+        }
+        this.testZooSpeciesLinks.push(result);
+        return Promise.resolve(result);
+    }
+
+    deleteZooSpecies(deleteLink: ZooSpeciesLinkJson | NewZooSpeciesLinkJson): Promise<void> {
+        this.testZooSpeciesLinks = this.testZooSpeciesLinks.filter(x => x.species_id != deleteLink.species_id || x.zoo_id != deleteLink.zoo_id);
         return Promise.resolve();
     }
 }
