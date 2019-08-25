@@ -219,6 +219,7 @@ describe("Categories router", function() {
                     expect(res.type).to.be.equal("application/json");
                     const category = res.body;
                     SubCategory.check(category);
+                    expect(mockCategoryProvider.testCategories).to.be.length(2);
                     done();
                 })
         });
@@ -244,6 +245,7 @@ describe("Categories router", function() {
                     expect(res.status).to.be.equal(403);
                     expect(res.body).to.property("error");
                     expect(res.body.error).to.be.equal("Not authorized.");
+                    expect(mockCategoryProvider.testCategories).to.be.length(0);
                     done();
                 });
         });
@@ -269,6 +271,7 @@ describe("Categories router", function() {
                     expect(res.status).to.be.equal(403);
                     expect(res.body).to.property("error");
                     expect(res.body.error).to.be.equal("Not authorized.");
+                    expect(mockCategoryProvider.testCategories).to.be.length(0);
                     done();
                 });
         });
