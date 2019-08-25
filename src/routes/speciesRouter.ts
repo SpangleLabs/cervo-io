@@ -64,11 +64,17 @@ export class SpeciesRouter extends AbstractRouter {
 
         /* POST a new species */
         this.router.post('/', function (req, res, next) {
-            self.species.addSpecies(req.body).then(function (newSpecies: SpeciesJson) {
-                res.json(newSpecies);
-            }).catch(function (err) {
-                res.status(500).json(err);
-            });
+            self.authChecker.isAdmin(req).then(function(isAdmin) {
+                if(isAdmin) {
+                    self.species.addSpecies(req.body).then(function (newSpecies: SpeciesJson) {
+                        res.json(newSpecies);
+                    }).catch(function (err) {
+                        res.status(500).json(err);
+                    });
+                } else {
+                    res.status(403).json({"error": "Not authorized."});
+                }
+            })
         });
     }
 

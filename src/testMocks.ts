@@ -120,6 +120,18 @@ export class MockSpeciesProvider extends SpeciesProvider {
         }
         return Promise.all(results);
     }
+
+    addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
+        const newId = createNewId(this.testSpecies.map(x => x.species_id));
+        const result = {
+            species_id: newId,
+            common_name: newSpecies.common_name,
+            latin_name: newSpecies.latin_name,
+            category_id: newSpecies.category_id
+        }
+        this.testSpecies.push(result);
+        return Promise.resolve(result);
+    }
 }
 
 export class MockZoosProvider extends ZoosProvider {
