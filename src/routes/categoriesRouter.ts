@@ -14,8 +14,9 @@ export class CategoriesRouter extends AbstractRouter {
     }
 
     initialise(): void {
-        /* GET categories listing. */
         const self = this;
+
+        /* GET categories listing. */
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
                 self.categories.getCategoryById(req.params.id).then(function (rows) {

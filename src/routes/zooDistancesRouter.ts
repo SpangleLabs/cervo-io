@@ -21,6 +21,7 @@ export class ZooDistancesRouter extends AbstractRouter {
 
     initialise(): void {
         const self = this;
+
         /* GET zoo distances. */
         this.router.get('/:postcode/:zooIdList', function (req, res, next) {
             // Get parameters

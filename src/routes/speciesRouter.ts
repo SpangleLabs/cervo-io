@@ -16,6 +16,7 @@ export class SpeciesRouter extends AbstractRouter {
     initialise(): void {
         const self = this;
 
+        /* GET list of valid first letters for species */
         this.router.get("/valid_first_letters", function (req, res, next) {
             self.species.getFirstLetters().then(function (letters) {
                 res.json(letters.map(a => a['letter']));
@@ -61,6 +62,7 @@ export class SpeciesRouter extends AbstractRouter {
             }
         });
 
+        /* POST a new species */
         this.router.post('/', function (req, res, next) {
             self.species.addSpecies(req.body).then(function () {
                 res.json(req.body);

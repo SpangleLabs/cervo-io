@@ -16,7 +16,8 @@ export class SessionsRouter extends AbstractRouter {
 
     initialise(): void {
         const self = this;
-        /* GET home page. */
+
+        /* GET session info. */
         this.router.get('/', function (req, res, next) {
             const authToken = <string>req.headers['authorization'];
             const ipAddr = <string>req.ip;
@@ -35,6 +36,7 @@ export class SessionsRouter extends AbstractRouter {
             });
         });
 
+        /* POST to create a new session (login) */
         this.router.post('/', function (req, res, next) {
             // Get password from post data
             const username = req.body.username;
@@ -66,6 +68,7 @@ export class SessionsRouter extends AbstractRouter {
             });
         });
 
+        /* DELETE session (logout) */
         this.router.delete('/', function (req, res, next) {
             const authToken = <string>req.headers['authorization'];
             const ipAddr = <string>req.ip;

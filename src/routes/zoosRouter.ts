@@ -15,6 +15,7 @@ export class ZoosRouter extends AbstractRouter {
 
     initialise(): void {
         const self = this;
+
         /* GET zoos listing. */
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
@@ -34,6 +35,7 @@ export class ZoosRouter extends AbstractRouter {
             }
         });
 
+        /* POST a new zoo */
         this.router.post('/', function (req, res, next) {
             self.zoos.addZoo(req.body).then(function () {
                 res.json(req.body);

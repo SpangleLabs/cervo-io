@@ -12,6 +12,8 @@ export class ZooSpeciesRouter extends AbstractRouter {
 
     initialise(): void {
         const self = this;
+
+        /* POST a new zoo species link */
         this.router.post('/', function (req, res, next) {
             self.zooSpecies.addZooSpecies(req.body).then(function () {
                 res.json(req.body);
@@ -20,6 +22,7 @@ export class ZooSpeciesRouter extends AbstractRouter {
             });
         });
 
+        /* DELETE a zoo species link */
         this.router.delete('/', function (req, res, next) {
             self.zooSpecies.deleteZooSpecies(req.body).then(function () {
                 res.json(req.body);
