@@ -37,11 +37,17 @@ export class ZoosRouter extends AbstractRouter {
 
         /* POST a new zoo */
         this.router.post('/', function (req, res, next) {
-            self.zoos.addZoo(req.body).then(function () {
-                res.json(req.body);
-            }).catch(function (err) {
-                res.status(500).json(err);
-            });
+            self.authChecker.isAdmin(req).then(function (isAdmin) {
+                if(isAdmin) {
+                    self.zoos.addZoo(req.body).then(function (newZoo) {
+                        res.json(newZoo);
+                    }).catch(function (err) {
+                        res.status(500).json(err);
+                    });
+                } else {
+                    res.status(403).json({"error": "Not authorized."});
+                }
+            })
         });
 
     }

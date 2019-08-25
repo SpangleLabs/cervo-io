@@ -1,6 +1,11 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
-import {MockAuthChecker, MockSpeciesProvider, MockZoosProvider, requestRouter} from "../testMocks";
+import {
+    MockAuthChecker,
+    MockSpeciesProvider,
+    MockZoosProvider,
+    requestRouter
+} from "../testMocks";
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
 import {Number, String, Record, Array} from "runtypes";
@@ -179,6 +184,97 @@ describe("Zoos Router", function () {
                 }
                 done();
             })
+        });
+    });
+
+    describe("POST / endpoint", function() {
+        it("should create a new zoo if authorized as admin", function(done) {
+
+            const mockZoosProvider = new MockZoosProvider([
+                {zoo_id: 1, name: "Test zoo", link: "http://example.com", postcode: "SA1 1AA", latitude: 57.3, longitude: -124.6}
+            ]);
+            const mockSpeciesProvider = new MockSpeciesProvider([]);
+            const authChecker = new MockAuthChecker();
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
+
+            const newZoo: NewZooJson = {
+                name: "Another zoo",
+                link: "http://example.com/blah",
+                postcode: "SA3 1AA",
+                longitude: 73.22,
+                latitude: -12.3
+            };
+
+            requestRouter(zoosRouter)
+                .post("/zoos/")
+                .set("content-type", "application/json")
+                .send(newZoo)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.type).to.be.equal("application/json");
+                    const zoo = res.body;
+                    Zoo.check(zoo);
+                    expect(mockZoosProvider.testZoos).to.be.length(2);
+                    expect(mockZoosProvider.testZoos.filter(x => x.name == "Another zoo")).to.be.length(1);
+                    done();
+                })
+        });
+
+        it("should not create a zoo if not an admin", function(done) {
+            const mockZoosProvider = new MockZoosProvider([]);
+            const mockSpeciesProvider = new MockSpeciesProvider([]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_admin = false;
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
+
+            const newZoo: NewZooJson = {
+                name: "Another zoo",
+                link: "http://example.com/blah",
+                postcode: "SA3 1AA",
+                longitude: 73.22,
+                latitude: -12.3
+            };
+
+            requestRouter(zoosRouter)
+                .post("/zoos/")
+                .set("content-type", "application/json")
+                .send(newZoo)
+                .end(function (err, res) {
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.property("error");
+                    expect(res.body.error).to.be.equal("Not authorized.");
+                    expect(mockZoosProvider.testZoos).to.be.length(0);
+                    done();
+                });
+        });
+
+        it("should not create a zoo if not logged in", function(done) {
+            const mockZoosProvider = new MockZoosProvider([]);
+            const mockSpeciesProvider = new MockSpeciesProvider([]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_logged_in = false;
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
+
+            const newZoo: NewZooJson = {
+                name: "Another zoo",
+                link: "http://example.com/blah",
+                postcode: "SA3 1AA",
+                longitude: 73.22,
+                latitude: -12.3
+            };
+
+            requestRouter(zoosRouter)
+                .post("/zoos/")
+                .set("content-type", "application/json")
+                .send(newZoo)
+                .end(function (err, res) {
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.property("error");
+                    expect(res.body.error).to.be.equal("Not authorized.");
+                    expect(mockZoosProvider.testZoos).to.be.length(0);
+                    done();
+                });
         });
     });
 });
