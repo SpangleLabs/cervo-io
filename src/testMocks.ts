@@ -308,7 +308,7 @@ export class MockAuthChecker extends AuthChecker {
     }
 
     isAdmin(req: Request): Promise<boolean> {
-        return Promise.resolve(this.is_admin);
+        return Promise.resolve(this.is_admin && this.is_logged_in);
     }
 
 }

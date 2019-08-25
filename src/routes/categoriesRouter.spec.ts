@@ -222,5 +222,55 @@ describe("Categories router", function() {
                     done();
                 })
         });
+
+        it("should return 403 if not authorized as an admin", function(done) {
+            const mockCategoryProvider = new MockCategoriesProvider([]);
+            const mockSpeciesProvider = new MockSpeciesProvider([]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_admin = false;
+            const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
+
+            const newCategory: NewCategoryJson = {
+                category_level_id: 2,
+                name: "sub category",
+                parent_category_id: null
+            };
+
+            requestRouter(categoryRouter)
+                .post("/categories/")
+                .set("content-type", "application/json")
+                .send(newCategory)
+                .end(function (err, res) {
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.property("error");
+                    expect(res.body.error).to.be.equal("Not authorized.");
+                    done();
+                });
+        });
+
+        it("should return 403 if not authorized at all", function(done) {
+            const mockCategoryProvider = new MockCategoriesProvider([]);
+            const mockSpeciesProvider = new MockSpeciesProvider([]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_logged_in = false;
+            const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
+
+            const newCategory: NewCategoryJson = {
+                category_level_id: 2,
+                name: "sub category",
+                parent_category_id: null
+            };
+
+            requestRouter(categoryRouter)
+                .post("/categories/")
+                .set("content-type", "application/json")
+                .send(newCategory)
+                .end(function (err, res) {
+                    expect(res.status).to.be.equal(403);
+                    expect(res.body).to.property("error");
+                    expect(res.body.error).to.be.equal("Not authorized.");
+                    done();
+                });
+        });
     });
 });

@@ -40,11 +40,18 @@ export class CategoriesRouter extends AbstractRouter {
 
         /* POST new category */
         this.router.post('/', function (req, res, next) {
-            self.categories.addCategory(req.body).then(function (newCategory: CategoryJson) {
-                res.json(newCategory);
-            }).catch(function (err) {
-                res.status(500).json(err);
-            });
+            self.authChecker.isAdmin(req).then(function(isAdmin) {
+                if(isAdmin) {
+                    self.categories.addCategory(req.body).then(function (newCategory: CategoryJson) {
+                        res.json(newCategory);
+                    }).catch(function (err) {
+                        res.status(500).json(err);
+                    });
+                } else {
+                    res.status(403).json({"error": "Not authorized."});
+                }
+            })
+
         });
     }
 
