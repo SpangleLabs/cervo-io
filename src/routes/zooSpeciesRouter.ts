@@ -25,15 +25,21 @@ export class ZooSpeciesRouter extends AbstractRouter {
                 } else {
                     res.status(403).json({"error": "Not authorized."});
                 }
-            })
+            });
         });
 
         /* DELETE a zoo species link */
         this.router.delete('/', function (req, res, next) {
-            self.zooSpecies.deleteZooSpecies(req.body).then(function () {
-                res.json(req.body);
-            }).catch(function (err) {
-                res.status(500).json(err);
+            self.authChecker.isAdmin(req).then(function(isAdmin) {
+                if (isAdmin) {
+                    self.zooSpecies.deleteZooSpecies(req.body).then(function () {
+                        res.status(204).json();
+                    }).catch(function (err) {
+                        res.status(500).json(err);
+                    });
+                } else {
+                    res.status(403).json({"error": "Not authorized."});
+                }
             });
         });
     }
