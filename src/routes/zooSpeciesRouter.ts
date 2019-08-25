@@ -15,8 +15,8 @@ export class ZooSpeciesRouter extends AbstractRouter {
 
         /* POST a new zoo species link */
         this.router.post('/', function (req, res, next) {
-            self.zooSpecies.addZooSpecies(req.body).then(function () {
-                res.json(req.body);
+            self.zooSpecies.addZooSpecies(req.body).then(function (newLink: ZooSpeciesLinkJson) {
+                res.json(newLink);
             }).catch(function (err) {
                 res.status(500).json(err);
             });

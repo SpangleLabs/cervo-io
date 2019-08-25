@@ -64,8 +64,8 @@ export class SpeciesRouter extends AbstractRouter {
 
         /* POST a new species */
         this.router.post('/', function (req, res, next) {
-            self.species.addSpecies(req.body).then(function () {
-                res.json(req.body);
+            self.species.addSpecies(req.body).then(function (newSpecies: SpeciesJson) {
+                res.json(newSpecies);
             }).catch(function (err) {
                 res.status(500).json(err);
             });

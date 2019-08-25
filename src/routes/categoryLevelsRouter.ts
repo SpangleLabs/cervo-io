@@ -31,7 +31,4 @@ export class CategoryLevelsRouter extends AbstractRouter {
             }
         );
     }
-
-    /* GET category levels listing. */
-
 }
