@@ -23,7 +23,7 @@ export class SpeciesRouter extends AbstractRouter {
             self.species.getFirstLetters().then(function (letters: LetterJson[]) {
                 return self.authChecker.isAdmin(req).then(function(isAdmin) {
                     if(!isAdmin) {
-                        letters = letters.filter(a => a.hidden == false);
+                        letters = letters.filter(a => !a.hidden);
                     }
                     const letterList = letters.map(a => a.letter).filter(function(el,i,a){return i===a.indexOf(el)});
                     res.json(letterList);
