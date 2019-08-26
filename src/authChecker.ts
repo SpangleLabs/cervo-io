@@ -45,4 +45,13 @@ export class AuthChecker {
             }
         });
     }
+
+    filterOutHidden<T extends {hidden: boolean}>(req: Request, items: T[]): Promise<T[]> {
+        return this.isAdmin(req).then(function(isAdmin) {
+            if(!isAdmin) {
+                items = items.filter(x => !x.hidden);
+            }
+            return items;
+        });
+    }
 }

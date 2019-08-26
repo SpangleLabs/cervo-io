@@ -4,7 +4,7 @@ import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
 import {MockCategoriesProvider, MockSpeciesProvider} from "../testMockProviders";
 import {requestRouter, MockAuthChecker} from "../testMocks";
-import {NewCategoryJson} from "../apiInterfaces";
+import {NewCategoryJson, SpeciesJson} from "../apiInterfaces";
 import {Category, FullCategory, Species} from "../testMockRecords";
 
 chai.use(chaiHttp);
@@ -123,25 +123,14 @@ describe("Categories router", function() {
     describe("View specific category", function () {
         it("Shows just one category", function (done) {
             const mockCategoryProvider = new MockCategoriesProvider([
-                {
-                    category_id: 1, category_level_id: 1, name: "Test category1", parent_category_id: null
-                },
-                {
-                    category_id: 2, category_level_id: 2, name: "Sub category", parent_category_id: 1
-                },
-                {
-                    category_id: 3, category_level_id: 2, name: "Sub category2", parent_category_id: 1
-                },
-                {
-                    category_id: 4, category_level_id: 3, name: "Sub sub category", parent_category_id: 2
-                }]);
+                {category_id: 1, category_level_id: 1, name: "Test category1", parent_category_id: null},
+                {category_id: 2, category_level_id: 2, name: "Sub category", parent_category_id: 1},
+                {category_id: 3, category_level_id: 2, name: "Sub category2", parent_category_id: 1},
+                {category_id: 4, category_level_id: 3, name: "Sub sub category", parent_category_id: 2}
+            ]);
             const mockSpeciesProvider = new MockSpeciesProvider([
-                {
-                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 2, hidden: false
-                },
-                {
-                    species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3, hidden: false
-                }
+                {species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 2, hidden: false},
+                {species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3, hidden: false}
             ]);
             const authChecker = new MockAuthChecker();
             const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
@@ -166,7 +155,65 @@ describe("Categories router", function() {
                 Species.check(species);
                 done();
             })
-        })
+        });
+
+        it("Does not list hidden species", function (done) {
+            const mockCategoryProvider = new MockCategoriesProvider([
+                {category_id: 1, category_level_id: 1, name: "Test category1", parent_category_id: null},
+                {category_id: 2, category_level_id: 2, name: "Sub category", parent_category_id: 1}
+            ]);
+            const mockSpeciesProvider = new MockSpeciesProvider([
+                {species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 2, hidden: false},
+                {species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 1, hidden: false},
+                {species_id: 3, common_name: "Test3", latin_name: "Examplera testii", category_id: 2, hidden: true}
+            ]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_logged_in = false;
+            const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
+
+            requestRouter(categoryRouter).get("/categories/2").end(function (err, res) {
+                expect(res.body).to.be.an("array");
+                expect(res.body.length).to.be.equal(1);
+                const category = res.body[0];
+                FullCategory.check(category);
+                expect(category.category_id).to.be.equal(2);
+                expect(category.species.length).to.be.equal(1);
+                const species = category.species[0];
+                Species.check(species);
+                expect(species.species_id).to.be.equal(1);
+                done();
+            })
+        });
+
+        it("Includes hidden species when authenticated as an admin", function (done) {
+            const mockCategoryProvider = new MockCategoriesProvider([
+                {category_id: 1, category_level_id: 1, name: "Test category1", parent_category_id: null},
+                {category_id: 2, category_level_id: 2, name: "Sub category", parent_category_id: 1}
+            ]);
+            const mockSpeciesProvider = new MockSpeciesProvider([
+                {species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 2, hidden: false},
+                {species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 1, hidden: false},
+                {species_id: 3, common_name: "Test3", latin_name: "Examplera testii", category_id: 2, hidden: true}
+            ]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_admin = true;
+            const categoryRouter = new CategoriesRouter(authChecker, mockCategoryProvider, mockSpeciesProvider);
+
+            requestRouter(categoryRouter).get("/categories/2").end(function (err, res) {
+                expect(res.body).to.be.an("array");
+                expect(res.body.length).to.be.equal(1);
+                const category = res.body[0];
+                FullCategory.check(category);
+                expect(category.category_id).to.be.equal(2);
+                expect(category.species.length).to.be.equal(2);
+                for(let species of category.species){
+                    Species.check(species);
+                }
+                expect(category.species.map((x: SpeciesJson) => x.species_id)).to.contain(1);
+                expect(category.species.map((x: SpeciesJson) => x.species_id)).to.contain(3);
+                done();
+            })
+        });
     });
 
     describe('Add new category', function () {

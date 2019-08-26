@@ -3,6 +3,7 @@ import {AbstractRouter} from "./abstractRouter";
 import {CategoriesProvider} from "../models/categoriesProvider";
 import {AuthChecker} from "../authChecker";
 import {CategoryJson, FullCategoryJson} from "../apiInterfaces";
+import {Request} from "express";
 
 export class CategoriesRouter extends AbstractRouter {
     categories: CategoriesProvider;
@@ -21,7 +22,7 @@ export class CategoriesRouter extends AbstractRouter {
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
                 self.categories.getCategoryById(req.params.id).then(function (rows) {
-                    return self.add_subcategories(rows)
+                    return self.addSubcategories(rows, req)
                 }).then(function(fullRows) {
                     res.json(fullRows);
                 }).catch(function (err) {
@@ -29,7 +30,7 @@ export class CategoriesRouter extends AbstractRouter {
                 });
             } else {
                 self.categories.getBaseCategories().then(function (rows) {
-                    return self.add_subcategories(rows)
+                    return self.addSubcategories(rows, req)
                 }).then(function(fullRows) {
                     res.json(fullRows);
                 }).catch(function (err) {
@@ -55,7 +56,7 @@ export class CategoriesRouter extends AbstractRouter {
         });
     }
 
-    add_subcategories(rows: CategoryJson[]): Promise<FullCategoryJson[]> {
+    addSubcategories(rows: CategoryJson[], req: Request): Promise<FullCategoryJson[]> {
         const self = this;
         const children_promises: Promise<FullCategoryJson>[] = [];
         for (const category of rows) {
@@ -67,6 +68,10 @@ export class CategoriesRouter extends AbstractRouter {
                 ]).then(function(children) {
                     const subCategories = children[0];
                     const species = children[1];
+                    return Promise.all([subCategories, self.authChecker.filterOutHidden(req, species)]);
+                }).then(function(filteredChildren) {
+                    const subCategories = filteredChildren[0];
+                    const species = filteredChildren[1];
                     const row_result: FullCategoryJson = {
                         category_id: category.category_id,
                         category_level_id: category.category_level_id,
