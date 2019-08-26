@@ -54,7 +54,9 @@ export class SpeciesRouter extends AbstractRouter {
             } else if (req.query.common_name) {
                 const search = req.query.common_name;
                 self.species.getSpeciesByCommonName(search).then(function (rows) {
-                    res.json(rows);
+                    return self.filterOutHidden(req, rows);
+                }).then(function(filteredRows) {
+                    res.json(filteredRows);
                 }).catch(function (err) {
                     res.status(500).json(err);
                 });

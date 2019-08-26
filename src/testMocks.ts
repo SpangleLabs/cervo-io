@@ -153,6 +153,36 @@ export class MockSpeciesProvider extends SpeciesProvider {
     getAllSpecies(): Promise<SpeciesJson[]> {
         return Promise.resolve(this.testSpecies);
     }
+
+    getSpeciesByCommonName(search: string): Promise<SpeciesJson[]> {
+        return Promise.resolve(this.testSpecies.filter(x => valueMatchesSqlLikeQuery(x.common_name, search)));
+    }
+
+    getSpeciesByName(search: string): Promise<SpeciesJson[]> {
+        return Promise.resolve(
+            this.testSpecies.filter(x => valueMatchesSqlLikeQuery(x.common_name, search) || valueMatchesSqlLikeQuery(x.latin_name, search))
+        );
+    }
+}
+
+function valueMatchesSqlLikeQuery(value: string, query: string): boolean {
+    if(query.includes("%")) {
+        if(query.startsWith("%")) {
+            if(query.endsWith("%")) {
+                return value.includes(query.substring(1, query.length-1));
+            } else {
+                return value.endsWith(query.substring(1));
+            }
+        } else {
+            if(query.endsWith("%")) {
+                return value.startsWith(query.substring(0, query.length-1));
+            } else {
+                throw new Error("Mock can't support this.");
+            }
+        }
+    } else {
+        return value == query;
+    }
 }
 
 export class MockZoosProvider extends ZoosProvider {

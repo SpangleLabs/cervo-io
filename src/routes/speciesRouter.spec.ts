@@ -217,11 +217,132 @@ describe("Species router", function() {
     });
 
     describe("GET /?common_name= search by common name endpoint", function() {
-        it("Returns species whose common names match");
-        it("Does not return species with matching latin names");
-        it("Handles wildcards");
-        it("Does not include hidden species");
-        it("Includes hidden species if user is admin");
+        it("Returns species whose common names match", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1, hidden: false},
+                {species_id: 2, latin_name: "cervus cervus", common_name: "Deer", category_id: 1, hidden: false},
+                {species_id: 3, latin_name: "aves aves", common_name: "Common bird", category_id: 1, hidden: false},
+                {species_id: 4, latin_name: "rattus rattus", common_name: "Common rat", category_id: 1, hidden: false}
+            ]);
+            const zoosProvider = new MockZoosProvider([]);
+            const authChecker = new MockAuthChecker();
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            requestRouter(speciesRouter)
+                .get("/species/?common_name=Common bird")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.an("array");
+                    expect(res.body).to.be.length(1);
+                    expect(res.body[0].species_id).to.be.equal(3);
+                    expect(res.body[0].latin_name).to.be.equal("aves aves");
+                    Species.check(res.body[0]);
+                    done();
+                });
+        });
+
+        it("Does not return species with matching latin names", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1, hidden: false},
+                {species_id: 2, latin_name: "cervus cervus", common_name: "Deer", category_id: 1, hidden: false},
+                {species_id: 3, latin_name: "aves aves", common_name: "Common bird", category_id: 1, hidden: false},
+                {species_id: 4, latin_name: "rattus rattus", common_name: "Common rat", category_id: 1, hidden: false}
+            ]);
+            const zoosProvider = new MockZoosProvider([]);
+            const authChecker = new MockAuthChecker();
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            requestRouter(speciesRouter)
+                .get("/species/?common_name=aves aves")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.an("array");
+                    expect(res.body).to.be.length(0);
+                    done();
+                });
+        });
+
+        it("Handles wildcards", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1, hidden: false},
+                {species_id: 2, latin_name: "cervus cervus", common_name: "Deer", category_id: 1, hidden: false},
+                {species_id: 3, latin_name: "aves aves", common_name: "Common bird", category_id: 1, hidden: false},
+                {species_id: 4, latin_name: "rattus rattus", common_name: "Common rat", category_id: 1, hidden: false}
+            ]);
+            const zoosProvider = new MockZoosProvider([]);
+            const authChecker = new MockAuthChecker();
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            requestRouter(speciesRouter)
+                .get("/species/?common_name=Common%")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.an("array");
+                    expect(res.body).to.be.length(2);
+                    for(let species of res.body) {
+                        Species.check(species);
+                    }
+                    expect(res.body.map((x: SpeciesJson) => x.species_id)).to.contain(3);
+                    expect(res.body.map((x: SpeciesJson) => x.species_id)).to.contain(4);
+                    done();
+                });
+        });
+
+        it("Does not include hidden species", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1, hidden: false},
+                {species_id: 2, latin_name: "cervus cervus", common_name: "Deer", category_id: 1, hidden: true},
+                {species_id: 3, latin_name: "aves aves", common_name: "Common bird", category_id: 1, hidden: false},
+                {species_id: 4, latin_name: "rattus rattus", common_name: "Common rat", category_id: 1, hidden: true}
+            ]);
+            const zoosProvider = new MockZoosProvider([]);
+            const authChecker = new MockAuthChecker();
+            authChecker.is_logged_in = false;
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            requestRouter(speciesRouter)
+                .get("/species/?common_name=Common%")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.an("array");
+                    expect(res.body).to.be.length(1);
+                    Species.check(res.body[0]);
+                    expect(res.body.map((x: SpeciesJson) => x.species_id)).to.contain(3);
+                    expect(res.body.map((x: SpeciesJson) => x.species_id)).not.to.contain(4);
+                    done();
+                });
+        });
+
+        it("Includes hidden species if user is admin", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1, hidden: false},
+                {species_id: 2, latin_name: "cervus cervus", common_name: "Deer", category_id: 1, hidden: true},
+                {species_id: 3, latin_name: "aves aves", common_name: "Common bird", category_id: 1, hidden: false},
+                {species_id: 4, latin_name: "rattus rattus", common_name: "Common rat", category_id: 1, hidden: true}
+            ]);
+            const zoosProvider = new MockZoosProvider([]);
+            const authChecker = new MockAuthChecker();
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            requestRouter(speciesRouter)
+                .get("/species/?common_name=Common%")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.an("array");
+                    expect(res.body).to.be.length(2);
+                    for(let species of res.body) {
+                        Species.check(species);
+                    }
+                    expect(res.body.map((x: SpeciesJson) => x.species_id)).to.contain(3);
+                    expect(res.body.map((x: SpeciesJson) => x.species_id)).to.contain(4);
+                    done();
+                });
+        });
     });
 
     describe("POST / create new species endpoint", function() {
