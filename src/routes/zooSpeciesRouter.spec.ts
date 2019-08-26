@@ -4,15 +4,9 @@ import {MockZooSpeciesProvider} from "../testMockProviders";
 import {MockAuthChecker, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {ZooSpeciesRouter} from "./zooSpeciesRouter";
-import {Record, Number} from "runtypes";
+import {ZooSpeciesLink} from "../testMockRecords";
 
 chai.use(chaiHttp);
-
-const ZooSpecies = Record({
-    zoo_species_id: Number,
-    species_id: Number,
-    zoo_id: Number
-});
 
 describe("Zoo species router", function() {
     describe("POST / endpoint", function () {
@@ -33,7 +27,7 @@ describe("Zoo species router", function() {
                 .end(function (err, res) {
                     expect(res.status).to.be.equal(200);
                     expect(res.body).to.be.an("object");
-                    ZooSpecies.check(res.body);
+                    ZooSpeciesLink.check(res.body);
                     expect(zooSpeciesProvider.testZooSpeciesLinks).to.be.length(1);
                     done();
             });

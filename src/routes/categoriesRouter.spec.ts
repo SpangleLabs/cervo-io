@@ -4,40 +4,10 @@ import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
 import {MockCategoriesProvider, MockSpeciesProvider} from "../testMockProviders";
 import {requestRouter, MockAuthChecker} from "../testMocks";
-import {Null, Number, String, Record, Array, Boolean} from "runtypes";
 import {NewCategoryJson} from "../apiInterfaces";
+import {Category, FullCategory, Species} from "../testMockRecords";
 
 chai.use(chaiHttp);
-
-const SubCategory = Record({
-    category_id: Number,
-    name: String,
-    category_level_id: Number,
-    parent_category_id: Number,
-});
-const Species = Record({
-    species_id: Number,
-    common_name: String,
-    latin_name: String,
-    category_id: Number,
-    hidden: Boolean
-});
-const BaseCategory = Record({
-    category_id: Number,
-    name: String,
-    category_level_id: Number,
-    parent_category_id: Null,
-    sub_categories: Array(SubCategory),
-    species: Array(Species)
-});
-const FullCategory = Record({
-    category_id: Number,
-    name: String,
-    category_level_id: Number,
-    parent_category_id: Number,
-    sub_categories: Array(SubCategory),
-    species: Array(Species)
-});
 
 describe("Categories router", function() {
     describe("Base category listing", function () {
@@ -64,10 +34,11 @@ describe("Categories router", function() {
                 expect(res.body).to.be.an("array");
                 expect(res.body.length).to.be.equal(1);
                 for (let category of res.body) {
-                    BaseCategory.check(category);
+                    FullCategory.check(category);
+                    expect(category.parent_category_id).to.be.null;
                     expect(category.sub_categories.length).to.be.equal(1);
                     for (let subCategory of category.sub_categories) {
-                        SubCategory.check(subCategory);
+                        Category.check(subCategory);
                         expect(subCategory.parent_category_id).to.be.equal(category.category_id);
                     }
                     expect(category.species.length).to.be.equal(1);
@@ -110,12 +81,13 @@ describe("Categories router", function() {
                 expect(res.body).to.be.an("array");
                 expect(res.body.length).to.be.equal(2);
                 for (let category of res.body) {
-                    BaseCategory.check(category);
+                    FullCategory.check(category);
+                    expect(category.parent_category_id).to.be.null;
                 }
                 const category1 = res.body[0];
                 expect(category1.sub_categories.length).to.be.equal(1);
                 for (let subCategory of category1.sub_categories) {
-                    SubCategory.check(subCategory);
+                    Category.check(subCategory);
                     expect(subCategory.parent_category_id).to.be.equal(category1.category_id);
                 }
                 expect(category1.species.length).to.be.equal(0);
@@ -182,10 +154,11 @@ describe("Categories router", function() {
                 expect(res.body.length).to.be.equal(1);
                 const category = res.body[0];
                 FullCategory.check(category);
+                expect(category.parent_category_id).not.to.be.null;
                 expect(category.category_id).to.be.equal(2);
                 expect(category.sub_categories.length).to.be.equal(1);
                 for (let subCategory of category.sub_categories) {
-                    SubCategory.check(subCategory);
+                    Category.check(subCategory);
                     expect(subCategory.parent_category_id).to.be.equal(category.category_id);
                 }
                 expect(category.species.length).to.be.equal(1);
@@ -221,7 +194,7 @@ describe("Categories router", function() {
                     expect(res.status).to.be.equal(200);
                     expect(res.type).to.be.equal("application/json");
                     const category = res.body;
-                    SubCategory.check(category);
+                    Category.check(category);
                     expect(mockCategoryProvider.testCategories).to.be.length(2);
                     done();
                 })

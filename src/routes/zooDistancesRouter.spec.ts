@@ -7,35 +7,11 @@ import {
     MockZoosProvider
 } from "../testMockProviders";
 import {MockAuthChecker, requestRouter} from "../testMocks";
-import {Number, Record, String} from "runtypes";
 import chaiHttp = require('chai-http');
 import {UserPostcodeJson, ZooJson} from "../apiInterfaces";
+import {NewZooDistance, UserPostcode, Zoo, ZooDistance} from "../testMockRecords";
 
 chai.use(chaiHttp);
-
-const Zoo = Record({
-    zoo_id: Number,
-    name: String,
-    link: String,
-    postcode: String,
-    latitude: Number,
-    longitude: Number
-});
-const UserPostcode = Record({
-    user_postcode_id: Number,
-    postcode_sector: String
-});
-const ZooDistance = Record({
-    zoo_id: Number,
-    metres: Number,
-    user_postcode_id: Number,
-    zoo_distance_id: Number
-});
-const NewZooDistance = Record({
-    zoo_id: Number,
-    metres: Number,
-    user_postcode_id: Number
-})
 
 describe("Zoo distances router", function () {
     describe("/zoo_distances/:postcode/:zooIdList/ endpoint", function () {

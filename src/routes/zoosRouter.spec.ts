@@ -4,36 +4,10 @@ import {MockSpeciesProvider, MockZoosProvider} from "../testMockProviders";
 import {MockAuthChecker, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
-import {Number, String, Record, Array} from "runtypes";
 import {NewZooJson} from "../apiInterfaces";
+import {FullZoo, SpeciesEntryForZoo, Zoo} from "../testMockRecords";
 
 chai.use(chaiHttp);
-
-const Zoo = Record({
-    zoo_id: Number,
-    name: String,
-    link: String,
-    postcode: String,
-    latitude: Number,
-    longitude: Number
-});
-const SpeciesEntryForZoo = Record({
-    species_id: Number,
-    category_id: Number,
-    common_name: String,
-    latin_name: String,
-    zoo_id: Number,
-    zoo_species_id: Number
-});
-const FullZoo = Record({
-    zoo_id: Number,
-    name: String,
-    link: String,
-    postcode: String,
-    latitude: Number,
-    longitude: Number,
-    species: Array(SpeciesEntryForZoo)
-});
 
 describe("Zoos Router", function () {
     describe("All zoos listing endpoint", function () {

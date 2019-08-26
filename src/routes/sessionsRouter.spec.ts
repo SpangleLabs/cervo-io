@@ -4,19 +4,11 @@ import {SessionsRouter} from "./sessionsRouter";
 import {MockSessionsProvider} from "../testMockProviders";
 import {requestRouter} from "../testMocks";
 import {expect} from "chai";
-import {Boolean, Record, String} from "runtypes";
 import {AuthChecker} from "../authChecker";
+import {SessionToken} from "../testMockRecords";
 
 chai.use(chaiHttp);
 chai.use(require('chai-as-promised'));
-
-const TokenResponse = Record({
-    username: String,
-    token: String,
-    expiry_time: String,
-    ip_addr: String,
-    is_admin: Boolean
-});
 
 describe("Sessions router", function() {
     describe('checkPassword() method', function () {
@@ -185,7 +177,7 @@ describe("Sessions router", function() {
                         expect(err).to.be.null;
                         expect(res.status).to.be.equal(200);
                         expect(res.body).to.be.a("object");
-                        TokenResponse.check(res.body);
+                        SessionToken.check(res.body);
                         done();
                     });
             });
@@ -287,7 +279,7 @@ describe("Sessions router", function() {
                         expect(res.status).to.be.equal(200);
                         expect(res.body).to.be.a("object");
                         expect(res.body).not.to.have.property("error");
-                        TokenResponse.check(res.body);
+                        SessionToken.check(res.body);
                         done();
                     });
             });
@@ -325,7 +317,7 @@ describe("Sessions router", function() {
                     .end(function (err, res) {
                         expect(err).to.be.null;
                         expect(res.status).to.be.equal(200);
-                        TokenResponse.check(res.body);
+                        SessionToken.check(res.body);
                         expect(sessionsProvider.sessionTokens).to.be.length(1);
                         expect(sessionsProvider.sessionTokens[0].token).not.to.be.equal(oldToken);
                         done();

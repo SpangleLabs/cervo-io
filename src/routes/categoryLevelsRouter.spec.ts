@@ -3,15 +3,10 @@ import {expect} from 'chai';
 import chaiHttp = require('chai-http');
 import {MockCategoryLevelsProvider} from "../testMockProviders";
 import {requestRouter, MockAuthChecker} from "../testMocks";
-import {Number, String, Record} from "runtypes";
 import {CategoryLevelsRouter} from "./categoryLevelsRouter";
+import {CategoryLevel} from "../testMockRecords";
 
 chai.use(chaiHttp);
-
-const CategoryLevel = Record({
-    category_level_id: Number,
-    name: String
-});
 
 describe("Category levels router", function() {
     describe("All category levels listing", function () {
