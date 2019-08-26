@@ -4,7 +4,7 @@ import {MockSpeciesProvider, MockZoosProvider} from "../testMockProviders";
 import {MockAuthChecker, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
-import {NewZooJson} from "../apiInterfaces";
+import {NewZooJson, SpeciesEntryForZooJson} from "../apiInterfaces";
 import {FullZoo, SpeciesEntryForZoo, Zoo} from "../testMockRecords";
 
 chai.use(chaiHttp);
@@ -153,6 +153,78 @@ describe("Zoos Router", function () {
                     SpeciesEntryForZoo.check(zooSpecies);
                     expect(zooSpecies.zoo_id).to.be.equal(2);
                 }
+                done();
+            })
+        });
+
+        it("should not list hidden species at a zoo", function (done) {
+            const mockZoosProvider = new MockZoosProvider([
+                {zoo_id: 2, name: "Zoo two", link: "http://example.com/zoo_2", postcode: "CA1 1AA", latitude: 74.232, longitude: 83.245}
+            ]);
+            const mockSpeciesProvider = new MockSpeciesProvider(
+                [
+                    {species_id: 1, category_id: 1, common_name: "Bird", latin_name: "Avian", hidden: false},
+                    {species_id: 2, category_id: 1, common_name: "Deer", latin_name: "Cervus", hidden: false},
+                    {species_id: 3, category_id: 1, common_name: "Dog", latin_name: "Canine", hidden: true}
+                ],
+                [
+                    {zoo_id: 2, species_id: 1, zoo_species_id: 1},
+                    {zoo_id: 2, species_id: 3, zoo_species_id: 2}
+                ]
+            );
+            const authChecker = new MockAuthChecker();
+            authChecker.is_logged_in = false;
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
+
+            requestRouter(zoosRouter).get("/zoos/2").end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res.status).to.be.equal(200);
+                expect(res.type).to.be.equal("application/json");
+                expect(res.body).to.be.an("array");
+                expect(res.body.length).to.be.equal(1);
+                const zoo = res.body[0];
+                FullZoo.check(zoo);
+                expect(zoo.species.length).to.be.equal(1);
+                SpeciesEntryForZoo.check(zoo.species[0]);
+                expect(zoo.species.map((x: SpeciesEntryForZooJson) => x.species_id)).to.contain(1);
+                expect(zoo.species.map((x: SpeciesEntryForZooJson) => x.species_id)).not.to.contain(3);
+                done();
+            })
+        });
+
+        it("Should include hidden species at a zoo if authorized as admin", function (done) {
+            const mockZoosProvider = new MockZoosProvider([
+                {zoo_id: 2, name: "Zoo two", link: "http://example.com/zoo_2", postcode: "CA1 1AA", latitude: 74.232, longitude: 83.245}
+            ]);
+            const mockSpeciesProvider = new MockSpeciesProvider(
+                [
+                    {species_id: 1, category_id: 1, common_name: "Bird", latin_name: "Avian", hidden: false},
+                    {species_id: 2, category_id: 1, common_name: "Deer", latin_name: "Cervus", hidden: false},
+                    {species_id: 3, category_id: 1, common_name: "Dog", latin_name: "Canine", hidden: true}
+                ],
+                [
+                    {zoo_id: 2, species_id: 1, zoo_species_id: 1},
+                    {zoo_id: 2, species_id: 3, zoo_species_id: 2}
+                ]
+            );
+            const authChecker = new MockAuthChecker();
+            authChecker.is_admin = true;
+            const zoosRouter = new ZoosRouter(authChecker, mockZoosProvider, mockSpeciesProvider);
+
+            requestRouter(zoosRouter).get("/zoos/2").end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res.status).to.be.equal(200);
+                expect(res.type).to.be.equal("application/json");
+                expect(res.body).to.be.an("array");
+                expect(res.body.length).to.be.equal(1);
+                const zoo = res.body[0];
+                FullZoo.check(zoo);
+                expect(zoo.species.length).to.be.equal(2);
+                for(let species of zoo.species) {
+                    SpeciesEntryForZoo.check(species);
+                }
+                expect(zoo.species.map((x: SpeciesEntryForZooJson) => x.species_id)).to.contain(1);
+                expect(zoo.species.map((x: SpeciesEntryForZooJson) => x.species_id)).to.contain(3);
                 done();
             })
         });

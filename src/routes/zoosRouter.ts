@@ -3,6 +3,7 @@ import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
 import {FullZooJson, ZooJson} from "../apiInterfaces";
+import {Request} from "express";
 
 export class ZoosRouter extends AbstractRouter {
     zoos: ZoosProvider;
@@ -21,7 +22,7 @@ export class ZoosRouter extends AbstractRouter {
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
                 self.zoos.getZooById(req.params.id).then(function (rows) {
-                    return Promise.all(rows.map(x => self.fillOutZoo(x)))
+                    return Promise.all(rows.map(x => self.fillOutZoo(x, req)))
                 }).then(function (fullRows) {
                     res.json(fullRows);
                 }).catch(function (err) {
@@ -50,11 +51,13 @@ export class ZoosRouter extends AbstractRouter {
                 }
             })
         });
-
     }
 
-    fillOutZoo(zoo: ZooJson): Promise<FullZooJson> {
-        return this.species.getSpeciesByZooId(zoo.zoo_id).then(function(data) {
+    fillOutZoo(zoo: ZooJson, req: Request): Promise<FullZooJson> {
+        const self = this;
+        return this.species.getSpeciesByZooId(zoo.zoo_id).then(function(species) {
+            return self.authChecker.filterOutHidden(req, species);
+        }).then(function(filteredSpecies) {
             const fullZoo: FullZooJson = {
                 zoo_id: zoo.zoo_id,
                 name: zoo.name,
@@ -62,7 +65,7 @@ export class ZoosRouter extends AbstractRouter {
                 postcode: zoo.postcode,
                 latitude: zoo.latitude,
                 longitude: zoo.longitude,
-                species: data
+                species: filteredSpecies
             };
             return fullZoo;
         })
