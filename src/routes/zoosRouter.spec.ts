@@ -1,11 +1,7 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
-import {
-    MockAuthChecker,
-    MockSpeciesProvider,
-    MockZoosProvider,
-    requestRouter
-} from "../testMocks";
+import {MockSpeciesProvider, MockZoosProvider} from "../testMockProviders";
+import {MockAuthChecker, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
 import {Number, String, Record, Array} from "runtypes";

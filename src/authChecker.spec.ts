@@ -1,4 +1,4 @@
-import {MockSessionsProvider} from "./testMocks";
+import {MockSessionsProvider} from "./testMockProviders";
 import {AuthChecker} from "./authChecker";
 import {expect} from "chai";
 import {Boolean, Number, Record, String} from "runtypes";

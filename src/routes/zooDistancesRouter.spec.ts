@@ -2,12 +2,11 @@ import * as chai from 'chai';
 import {expect} from 'chai';
 import {ZooDistancesRouter} from "./zooDistancesRouter";
 import {
-    MockAuthChecker,
     MockUserPostcodeProvider,
     MockZooDistanceProvider,
-    MockZoosProvider,
-    requestRouter
-} from "../testMocks";
+    MockZoosProvider
+} from "../testMockProviders";
+import {MockAuthChecker, requestRouter} from "../testMocks";
 import {Number, Record, String} from "runtypes";
 import chaiHttp = require('chai-http');
 import {UserPostcodeJson, ZooJson} from "../apiInterfaces";

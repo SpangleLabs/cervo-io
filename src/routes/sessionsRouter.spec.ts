@@ -1,7 +1,8 @@
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 import {SessionsRouter} from "./sessionsRouter";
-import {MockSessionsProvider, requestRouter} from "../testMocks";
+import {MockSessionsProvider} from "../testMockProviders";
+import {requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {Boolean, Record, String} from "runtypes";
 import {AuthChecker} from "../authChecker";

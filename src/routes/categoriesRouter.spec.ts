@@ -2,7 +2,8 @@ import * as chai from 'chai';
 import {expect} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
-import {requestRouter, MockCategoriesProvider, MockSpeciesProvider, MockAuthChecker} from "../testMocks";
+import {MockCategoriesProvider, MockSpeciesProvider} from "../testMockProviders";
+import {requestRouter, MockAuthChecker} from "../testMocks";
 import {Null, Number, String, Record, Array, Boolean} from "runtypes";
 import {NewCategoryJson} from "../apiInterfaces";
 
