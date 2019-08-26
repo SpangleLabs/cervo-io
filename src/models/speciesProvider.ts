@@ -9,7 +9,8 @@ function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
             species_id: datum.species_id,
             common_name: datum.common_name,
             latin_name: datum.latin_name,
-            category_id: datum.category_id
+            category_id: datum.category_id,
+            hidden: datum.hidden
         }
     });
 }
