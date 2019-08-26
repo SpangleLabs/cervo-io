@@ -4,7 +4,7 @@ import {LetterJson, NewEntryData} from "../dbInterfaces";
 import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "../apiInterfaces";
 
 function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
-    return data.map(function (datum: SpeciesJson | any) {
+    return data.map(function (datum: SpeciesJson | any): SpeciesJson {
         return {
             species_id: datum.species_id,
             common_name: datum.common_name,
