@@ -6,6 +6,7 @@ import {SearchView} from "./searchView";
 import $ from "jquery";
 import {View} from "./views";
 import {promiseSpinner} from "./utilities";
+import {CategoryLevelJson} from "./apiInterfaces";
 
 /**
  * Handle (and update) which view is active

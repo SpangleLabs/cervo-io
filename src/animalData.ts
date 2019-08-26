@@ -2,6 +2,14 @@
  * Store data about known species
  */
 import {promiseGet} from "./utilities";
+import {
+    CategoryJson,
+    CategoryLevelJson,
+    FullCategoryJson,
+    FullSpeciesJson,
+    SpeciesJson,
+    ZooJson
+} from "./apiInterfaces";
 
 
 export class AnimalData {

@@ -1,5 +1,6 @@
 import $ from "jquery";
 import {promiseGet} from "./utilities";
+import {FullZooJson, ZooJson} from "./apiInterfaces";
 
 /**
  * Wrapper around the google maps Map class, having handy methods and caches
