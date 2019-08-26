@@ -163,6 +163,12 @@ export class MockSpeciesProvider extends SpeciesProvider {
             this.testSpecies.filter(x => valueMatchesSqlLikeQuery(x.common_name, search) || valueMatchesSqlLikeQuery(x.latin_name, search))
         );
     }
+
+    getSpeciesById(id: number): Promise<SpeciesJson[]> {
+        return Promise.resolve(
+            this.testSpecies.filter(x => x.species_id == id)
+        );
+    }
 }
 
 function valueMatchesSqlLikeQuery(value: string, query: string): boolean {

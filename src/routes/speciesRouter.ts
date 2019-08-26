@@ -36,7 +36,9 @@ export class SpeciesRouter extends AbstractRouter {
             // Requesting by ID
             if (req.params.id) {
                 self.species.getSpeciesById(req.params.id).then(function (rows) {
-                    return Promise.all(rows.map(x => self.fillOutSpecies(x)));
+                    return self.filterOutHidden(req, rows);
+                }).then(function(filteredRows) {
+                    return Promise.all(filteredRows.map(x => self.fillOutSpecies(x)));
                 }).then(function (fullRows) {
                     res.json(fullRows);
                 }).catch(function (err) {
