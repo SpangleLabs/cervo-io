@@ -22,7 +22,9 @@ export class CategoriesRouter extends AbstractRouter {
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
                 self.categories.getCategoryById(req.params.id).then(function (rows) {
-                    return self.addSubcategories(rows, req)
+                    return self.authChecker.filterOutHidden(req, rows);
+                }).then(function (filteredRows) {
+                    return self.addSubcategories(filteredRows, req)
                 }).then(function(fullRows) {
                     res.json(fullRows);
                 }).catch(function (err) {
@@ -30,7 +32,9 @@ export class CategoriesRouter extends AbstractRouter {
                 });
             } else {
                 self.categories.getBaseCategories().then(function (rows) {
-                    return self.addSubcategories(rows, req)
+                    return self.authChecker.filterOutHidden(req, rows);
+                }).then(function (filteredRows) {
+                    return self.addSubcategories(filteredRows, req)
                 }).then(function(fullRows) {
                     res.json(fullRows);
                 }).catch(function (err) {
@@ -68,7 +72,10 @@ export class CategoriesRouter extends AbstractRouter {
                 ]).then(function(children) {
                     const subCategories = children[0];
                     const species = children[1];
-                    return Promise.all([subCategories, self.authChecker.filterOutHidden(req, species)]);
+                    return Promise.all([
+                        self.authChecker.filterOutHidden(req, subCategories),
+                        self.authChecker.filterOutHidden(req, species)
+                    ]);
                 }).then(function(filteredChildren) {
                     const subCategories = filteredChildren[0];
                     const species = filteredChildren[1];
@@ -77,6 +84,7 @@ export class CategoriesRouter extends AbstractRouter {
                         category_level_id: category.category_level_id,
                         name: category.name,
                         parent_category_id: category.parent_category_id,
+                        hidden: category.hidden,
                         sub_categories: subCategories,
                         species: species
                     };

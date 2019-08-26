@@ -60,6 +60,7 @@ export interface NewCategoryJson {
     name: string;
     category_level_id: number;
     parent_category_id: number | null;
+    hidden: boolean;
 }
 
 export interface CategoryJson extends NewCategoryJson {

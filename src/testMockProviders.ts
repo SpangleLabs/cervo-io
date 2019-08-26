@@ -73,7 +73,8 @@ export class MockCategoriesProvider extends CategoriesProvider {
             category_id: newId,
             category_level_id: newCategory.category_level_id,
             name: newCategory.name,
-            parent_category_id: newCategory.parent_category_id
+            parent_category_id: newCategory.parent_category_id,
+            hidden: newCategory.hidden
         };
         this.testCategories.push(result);
         return Promise.resolve(result);

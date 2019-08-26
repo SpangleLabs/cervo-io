@@ -5,7 +5,8 @@ export const Category = Record({
     category_id: Number,
     name: String,
     category_level_id: Number,
-    parent_category_id: Number,
+    parent_category_id: Union(Number, Null),
+    hidden: Boolean
 });
 export const Species = Record({
     species_id: Number,
@@ -19,6 +20,7 @@ export const FullCategory = Record({
     name: String,
     category_level_id: Number,
     parent_category_id: Union(Number, Null),
+    hidden: Boolean,
     sub_categories: Array(Category),
     species: Array(Species)
 });
