@@ -63,7 +63,12 @@ export class SpeciesRouter extends AbstractRouter {
                 // List all species
             } else {
                 self.species.getAllSpecies().then(function (rows) {
-                    res.json(rows);
+                    return self.authChecker.isAdmin(req).then(function(isAdmin) {
+                        if(!isAdmin) {
+                            rows = rows.filter(x => !x.hidden);
+                        }
+                        res.json(rows);
+                    });
                 }).catch(function (err) {
                     res.status(500).json(err);
                 });

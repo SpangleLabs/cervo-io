@@ -149,6 +149,10 @@ export class MockSpeciesProvider extends SpeciesProvider {
         const uniqueLetters = letters.filter(function(el,i,a){return i===a.indexOf(el)});
         return Promise.resolve(uniqueLetters);
     }
+
+    getAllSpecies(): Promise<SpeciesJson[]> {
+        return Promise.resolve(this.testSpecies);
+    }
 }
 
 export class MockZoosProvider extends ZoosProvider {
