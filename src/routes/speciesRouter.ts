@@ -3,6 +3,7 @@ import {ZoosProvider} from "../models/zoosProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
 import {FullSpeciesJson, SpeciesJson} from "../apiInterfaces";
+import {LetterJson} from "../dbInterfaces";
 
 export class SpeciesRouter extends AbstractRouter {
     species: SpeciesProvider;
@@ -19,8 +20,14 @@ export class SpeciesRouter extends AbstractRouter {
 
         /* GET list of valid first letters for species */
         this.router.get("/valid_first_letters", function (req, res, next) {
-            self.species.getFirstLetters().then(function (letters) {
-                res.json(letters.map(a => a['letter']));
+            self.species.getFirstLetters().then(function (letters: LetterJson[]) {
+                return self.authChecker.isAdmin(req).then(function(isAdmin) {
+                    if(!isAdmin) {
+                        letters = letters.filter(a => a.hidden == false);
+                    }
+                    const letterList = letters.map(a => a.letter).filter(function(el,i,a){return i===a.indexOf(el)});
+                    res.json(letterList);
+                })
             }).catch(function (err) {
                 res.status(500).json(err);
             });

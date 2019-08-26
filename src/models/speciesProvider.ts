@@ -96,7 +96,8 @@ export class SpeciesProvider extends AbstractProvider {
         }).then(function (data: LetterJson[]) {
             return data.map(function (datum: LetterJson) {
                 return {
-                    letter: datum.letter
+                    letter: datum.letter,
+                    hidden: datum.hidden
                 }
             })
         })
