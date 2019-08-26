@@ -4,6 +4,7 @@ import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
 import {FullSpeciesJson, SpeciesJson} from "../apiInterfaces";
 import {LetterJson} from "../dbInterfaces";
+import {Request} from "express";
 
 export class SpeciesRouter extends AbstractRouter {
     species: SpeciesProvider;
@@ -21,13 +22,10 @@ export class SpeciesRouter extends AbstractRouter {
         /* GET list of valid first letters for species */
         this.router.get("/valid_first_letters", function (req, res, next) {
             self.species.getFirstLetters().then(function (letters: LetterJson[]) {
-                return self.authChecker.isAdmin(req).then(function(isAdmin) {
-                    if(!isAdmin) {
-                        letters = letters.filter(a => !a.hidden);
-                    }
-                    const letterList = letters.map(a => a.letter).filter(function(el,i,a){return i===a.indexOf(el)});
+                return self.filterOutHidden(req, letters);
+            }).then(function(filteredLetters: LetterJson[]) {
+                    const letterList = filteredLetters.map(a => a.letter).filter(function(el,i,a){return i===a.indexOf(el)});
                     res.json(letterList);
-                })
             }).catch(function (err) {
                 res.status(500).json(err);
             });
@@ -63,12 +61,9 @@ export class SpeciesRouter extends AbstractRouter {
                 // List all species
             } else {
                 self.species.getAllSpecies().then(function (rows) {
-                    return self.authChecker.isAdmin(req).then(function(isAdmin) {
-                        if(!isAdmin) {
-                            rows = rows.filter(x => !x.hidden);
-                        }
-                        res.json(rows);
-                    });
+                    return self.filterOutHidden(req, rows)
+                }).then(function(filteredRows) {
+                    res.json(filteredRows);
                 }).catch(function (err) {
                     res.status(500).json(err);
                 });
@@ -88,6 +83,15 @@ export class SpeciesRouter extends AbstractRouter {
                     res.status(403).json({"error": "Not authorized."});
                 }
             })
+        });
+    }
+
+    filterOutHidden<T extends {hidden: boolean}>(req: Request, items: T[]): Promise<T[]> {
+        return this.authChecker.isAdmin(req).then(function(isAdmin) {
+            if(!isAdmin) {
+                items = items.filter(x => !x.hidden);
+            }
+            return items;
         });
     }
 
