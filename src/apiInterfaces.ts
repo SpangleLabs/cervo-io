@@ -1,4 +1,4 @@
-interface NewZooJson {
+export interface NewZooJson {
     name: string;
     postcode: string;
     link: string;
@@ -6,87 +6,85 @@ interface NewZooJson {
     longitude: number;
 }
 
-interface ZooJson extends NewZooJson {
+export interface ZooJson extends NewZooJson {
     zoo_id: number;
 }
 
-interface ZooEntryForSpeciesJson extends ZooJson {
+export interface ZooEntryForSpeciesJson extends ZooJson {
     zoo_species_id: number;
     species_id: number;
 }
 
-interface FullZooJson extends ZooJson {
+export interface FullZooJson extends ZooJson {
     species: SpeciesEntryForZooJson[];
 }
 
-interface NewSpeciesJson {
+export interface NewSpeciesJson {
     common_name: string;
     latin_name: string;
     category_id: number;
+    hidden: boolean;
 }
 
-interface SpeciesJson extends NewSpeciesJson {
+export interface SpeciesJson extends NewSpeciesJson {
     species_id: number;
 }
 
-interface SpeciesEntryForZooJson extends SpeciesJson {
+export interface SpeciesEntryForZooJson extends SpeciesJson {
     zoo_species_id: number;
     zoo_id: number;
 }
 
-interface NewZooSpeciesLinkJson {
+export interface NewZooSpeciesLinkJson {
     zoo_id: number;
     species_id: number;
 }
 
-interface ZooSpeciesLinkJson extends NewZooSpeciesLinkJson {
+export interface ZooSpeciesLinkJson extends NewZooSpeciesLinkJson {
     zoo_species_id: number;
 }
 
-interface FullSpeciesJson extends SpeciesJson {
+export interface FullSpeciesJson extends SpeciesJson {
     zoos: ZooJson[];
 }
 
-interface NewCategoryLevelJson {
+export interface NewCategoryLevelJson {
     name: string;
 }
 
-interface CategoryLevelJson extends NewCategoryLevelJson {
+export interface CategoryLevelJson extends NewCategoryLevelJson {
     category_level_id: number;
 }
 
-interface NewCategoryJson {
+export interface NewCategoryJson {
     name: string;
     category_level_id: number;
     parent_category_id: number | null;
 }
 
-interface CategoryJson extends NewCategoryJson {
+export interface CategoryJson extends NewCategoryJson {
     category_id: number;
-    name: string;
-    category_level_id: number;
-    parent_category_id: number | null;
 }
 
-interface FullCategoryJson extends CategoryJson {
+export interface FullCategoryJson extends CategoryJson {
     sub_categories: CategoryJson[];
     species: SpeciesJson[];
 }
 
-interface ZooDistanceCache {
+export interface ZooDistanceCache {
     zoo_id: number;
     metres: number;
 }
 
-interface NewZooDistanceJson extends ZooDistanceCache {
+export interface NewZooDistanceJson extends ZooDistanceCache {
     user_postcode_id: number;
 }
 
-interface ZooDistanceJson extends NewZooDistanceJson {
+export interface ZooDistanceJson extends NewZooDistanceJson {
     zoo_distance_id: number;
 }
 
-interface SessionTokenJson {
+export interface SessionTokenJson {
     user_id: number;
     username: string;
     token: string;
@@ -95,14 +93,10 @@ interface SessionTokenJson {
     is_admin: boolean
 }
 
-interface NewUserPostcodeJson {
+export interface NewUserPostcodeJson {
     postcode_sector: string
 }
 
-interface UserPostcodeJson extends NewUserPostcodeJson{
+export interface UserPostcodeJson extends NewUserPostcodeJson{
     user_postcode_id: number
-}
-
-interface NewEntryData {
-    insertId: number;
 }

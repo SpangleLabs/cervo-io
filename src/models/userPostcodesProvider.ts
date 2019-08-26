@@ -1,5 +1,7 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
+import {NewUserPostcodeJson, UserPostcodeJson} from "../apiInterfaces";
+import {NewEntryData} from "../dbInterfaces";
 
 function processIntoUserPostcodeJson(data: UserPostcodeJson[] | any): UserPostcodeJson[] {
     return data.map(function (datum: UserPostcodeJson | any) {

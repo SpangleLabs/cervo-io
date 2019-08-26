@@ -1,5 +1,6 @@
 import {AbstractProvider} from "./abstractProvider";
 import {ConnectionProvider} from "../dbconnection";
+import {SessionTokenJson} from "../apiInterfaces";
 
 export class SessionsProvider extends AbstractProvider {
 

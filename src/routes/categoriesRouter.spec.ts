@@ -3,7 +3,8 @@ import {expect} from 'chai';
 import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
 import {requestRouter, MockCategoriesProvider, MockSpeciesProvider, MockAuthChecker} from "../testMocks";
-import {Null, Number, String, Record, Array} from "runtypes";
+import {Null, Number, String, Record, Array, Boolean} from "runtypes";
+import {NewCategoryJson} from "../apiInterfaces";
 
 chai.use(chaiHttp);
 
@@ -17,7 +18,8 @@ const Species = Record({
     species_id: Number,
     common_name: String,
     latin_name: String,
-    category_id: Number
+    category_id: Number,
+    hidden: Boolean
 });
 const BaseCategory = Record({
     category_id: Number,
@@ -48,7 +50,7 @@ describe("Categories router", function() {
                 }]);
             const mockSpeciesProvider = new MockSpeciesProvider([
                 {
-                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", "category_id": 1
+                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 1, hidden: false
                 }
             ]);
             const authChecker = new MockAuthChecker();
@@ -91,10 +93,10 @@ describe("Categories router", function() {
                 }]);
             const mockSpeciesProvider = new MockSpeciesProvider([
                 {
-                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", "category_id": 3
+                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 3, hidden: false
                 },
                 {
-                    species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3
+                    species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3, hidden: false
                 }
             ]);
             const authChecker = new MockAuthChecker();
@@ -162,10 +164,10 @@ describe("Categories router", function() {
                 }]);
             const mockSpeciesProvider = new MockSpeciesProvider([
                 {
-                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", "category_id": 2
+                    species_id: 1, common_name: "Test species", latin_name: "Examplera testus", category_id: 2, hidden: false
                 },
                 {
-                    species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3
+                    species_id: 2, common_name: "Test2", latin_name: "Duo testus", category_id: 3, hidden: false
                 }
             ]);
             const authChecker = new MockAuthChecker();

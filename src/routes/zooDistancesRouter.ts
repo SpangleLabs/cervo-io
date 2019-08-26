@@ -6,6 +6,7 @@ import {UserPostcodesProvider} from "../models/userPostcodesProvider";
 import {ZooDistancesProvider} from "../models/zooDistancesProvider";
 import {ZoosProvider} from "../models/zoosProvider";
 import {AuthChecker} from "../authChecker";
+import {NewUserPostcodeJson, NewZooDistanceJson, UserPostcodeJson, ZooDistanceJson, ZooJson} from "../apiInterfaces";
 
 export class ZooDistancesRouter extends AbstractRouter {
     zooDistances: ZooDistancesProvider;

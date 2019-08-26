@@ -1,5 +1,7 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
+import {NewZooJson, ZooEntryForSpeciesJson, ZooJson} from "../apiInterfaces";
+import {NewEntryData} from "../dbInterfaces";
 
 function processIntoZooJson(data: ZooJson[] | any): ZooJson[] {
     return data.map(function (datum: ZooJson | any) {

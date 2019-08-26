@@ -2,6 +2,7 @@ import {ZoosProvider} from "../models/zoosProvider";
 import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
+import {FullZooJson, ZooJson} from "../apiInterfaces";
 
 export class ZoosRouter extends AbstractRouter {
     zoos: ZoosProvider;

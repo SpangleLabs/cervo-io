@@ -13,6 +13,14 @@ import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 import {AuthChecker} from "./authChecker";
 import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
 import {LetterJson} from "./dbInterfaces";
+import {
+    CategoryJson, CategoryLevelJson,
+    NewCategoryJson,
+    NewSpeciesJson, NewUserPostcodeJson, NewZooDistanceJson, NewZooJson, NewZooSpeciesLinkJson, SessionTokenJson,
+    SpeciesEntryForZooJson,
+    SpeciesJson, UserPostcodeJson, ZooDistanceJson, ZooJson,
+    ZooSpeciesLinkJson
+} from "./apiInterfaces";
 
 const express = require('express');
 
@@ -114,6 +122,7 @@ export class MockSpeciesProvider extends SpeciesProvider {
                     category_id: species.category_id,
                     common_name: species.common_name,
                     latin_name: species.latin_name,
+                    hidden: species.hidden,
                     zoo_species_id: speciesLink.zoo_species_id,
                     zoo_id: zoo_id
                 }
@@ -128,7 +137,8 @@ export class MockSpeciesProvider extends SpeciesProvider {
             species_id: newId,
             common_name: newSpecies.common_name,
             latin_name: newSpecies.latin_name,
-            category_id: newSpecies.category_id
+            category_id: newSpecies.category_id,
+            hidden: newSpecies.hidden
         }
         this.testSpecies.push(result);
         return Promise.resolve(result);

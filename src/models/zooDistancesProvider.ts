@@ -1,5 +1,7 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
+import {NewZooDistanceJson, ZooDistanceJson} from "../apiInterfaces";
+import {NewEntryData} from "../dbInterfaces";
 
 export class ZooDistancesProvider extends AbstractProvider {
 

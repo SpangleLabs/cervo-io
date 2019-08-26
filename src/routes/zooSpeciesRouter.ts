@@ -1,6 +1,7 @@
 import {ZooSpeciesProvider} from "../models/zooSpeciesProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
+import {ZooSpeciesLinkJson} from "../apiInterfaces";
 
 export class ZooSpeciesRouter extends AbstractRouter {
     zooSpecies: ZooSpeciesProvider;

@@ -2,6 +2,7 @@ import {SpeciesProvider} from "../models/speciesProvider";
 import {ZoosProvider} from "../models/zoosProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
+import {FullSpeciesJson, SpeciesJson} from "../apiInterfaces";
 
 export class SpeciesRouter extends AbstractRouter {
     species: SpeciesProvider;
@@ -85,6 +86,7 @@ export class SpeciesRouter extends AbstractRouter {
                 common_name: species.common_name,
                 latin_name: species.latin_name,
                 category_id: species.category_id,
+                hidden: species.hidden,
                 zoos: zoos
             };
             return fullSpecies;

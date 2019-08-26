@@ -1,5 +1,7 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
+import {CategoryJson, NewCategoryJson} from "../apiInterfaces";
+import {NewEntryData} from "../dbInterfaces";
 
 function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {
     return data.map(function (datum: CategoryJson | any) {

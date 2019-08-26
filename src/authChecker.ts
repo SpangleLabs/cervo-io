@@ -1,5 +1,6 @@
 import {SessionsProvider} from "./models/sessionsProvider";
 import {Request} from "express";
+import {SessionTokenJson} from "./apiInterfaces";
 
 export class AuthChecker {
     sessions: SessionsProvider

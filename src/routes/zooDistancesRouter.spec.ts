@@ -10,6 +10,7 @@ import {
 } from "../testMocks";
 import {Number, Record, String} from "runtypes";
 import chaiHttp = require('chai-http');
+import {UserPostcodeJson, ZooJson} from "../apiInterfaces";
 
 chai.use(chaiHttp);
 

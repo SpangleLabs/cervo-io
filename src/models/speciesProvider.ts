@@ -1,6 +1,7 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
-import {LetterJson} from "../dbInterfaces";
+import {LetterJson, NewEntryData} from "../dbInterfaces";
+import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "../apiInterfaces";
 
 function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
     return data.map(function (datum: SpeciesJson | any) {
@@ -57,6 +58,7 @@ export class SpeciesProvider extends AbstractProvider {
                     common_name: datum.common_name,
                     latin_name: datum.latin_name,
                     category_id: datum.category_id,
+                    hidden: datum.hidden,
                     zoo_species_id: datum.zoo_species_id,
                     zoo_id: datum.zoo_id
                 }
@@ -86,7 +88,7 @@ export class SpeciesProvider extends AbstractProvider {
 
     getFirstLetters(): Promise<LetterJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select distinct lower(left(common_name, 1)) as letter " +
+            const result = conn.query("select distinct lower(left(common_name, 1)) as letter, hidden " +
                 "from species " +
                 "order by letter");
             conn.end();
@@ -102,15 +104,16 @@ export class SpeciesProvider extends AbstractProvider {
 
     addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
         return this.connection().then(function (conn) {
-            const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`) " +
-                "values (?,?,?)", [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id]);
+            const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`,`hidden`) " +
+                "values (?,?,?)", [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]);
             conn.end();
             return result.then(function (data: NewEntryData) {
                 const result: SpeciesJson = {
                     species_id: data.insertId,
                     common_name: newSpecies.common_name,
                     latin_name: newSpecies.latin_name,
-                    category_id: newSpecies.category_id
+                    category_id: newSpecies.category_id,
+                    hidden: newSpecies.hidden
                 };
                 return result;
             });

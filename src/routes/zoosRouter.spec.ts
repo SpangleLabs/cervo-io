@@ -9,6 +9,7 @@ import {
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
 import {Number, String, Record, Array} from "runtypes";
+import {NewZooJson} from "../apiInterfaces";
 
 chai.use(chaiHttp);
 
@@ -156,9 +157,9 @@ describe("Zoos Router", function () {
             ]);
             const mockSpeciesProvider = new MockSpeciesProvider(
                 [
-                    {species_id: 1, category_id: 1, common_name: "Bird", latin_name: "Avian"},
-                    {species_id: 2, category_id: 1, common_name: "Deer", latin_name: "Cervus"},
-                    {species_id: 3, category_id: 1, common_name: "Dog", latin_name: "Canine"}
+                    {species_id: 1, category_id: 1, common_name: "Bird", latin_name: "Avian", hidden: false},
+                    {species_id: 2, category_id: 1, common_name: "Deer", latin_name: "Cervus", hidden: false},
+                    {species_id: 3, category_id: 1, common_name: "Dog", latin_name: "Canine", hidden: false}
                 ],
                 [
                     {zoo_id: 2, species_id: 1, zoo_species_id: 1},
