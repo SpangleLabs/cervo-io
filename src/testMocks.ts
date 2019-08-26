@@ -12,6 +12,7 @@ import {ZooDistancesProvider} from "./models/zooDistancesProvider";
 import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 import {AuthChecker} from "./authChecker";
 import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
+import {LetterJson} from "./dbInterfaces";
 
 const express = require('express');
 
@@ -131,6 +132,12 @@ export class MockSpeciesProvider extends SpeciesProvider {
         }
         this.testSpecies.push(result);
         return Promise.resolve(result);
+    }
+
+    getFirstLetters(): Promise<LetterJson[]> {
+        return Promise.resolve(
+            this.testSpecies.map(x => x.common_name[0].toLowerCase()).sort().filter(function(el,i,a){return i===a.indexOf(el)}).map(x => {return {"letter": x}})
+        );
     }
 }
 

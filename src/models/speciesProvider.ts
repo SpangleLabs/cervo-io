@@ -1,5 +1,6 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
+import {LetterJson} from "../dbInterfaces";
 
 function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
     return data.map(function (datum: SpeciesJson | any) {
@@ -85,7 +86,7 @@ export class SpeciesProvider extends AbstractProvider {
 
     getFirstLetters(): Promise<LetterJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select distinct left(common_name, 1) as letter " +
+            const result = conn.query("select distinct lower(left(common_name, 1)) as letter " +
                 "from species " +
                 "order by letter");
             conn.end();

@@ -103,10 +103,6 @@ interface UserPostcodeJson extends NewUserPostcodeJson{
     user_postcode_id: number
 }
 
-interface LetterJson {
-    letter: string;
-}
-
 interface NewEntryData {
     insertId: number;
 }

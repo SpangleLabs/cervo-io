@@ -17,8 +17,28 @@ const Species = Record({
 describe("Species router", function() {
 
     describe("GET /valid_first_letters endpoint", function() {
-        it("Returns a list of letters");
-        it("Doesn't return uppercase and lower case");
+        it("Returns a list of letters", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1},
+                {species_id: 2, latin_name: "rattus rattus", common_name: "Common rat", category_id: 1}
+            ]);
+            const zoosProvider = new MockZoosProvider([]);
+            const authChecker = new MockAuthChecker();
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            requestRouter(speciesRouter)
+                .get("/species/valid_first_letters")
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.be.equal(200);
+                    expect(res.body).to.be.an("array");
+                    expect(res.body).to.be.length(2);
+                    expect(res.body).to.contain("c");
+                    expect(res.body).to.contain("r");
+                    done();
+                });
+        });
+
         it("Doesn't include letters of hidden species");
         it("Includes letters of hidden species if user is an admin");
     });
