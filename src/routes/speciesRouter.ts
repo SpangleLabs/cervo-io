@@ -46,7 +46,9 @@ export class SpeciesRouter extends AbstractRouter {
             } else if (req.query.name) {
                 const search = req.query.name;
                 self.species.getSpeciesByName(search).then(function (rows) {
-                    res.json(rows);
+                    return self.filterOutHidden(req, rows);
+                }).then(function(filteredRows) {
+                    res.json(filteredRows);
                 }).catch(function (err) {
                     res.status(500).json(err);
                 });
