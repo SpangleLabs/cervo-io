@@ -3,7 +3,7 @@ import chaiHttp = require('chai-http');
 import {MockAuthChecker, MockSpeciesProvider, MockZoosProvider, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {SpeciesRouter} from "./speciesRouter";
-import {Record, Number, String, Boolean} from "runtypes";
+import {Record, Number, String, Boolean, Array} from "runtypes";
 import {NewSpeciesJson, SpeciesJson} from "../apiInterfaces";
 
 chai.use(chaiHttp);
@@ -14,7 +14,25 @@ const Species = Record({
     latin_name: String,
     category_id: Number,
     hidden: Boolean
+});
+const ZooEntryForSpecies = Record({
+    zoo_species_id: Number,
+    species_id: Number,
+    zoo_id: Number,
+    name: String,
+    postcode: String,
+    link: String,
+    latitude: Number,
+    longitude: Number
 })
+const FullSpecies = Record({
+    species_id: Number,
+    common_name: String,
+    latin_name: String,
+    category_id: Number,
+    hidden: Boolean,
+    zoos: Array(ZooEntryForSpecies)
+});
 
 describe("Species router", function() {
 
@@ -589,6 +607,32 @@ describe("Species router", function() {
     });
 
     describe("fillOutSpecies() method", function() {
-        it("Adds zoo listings to a species");
+        it("Adds zoo listings to a species", function(done) {
+            const speciesProvider = new MockSpeciesProvider([
+                {species_id: 1, latin_name: "doggus doggus", common_name: "Rat dog", category_id: 1, hidden: false}
+            ]);
+            const zoosProvider = new MockZoosProvider([
+                    {zoo_id: 1, name: "Test zoo", link: "http://example.com/1", postcode: "SA1 1AA", latitude: 24.23, longitude: -53.2},
+                    {zoo_id: 2, name: "Zoo 2", link: "http://example.com/2", postcode: "SA2 1AA", latitude: 24.23, longitude: -53.2},
+                    {zoo_id: 3, name: "Park 3", link: "http://example.com/3", postcode: "SA3 1AA", latitude: 24.23, longitude: -53.2}
+                ],
+                [
+                    {zoo_species_id: 1, species_id: 1, zoo_id: 1},
+                    {zoo_species_id: 2, species_id: 1, zoo_id: 3}
+                ]);
+            const authChecker = new MockAuthChecker();
+            const speciesRouter = new SpeciesRouter(authChecker, speciesProvider, zoosProvider);
+
+            speciesRouter.fillOutSpecies(speciesProvider.testSpecies[0]).then(function(fullSpecies) {
+                FullSpecies.check(fullSpecies);
+                expect(fullSpecies.zoos).to.be.length(2);
+                expect(fullSpecies.zoos.filter(x => x.zoo_id == 1)).to.be.length(1);
+                expect(fullSpecies.zoos.filter(x => x.zoo_id == 2)).to.be.empty;
+                expect(fullSpecies.zoos.filter(x => x.zoo_id == 3)).to.be.length(1);
+                done();
+            }).catch(function(err) {
+                done(err);
+            });
+        });
     });
 });

@@ -18,7 +18,7 @@ import {
     NewCategoryJson,
     NewSpeciesJson, NewUserPostcodeJson, NewZooDistanceJson, NewZooJson, NewZooSpeciesLinkJson, SessionTokenJson,
     SpeciesEntryForZooJson,
-    SpeciesJson, UserPostcodeJson, ZooDistanceJson, ZooJson,
+    SpeciesJson, UserPostcodeJson, ZooDistanceJson, ZooEntryForSpeciesJson, ZooJson,
     ZooSpeciesLinkJson
 } from "./apiInterfaces";
 
@@ -115,7 +115,7 @@ export class MockSpeciesProvider extends SpeciesProvider {
         const speciesLinksForZoo = this.testZooSpecies.filter(x => x.zoo_id == zoo_id);
         const results: SpeciesEntryForZooJson[] = [];
         for (let speciesLink of speciesLinksForZoo) {
-            const species = this.testSpecies.filter(x => speciesLinksForZoo.map(x => x.species_id).indexOf(x.species_id) !== -1)[0];
+            const species = this.testSpecies.filter(x => x.species_id == speciesLink.species_id)[0];
             results.push(
                 {
                     species_id: species.species_id,
@@ -187,10 +187,15 @@ function valueMatchesSqlLikeQuery(value: string, query: string): boolean {
 
 export class MockZoosProvider extends ZoosProvider {
     testZoos: ZooJson[];
+    testZooSpecies: ZooSpeciesLinkJson[];
 
-    constructor(testZoos: ZooJson[]) {
+    constructor(testZoos: ZooJson[], testZooSpecies?: ZooSpeciesLinkJson[]) {
         super(() => { throw new Error("Mock database.");});
         this.testZoos = testZoos;
+        if (!testZooSpecies) {
+            testZooSpecies = [];
+        }
+        this.testZooSpecies = testZooSpecies;
     }
 
     getAllZoos(): Promise<ZooJson[]> {
@@ -217,6 +222,27 @@ export class MockZoosProvider extends ZoosProvider {
         };
         this.testZoos.push(result);
         return Promise.resolve(result);
+    }
+
+    getZoosBySpeciesId(species_id: number): Promise<ZooEntryForSpeciesJson[]> {
+        const zooLinksForSpecies = this.testZooSpecies.filter(x => x.species_id == species_id);
+        const results: ZooEntryForSpeciesJson[] = [];
+        for (let speciesLink of zooLinksForSpecies) {
+            const zoo = this.testZoos.filter(x => x.zoo_id == speciesLink.zoo_id)[0];
+            results.push(
+                {
+                    zoo_species_id: speciesLink.zoo_species_id,
+                    species_id: species_id,
+                    zoo_id: zoo.zoo_id,
+                    name: zoo.name,
+                    postcode: zoo.postcode,
+                    link: zoo.link,
+                    latitude: zoo.latitude,
+                    longitude: zoo.longitude
+                }
+            )
+        }
+        return Promise.all(results);
     }
 }
 
