@@ -19,17 +19,23 @@ describe("Species router", function() {
     describe("GET /valid_first_letters endpoint", function() {
         it("Returns a list of letters");
         it("Doesn't return uppercase and lower case");
+        it("Doesn't include letters of hidden species");
+        it("Includes letters of hidden species if user is an admin");
     });
 
     describe("GET / base listing endpoint", function() {
         it("Lists all species");
         it("Has the correct formats");
+        it("Doesn't include hidden species");
+        it("Includes hidden species if user is an admin");
     });
 
     describe("GET /id specific species endpoint", function() {
         it("Shows just one species");
         it("Fills out the species correctly");
         it("Returns 404 if the species doesn't exist");
+        it("Returns 404 if the species is hidden");
+        it("Displays hidden species information to admins");
     });
 
     describe("GET /?name= search by name endpoint", function() {
@@ -37,12 +43,16 @@ describe("Species router", function() {
         it("Returns species whose common names match");
         it("Returns species whose latin names match and species whose common names match");
         it("Handles wildcards");
+        it("Does not include hidden species");
+        it("Includes hidden species if user is admin");
     });
 
     describe("GET /?common_name= search by common name endpoint", function() {
         it("Returns species whose common names match");
         it("Does not return species with matching latin names");
         it("Handles wildcards");
+        it("Does not include hidden species");
+        it("Includes hidden species if user is admin");
     });
 
     describe("POST / create new species endpoint", function() {
