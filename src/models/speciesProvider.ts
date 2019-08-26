@@ -88,7 +88,7 @@ export class SpeciesProvider extends AbstractProvider {
 
     getFirstLetters(): Promise<LetterJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select distinct lower(left(common_name, 1)) as letter, hidden " +
+            const result = conn.query("select distinct upper(left(common_name, 1)) as letter, hidden " +
                 "from species " +
                 "order by letter");
             conn.end();

@@ -145,7 +145,7 @@ export class MockSpeciesProvider extends SpeciesProvider {
     }
 
     getFirstLetters(): Promise<LetterJson[]> {
-        const letters = this.testSpecies.map(x => {return {letter: x.common_name[0].toLowerCase(), hidden: x.hidden}}).sort();
+        const letters = this.testSpecies.map(x => {return {letter: x.common_name[0].toUpperCase(), hidden: x.hidden}}).sort();
         const uniqueLetters = letters.filter(function(el,i,a){return i===a.indexOf(el)});
         return Promise.resolve(uniqueLetters);
     }

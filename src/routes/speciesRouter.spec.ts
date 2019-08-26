@@ -33,8 +33,8 @@ describe("Species router", function() {
                     expect(res.status).to.be.equal(200);
                     expect(res.body).to.be.an("array");
                     expect(res.body).to.be.length(2);
-                    expect(res.body).to.contain("c");
-                    expect(res.body).to.contain("r");
+                    expect(res.body).to.contain("C");
+                    expect(res.body).to.contain("R");
                     done();
                 });
         });
@@ -56,8 +56,8 @@ describe("Species router", function() {
                     expect(res.status).to.be.equal(200);
                     expect(res.body).to.be.an("array");
                     expect(res.body).to.be.length(1);
-                    expect(res.body).not.to.contain("c");
-                    expect(res.body).to.contain("r");
+                    expect(res.body).not.to.contain("C");
+                    expect(res.body).to.contain("R");
                     done();
                 });
         });
@@ -81,9 +81,9 @@ describe("Species router", function() {
                     expect(res.status).to.be.equal(200);
                     expect(res.body).to.be.an("array");
                     expect(res.body).to.be.length(2);
-                    expect(res.body).not.to.contain("d");
-                    expect(res.body).to.contain("c");
-                    expect(res.body).to.contain("r");
+                    expect(res.body).not.to.contain("D");
+                    expect(res.body).to.contain("C");
+                    expect(res.body).to.contain("R");
                     done();
                 });
         });
@@ -107,9 +107,9 @@ describe("Species router", function() {
                     expect(res.status).to.be.equal(200);
                     expect(res.body).to.be.an("array");
                     expect(res.body).to.be.length(3);
-                    expect(res.body).to.contain("d");
-                    expect(res.body).to.contain("c");
-                    expect(res.body).to.contain("r");
+                    expect(res.body).to.contain("D");
+                    expect(res.body).to.contain("C");
+                    expect(res.body).to.contain("R");
                     done();
                 });
         });
