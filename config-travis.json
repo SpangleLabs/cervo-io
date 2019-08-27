@@ -1,0 +1,9 @@
+{
+  "mysql": {
+    "host": "localhost",
+    "username": "root",
+    "password": "",
+    "database": "zoo_species_test"
+  },
+  "google_distance_api_key": ""
+}
