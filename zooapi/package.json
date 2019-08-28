@@ -17,7 +17,6 @@
     "express": "^4.16.4",
     "morgan": "^1.9.1",
     "node-fetch": "^2.6.0",
-    "npm": "^6.10.2",
     "postcode": "^2.0.0",
     "promise-mysql": "latest",
     "request": "^2.88.0",
