@@ -5,6 +5,7 @@ node_js:
 services:
   - mysql
 before_script:
+  - cd zooapi
   - npm install
   - npm run build
 env:
