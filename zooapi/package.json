@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "parcel build ./src/index.ts --target node",
     "start": "node ./bin/www",
-    "test": "npm run test-unit",
+    "test": "parcel build ./src/**/*.spec.ts --target node && npm run test-unit",
     "test-unit": "mocha --require co-mocha dist/**/*.spec.js"
   },
   "main": "lambda.js",
@@ -37,6 +37,7 @@
     "co-mocha": "^1.2.1",
     "mocha": "^4.1.0",
     "mysql-import": "^1.0.9",
+    "parcel-bundler": "^1.12.3",
     "runtypes": "^4.0.1",
     "sinon": "^4.1.3",
     "sinon-chai": "^2.14.0",
