@@ -21,7 +21,8 @@ export class CategoriesRouter extends AbstractRouter {
         /* GET categories listing. */
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
-                self.categories.getCategoryById(req.params.id).then(function (rows) {
+                const categoryId = Number(req.params.id);
+                self.categories.getCategoryById(categoryId).then(function (rows) {
                     return self.authChecker.filterOutHidden(req, rows);
                 }).then(function (filteredRows) {
                     return self.addSubcategories(filteredRows, req)

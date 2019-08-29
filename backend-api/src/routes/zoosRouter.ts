@@ -21,7 +21,8 @@ export class ZoosRouter extends AbstractRouter {
         /* GET zoos listing. */
         this.router.get('/:id?', function (req, res, next) {
             if (req.params.id) {
-                self.zoos.getZooById(req.params.id).then(function (rows) {
+                const zooId = Number(req.params.id);
+                self.zoos.getZooById(zooId).then(function (rows) {
                     return Promise.all(rows.map(x => self.fillOutZoo(x, req)))
                 }).then(function (fullRows) {
                     res.json(fullRows);

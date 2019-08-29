@@ -16,7 +16,8 @@ export class CategoryLevelsRouter extends AbstractRouter {
         /* GET category levels listing */
         this.router.get('/:id?', function (req, res, next) {
                 if (req.params.id) {
-                    self.categoryLevels.getCategoryLevelById(req.params.id).then(function (rows) {
+                    const categoryLevelId = Number(req.params.id);
+                    self.categoryLevels.getCategoryLevelById(categoryLevelId).then(function (rows) {
                         res.json(rows);
                     }).catch(function (err) {
                         res.status(500).json(err);
