@@ -1,7 +1,7 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 import {LetterJson, NewEntryData} from "../dbInterfaces";
-import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "../apiInterfaces";
+import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
     return data.map(function (datum: SpeciesJson | any): SpeciesJson {

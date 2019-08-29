@@ -6,7 +6,7 @@ import {
     SpeciesEntryForZooJson,
     SpeciesJson, UserPostcodeJson, ZooDistanceJson, ZooEntryForSpeciesJson, ZooJson,
     ZooSpeciesLinkJson
-} from "./apiInterfaces";
+} from "@cervoio/common-lib/src/apiInterfaces";
 import {SpeciesProvider} from "./models/speciesProvider";
 import {LetterJson} from "./dbInterfaces";
 import {ZoosProvider} from "./models/zoosProvider";

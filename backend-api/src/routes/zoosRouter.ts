@@ -2,7 +2,7 @@ import {ZoosProvider} from "../models/zoosProvider";
 import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {AuthChecker} from "../authChecker";
-import {FullZooJson, ZooJson} from "../apiInterfaces";
+import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Request} from "express";
 
 export class ZoosRouter extends AbstractRouter {

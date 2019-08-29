@@ -1,6 +1,6 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
-import {NewZooJson, ZooEntryForSpeciesJson, ZooJson} from "../apiInterfaces";
+import {NewZooJson, ZooEntryForSpeciesJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
 
 function processIntoZooJson(data: ZooJson[] | any): ZooJson[] {

@@ -8,7 +8,7 @@ import {
 } from "../testMockProviders";
 import {MockAuthChecker, requestRouter} from "../testMocks";
 import chaiHttp = require('chai-http');
-import {UserPostcodeJson, ZooJson} from "../apiInterfaces";
+import {UserPostcodeJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewZooDistance, UserPostcode, Zoo, ZooDistance} from "../testMockRecords";
 
 chai.use(chaiHttp);

@@ -4,7 +4,7 @@ import {CategoriesRouter} from "./categoriesRouter";
 import chaiHttp = require('chai-http');
 import {MockCategoriesProvider, MockSpeciesProvider} from "../testMockProviders";
 import {requestRouter, MockAuthChecker} from "../testMocks";
-import {CategoryJson, NewCategoryJson, SpeciesJson} from "../apiInterfaces";
+import {CategoryJson, NewCategoryJson, SpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Category, FullCategory, Species} from "../testMockRecords";
 
 chai.use(chaiHttp);

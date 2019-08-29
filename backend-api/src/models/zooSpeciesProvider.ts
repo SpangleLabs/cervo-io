@@ -1,6 +1,6 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
-import {NewZooSpeciesLinkJson, ZooSpeciesLinkJson} from "../apiInterfaces";
+import {NewZooSpeciesLinkJson, ZooSpeciesLinkJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
 
 function hasUniqueId(arg: any): arg is ZooSpeciesLinkJson {

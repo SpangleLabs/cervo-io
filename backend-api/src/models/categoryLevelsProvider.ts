@@ -1,6 +1,6 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
-import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "../apiInterfaces";
+import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
 
 function processIntoCategoryLevelJson(data: CategoryLevelJson[] | any): CategoryLevelJson[] {

@@ -1,6 +1,6 @@
 import {SessionsProvider} from "./models/sessionsProvider";
 import {Request} from "express";
-import {SessionTokenJson} from "./apiInterfaces";
+import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 export class AuthChecker {
     sessions: SessionsProvider

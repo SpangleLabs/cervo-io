@@ -1,6 +1,6 @@
 import {AbstractProvider} from "./abstractProvider";
 import {ConnectionProvider} from "../dbconnection";
-import {SessionTokenJson} from "../apiInterfaces";
+import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 export class SessionsProvider extends AbstractProvider {
 

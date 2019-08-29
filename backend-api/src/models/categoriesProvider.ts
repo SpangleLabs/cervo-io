@@ -1,6 +1,6 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
-import {CategoryJson, NewCategoryJson} from "../apiInterfaces";
+import {CategoryJson, NewCategoryJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
 
 function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {

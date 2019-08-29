@@ -1,6 +1,6 @@
 import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
-import {NewUserPostcodeJson, UserPostcodeJson} from "../apiInterfaces";
+import {NewUserPostcodeJson, UserPostcodeJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
 
 function processIntoUserPostcodeJson(data: UserPostcodeJson[] | any): UserPostcodeJson[] {

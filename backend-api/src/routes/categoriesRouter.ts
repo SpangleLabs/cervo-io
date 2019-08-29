@@ -2,7 +2,7 @@ import {SpeciesProvider} from "../models/speciesProvider";
 import {AbstractRouter} from "./abstractRouter";
 import {CategoriesProvider} from "../models/categoriesProvider";
 import {AuthChecker} from "../authChecker";
-import {CategoryJson, FullCategoryJson} from "../apiInterfaces";
+import {CategoryJson, FullCategoryJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Request} from "express";
 
 export class CategoriesRouter extends AbstractRouter {

@@ -4,7 +4,7 @@ import {MockSpeciesProvider, MockZoosProvider} from "../testMockProviders";
 import {MockAuthChecker, requestRouter} from "../testMocks";
 import {expect} from "chai";
 import {ZoosRouter} from "./zoosRouter";
-import {NewZooJson, SpeciesEntryForZooJson} from "../apiInterfaces";
+import {NewZooJson, SpeciesEntryForZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {FullZoo, SpeciesEntryForZoo, Zoo} from "../testMockRecords";
 
 chai.use(chaiHttp);
