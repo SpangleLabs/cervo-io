@@ -1,4 +1,4 @@
-import {config} from "./admin_config";
+import {config} from "./config";
 import $ from "jquery";
 
 const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;

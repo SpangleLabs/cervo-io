@@ -1,7 +1,7 @@
 {
-  "name": "admin-ui",
+  "name": "common-ui-lib",
   "version": "1.0.0",
-  "description": "Administration frontend for the cervo.io zoo listing website",
+  "description": "Common ui ",
   "main": "src/main.js",
   "scripts": {
     "build": "parcel build src/*.html --public-url ./",
@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@cervoio/common-lib": "../common-lib",
-    "@cervoio/common-ui-lib": "../common-ui-lib",
     "@types/jquery": "^3.3.30",
     "awesome-typescript-loader": "^5.2.1",
     "parcel": "^1.12.3",

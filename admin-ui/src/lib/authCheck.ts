@@ -1,6 +1,6 @@
 import {config} from "../admin_config";
-import {promiseGet} from "../utilities";
-import {SessionTokenJson} from "../common-lib/src/apiInterfaces";
+import {promiseGet} from "@cervoio/common-ui-lib/src/utilities";
+import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 
 export function getAuthCookie(): string {
