@@ -45,6 +45,41 @@ export function promiseGet(path: string, headers?: Map<string, string>): Promise
     });
 }
 
+export function promisePost(path: string, data: any, headers?: Map<string, string>): Promise<any> {
+    if(!headers) {
+        headers = new Map<string, string>();
+    }
+    const url = config['api_url'] + path;
+
+    return new Promise(function (resolve, reject) {
+        // Do the usual XHR stuff
+        let req = new XMLHttpRequest();
+        req.open('POST', url);
+        req.setRequestHeader("Content-type", "application/json");
+        for(let key of headers.keys()) {
+            req.setRequestHeader(key, headers.get(key));
+        }
+        req.onload = function () {
+            // This is called even on 404 etc
+            // so check the status
+            if (req.status === 200) {
+                // Resolve the promise with the response text
+                resolve(JSON.parse(req.responseText));
+            } else {
+                // Otherwise reject with the status text
+                // which will hopefully be a meaningful error
+                reject(Error(req.responseText));
+            }
+        };
+        // Handle network errors
+        req.onerror = function () {
+            reject(Error("Network Error"));
+        };
+        // Make the request
+        req.send(JSON.stringify(data));
+    });
+}
+
 export function arrayEquals<T>(array1: T[], array2: T[]): boolean {
     if (array1 == null || array2 == null) return false;
     if (array1.length !== array2.length) return false;
