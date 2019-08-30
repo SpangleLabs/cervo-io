@@ -41,5 +41,8 @@
     "typescript": "^3.5.3",
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6"
-  }
+  },
+  "browserslist": [
+    "since 2017-06"
+  ]
 }
