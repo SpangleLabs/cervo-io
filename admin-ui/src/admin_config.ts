@@ -1,3 +1,3 @@
-const config = {
+export const config = {
     "api_url": "http://api.cervo.io/"
 };
