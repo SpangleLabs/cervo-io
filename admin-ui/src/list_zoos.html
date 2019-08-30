@@ -5,8 +5,8 @@
     <title>Zoo list</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="admin_config.js"></script>
-    <link rel="stylesheet" href="../src/style.css" />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="../../frontend-ui/src/style.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <h1>List of UK zoos</h1>
@@ -25,7 +25,7 @@
         var tableElem = $("table tbody");
         $.get(config["api_url"]+"zoos/", function(/*[ZooObj]*/data) {
             for(var a = 0; a < data.length; a++) {
-                tableElem.append("<tr><td><a href='view_zoo.html?id="+data[a].zoo_id+"'>"+data[a].name+"</a></td>" +
+                tableElem.append("<tr><td><a href="+data[a].zoo_id+"'view_zoo.html?id='>"+data[a].name+"</a></td>" +
                     "<td>"+data[a].postcode+"</td>" +
                     "<td>"+data[a].latitude+"</td>" +
                     "<td>"+data[a].longitude+"</td>" +

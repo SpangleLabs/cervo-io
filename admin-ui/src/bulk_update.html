@@ -5,8 +5,8 @@
     <title>Title</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="admin_config.js"></script>
-    <link rel="stylesheet" href="../src/style.css" />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="../../frontend-ui/src/style.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <h1>Bulk update zoo species</h1>
@@ -65,7 +65,7 @@
 
     function domAddZooRow(zooData) {
         var tableBodyElem = $("table#update_table");//" tbody");
-        var zooRow = "<tr><td><a href='view_zoo.html?id="+zooData.zoo_id+"'>"+zooData.name+"</a></td>";
+        var zooRow = "<tr><td><a href="+zooData.zoo_id+"'view_zoo.html?id='>"+zooData.name+"</a></td>";
         for(var a = 0; a < listSpecies.length; a++) {
             var zooId = zooData.zoo_id;
             var speciesId = listSpecies[a].species_id;
