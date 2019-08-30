@@ -3,7 +3,7 @@ import {promiseSpinner, tickboxImageElem} from "./utilities";
 import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 import {View} from "./views";
 import {SelectedSpecies} from "./selectedSpecies";
-import {CategoryLevelJson} from "./apiInterfaces";
+import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 
 /**

@@ -33,6 +33,7 @@
     "load-google-maps-api": "^2.0.1"
   },
   "devDependencies": {
+    "@cervoio/common-lib": "../common-lib",
     "awesome-typescript-loader": "^5.2.1",
     "parcel": "^1.12.3",
     "source-map-loader": "^0.2.4",

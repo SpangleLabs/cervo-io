@@ -9,7 +9,7 @@ import {
     FullSpeciesJson,
     SpeciesJson,
     ZooJson
-} from "./apiInterfaces";
+} from "@cervoio/common-lib/src/apiInterfaces";
 
 
 export class AnimalData {

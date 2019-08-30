@@ -1,6 +1,6 @@
 import $ from "jquery";
 import {promiseGet} from "./utilities";
-import {FullZooJson, ZooJson} from "./apiInterfaces";
+import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 /**
  * Wrapper around the google maps Map class, having handy methods and caches

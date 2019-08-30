@@ -2,7 +2,7 @@ import $ from "jquery";
 import {arrayEquals, promiseGet, tickboxImageElem} from "./utilities";
 import {AnimalData} from "./animalData";
 import {PageMap} from "./pageMap";
-import {ZooDistanceCache, ZooDistanceJson, ZooJson} from "./apiInterfaces";
+import {ZooDistanceCache, ZooDistanceJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 
 /**
