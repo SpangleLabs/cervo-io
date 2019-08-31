@@ -3,49 +3,19 @@ import $ from "jquery";
 
 const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
 
-/**
- * I pulled this method from somewhere else, tbh
- * @param path API relative path
- * @param headers Optional map of header values
- * @returns {Promise<object>}
- */
 export function promiseGet(path: string, headers?: Map<string, string>): Promise<any> {
-    if(!headers) {
-        headers = new Map<string, string>();
-    }
-    const url = config['api_url'] + path;
-    // Return a new promise.
-    return new Promise(function (resolve, reject) {
-        // Do the usual XHR stuff
-        let req = new XMLHttpRequest();
-        req.open('GET', url);
-        for(let key of headers.keys()) {
-            req.setRequestHeader(key, headers.get(key));
-        }
-        req.onload = function () {
-            // This is called even on 404 etc
-            // so check the status
-            if (req.status === 200) {
-                // Resolve the promise with the response text
-                resolve(JSON.parse(req.responseText));
-            } else {
-                // Otherwise reject with the status text
-                // which will hopefully be a meaningful error
-                reject(Error(req.responseText));
-            }
-        };
-
-        // Handle network errors
-        req.onerror = function () {
-            reject(Error("Network Error"));
-        };
-
-        // Make the request
-        req.send();
-    });
+    return promiseRequest("GET", path, null, headers);
 }
 
 export function promisePost(path: string, data: any, headers?: Map<string, string>): Promise<any> {
+    return promiseRequest("POST", path, data, headers);
+}
+
+export function promiseDelete(path: string, data: any, headers?: Map<string, string>): Promise<any> {
+    return promiseRequest("DELETE", path, data, headers);
+}
+
+function promiseRequest(method: string, path: string, data?: any, headers?: Map<string, string>): Promise<any> {
     if(!headers) {
         headers = new Map<string, string>();
     }
@@ -54,8 +24,8 @@ export function promisePost(path: string, data: any, headers?: Map<string, strin
     return new Promise(function (resolve, reject) {
         // Do the usual XHR stuff
         let req = new XMLHttpRequest();
-        req.open('POST', url);
-        req.setRequestHeader("Content-type", "application/json");
+        req.open(method, url);
+        if(data) req.setRequestHeader("Content-type", "application/json");
         for(let key of headers.keys()) {
             req.setRequestHeader(key, headers.get(key));
         }
@@ -65,6 +35,8 @@ export function promisePost(path: string, data: any, headers?: Map<string, strin
             if (req.status === 200) {
                 // Resolve the promise with the response text
                 resolve(JSON.parse(req.responseText));
+            } else if(req.status === 204) {
+                resolve();
             } else {
                 // Otherwise reject with the status text
                 // which will hopefully be a meaningful error
@@ -76,7 +48,11 @@ export function promisePost(path: string, data: any, headers?: Map<string, strin
             reject(Error("Network Error"));
         };
         // Make the request
-        req.send(JSON.stringify(data));
+        if(data) {
+            req.send(JSON.stringify(data));
+        } else {
+            req.send();
+        }
     });
 }
 

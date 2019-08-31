@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseGet, promisePost} from "../../common-ui-lib/src/utilities";
+import {promiseDelete, promiseGet, promisePost} from "../../common-ui-lib/src/utilities";
 import {
     NewZooSpeciesLinkJson,
     SpeciesEntryForZooJson,
@@ -21,8 +21,30 @@ async function loadZooData(zooId: number) {
 }
 
 function addZooSpeciesToList(zooSpecies: SpeciesEntryForZooJson) {
-    $("#species_list").append("<li>"+zooSpecies.common_name+" " +
-        "<span class='latin_name'>"+zooSpecies.latin_name+"</span></li>");
+    const liId = `link-${zooSpecies.zoo_species_id}`;
+    $("#species_list").append(
+        `<li id="${liId}">
+            ${zooSpecies.common_name} 
+            <span class="latin_name">${zooSpecies.latin_name}</span>
+            ${zooSpecies.hidden ? "(hidden)" : ""}
+        </li>`
+    );
+    const removeButton = $("<button type='button'>remove</button>");
+    removeButton.on("click", async function () {
+        const zooSpeciesLink = {
+            zoo_species_id: zooSpecies.zoo_species_id,
+            zoo_id: zooSpecies.zoo_id,
+            species_id: zooSpecies.species_id
+        };
+        await removeSpeciesFromZoo(zooSpeciesLink);
+    });
+    $("#"+liId).append(removeButton);
+}
+
+async function removeSpeciesFromZoo(zooSpeciesLink: ZooSpeciesLinkJson) {
+    const authHeaders = new Map([["authorization", getAuthCookie()]]);
+    await promiseDelete("zoo_species/", zooSpeciesLink, authHeaders);
+    $("#link-"+zooSpeciesLink.zoo_species_id).remove();
 }
 
 async function addSpeciesButton(zooId: number) {
