@@ -3,20 +3,23 @@ import {promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
 import {NewZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {checkLogin, getAuthCookie} from "./lib/authCheck";
 
-function fillTable() {
+function addZooRow(zoo: ZooJson): void {
     const tableElem = $("table tbody");
-    promiseGet("zoos/").then(function(zooList: ZooJson[]) {
-        for(const zoo of zooList) {
-            tableElem.append(`<tr><td><a href="view_zoo.html?id=${zoo.zoo_id}">${zoo.name}</a></td>" +
+    tableElem.append(`<tr><td><a href="view_zoo.html?id=${zoo.zoo_id}">${zoo.name}</a></td>" +
                 "<td>${zoo.postcode}</td>" +
                 "<td>${zoo.latitude}</td>" +
                 "<td>${zoo.longitude}</td>" +
                 "<td><a href="${zoo.link}">${zoo.link}</a></td></tr>`);
-        }
-    });
 }
 
-function addNewZoo() {
+async function fillTable(): Promise<void> {
+    const zooList: ZooJson[] = await promiseGet("zoos/");
+    for(const zoo of zooList) {
+        addZooRow(zoo);
+    }
+}
+
+async function addNewZoo(): Promise<void> {
     const formElement = $("form");
     const inputName = <string>formElement.find("input.input-name").val();
     const inputPostcode = <string>formElement.find("input.input-postcode").val();
@@ -32,12 +35,12 @@ function addNewZoo() {
     };
     const authHeaders = new Map([["authorization", getAuthCookie()]]);
     console.log(newZoo);
-    promisePost("zoos/", newZoo, authHeaders).then(function() {
-        formElement.trigger("reset");
-    });
+    const newZooData = await promisePost("zoos/", newZoo, authHeaders);
+    addZooRow(newZooData);
+    formElement.trigger("reset");
 }
 
-function addFormRow() {
+function addFormRow(): void {
     const tableElem = $("table");
     tableElem.append("<tfoot>" +
         "<tr>" +
@@ -53,16 +56,16 @@ function addFormRow() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const token = getAuthCookie();
-    checkLogin(token).then(function(isLogin) {
+    checkLogin(token).then(async function(isLogin) {
         $("#login-status").text(`You are logged in as ${isLogin.username}`);
-        fillTable();
+        await fillTable();
         addFormRow();
+
+        $("form#addZoo").on("submit", function(e) {
+            e.preventDefault();
+            addNewZoo();
+        });
     }).catch(function (err) {
         $("#login-status").html(`You are not logged in. <a href="login.html">Go to login</a>`);
     });
-});
-
-$("#addZoo").on("submit", function() {
-    addNewZoo();
-    return false;
 });
