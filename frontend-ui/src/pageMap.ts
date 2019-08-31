@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseGet} from "./utilities";
+import {promiseGet} from "@cervoio/common-ui-lib/src/utilities";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 /**

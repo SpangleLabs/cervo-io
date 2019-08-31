@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {arrayEquals, promiseGet, tickboxImageElem} from "./utilities";
+import {arrayEquals, promiseGet, tickboxImageElem} from "@cervoio/common-ui-lib/src/utilities";
 import {AnimalData} from "./animalData";
 import {PageMap} from "./pageMap";
 import {ZooDistanceCache, ZooDistanceJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";

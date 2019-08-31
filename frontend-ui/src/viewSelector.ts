@@ -5,7 +5,7 @@ import {AlphabetView} from "./alphabetView";
 import {SearchView} from "./searchView";
 import $ from "jquery";
 import {View} from "./views";
-import {promiseSpinner} from "./utilities";
+import {promiseSpinner} from "@cervoio/common-ui-lib/src/utilities";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 /**

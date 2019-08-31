@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@cervoio/common-lib": "../common-lib",
+    "@cervoio/common-ui-lib": "../common-ui-lib",
     "@types/googlemaps": "^3.37.0",
     "@types/jquery": "^3.3.30",
     "@types/load-google-maps-api": "^2.0.0",

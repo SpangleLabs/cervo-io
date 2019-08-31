@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {promiseSpinner, tickboxImageElem} from "./utilities";
+import {promiseSpinner, tickboxImageElem} from "@cervoio/common-ui-lib/src/utilities";
 import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 import {View} from "./views";
 import {SelectedSpecies} from "./selectedSpecies";
