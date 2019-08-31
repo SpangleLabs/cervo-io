@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Zoo list</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script src="admin_config.ts"></script>
+    <script src="list_zoos.ts"></script>
     <link rel="stylesheet" href="../../frontend-ui/src/style.css" />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <h1>List of UK zoos</h1>
 <a href="index.html">Back to admin index</a><br />
-<form onsubmit='addNewZoo()'>
+<form id="addZoo">
     <table>
         <thead>
             <tr><th>Name</th><th>Postcode</th><th>Lat.</th><th>Long.</th><th>Link</th></tr>
@@ -20,56 +19,4 @@
     </table>
 </form>
 </body>
-<script>
-    function fillTable() {
-        var tableElem = $("table tbody");
-        $.get(config["api_url"]+"zoos/", function(/*[ZooObj]*/data) {
-            for(var a = 0; a < data.length; a++) {
-                tableElem.append("<tr><td><a href="+data[a].zoo_id+"'view_zoo.html?id='>"+data[a].name+"</a></td>" +
-                    "<td>"+data[a].postcode+"</td>" +
-                    "<td>"+data[a].latitude+"</td>" +
-                    "<td>"+data[a].longitude+"</td>" +
-                    "<td><a href='"+data[a].link+"'>"+data[a].link+"</a></td></tr>");
-            }
-        });
-    }
-
-    function addNewZoo() {
-        var formElement = $("form");
-        var inputName = formElement.find("input.input-name").val();
-        var inputPostcode = formElement.find("input.input-postcode").val();
-        var inputLatitude = formElement.find("input.input-lat").val();
-        var inputLongitude = formElement.find("input.input-long").val();
-        var inputLink = formElement.find("input.input-link").val();
-        var inputObj = {};
-        inputObj.name = inputName;
-        inputObj.postcode = inputPostcode;
-        inputObj.link = inputLink;
-        inputObj.latitude = inputLatitude;
-        inputObj.longitude = inputLongitude;
-        console.log(inputObj);
-        $.post(config["api_url"]+"zoos/", inputObj);
-        formElement.first().reset();
-        return false;
-    }
-
-    function addFormRow() {
-        var tableElem = $("table");
-        tableElem.append("<tfoot>" +
-            "<tr>" +
-            "<td><input type='text' class='input-name' name='name' /></td>" +
-            "<td><input type='text' class='input-postcode' name='postcode' /></td>" +
-            "<td><input type='text' class='input-lat' name='latitude' /></td>" +
-            "<td><input type='text' class='input-long' name='longitude' /></td>" +
-            "<td><input type='text' class='input-link' name='link' />" +
-            "<input type='submit' /></td>" +
-            "</tr></tfoot>");
-        console.log("added form");
-    }
-
-    $(document).ready(function () {
-        fillTable();
-        addFormRow();
-    });
-</script>
 </html>
