@@ -28,11 +28,11 @@ function addCategory(element: JQuery, categoryData: CategoryJson) {
     const categoryLevelId = categoryData.category_level_id;
     const categoryLiId = "category-"+categoryId;
     const categoryLevelName = getCategoryLevel(categoryLevelId).name;
-    element.append("<li class='category closed' id='"+categoryLiId+"'>" +
-        "<span class='load_category'>"+name+"</span> " +
-        "<span class='category_level'>"+categoryLevelName+"</span>" +
-        "</li>");
-    $("#"+categoryLiId+" > span.load_category").on("click", function() {
+    element.append(`<li class='category closed' id='${categoryLiId}'>
+    <span class='load_category'>${name}</span> <span class='category_level'>${categoryLevelName}</span>
+    ${categoryData.hidden ? "⛔" : "👁️"}
+    </li>`);
+    $(`#${categoryLiId} > span.load_category`).on("click", function() {
         loadCategory(categoryData.category_id);
     });
 }
@@ -41,7 +41,10 @@ function addSpecies(element: JQuery, speciesData: SpeciesJson) {
     //var speciesId = speciesData.species_id;
     const name = speciesData.common_name;
     const latinName = speciesData.latin_name;
-    element.append("<li class='species'>"+name+" <span class='latin_name'>"+latinName+"</span></li>");
+    element.append(`<li class='species'>
+    ${name} <span class='latin_name'>${latinName}</span>
+    ${speciesData.hidden ? "⛔" : "👁️"}
+    </li>`);
 }
 
 function addNewSpeciesForm(element: JQuery, parentCategoryId: number) {
