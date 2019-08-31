@@ -9,7 +9,8 @@ import {
 import {getAuthCookie, updateLoginStatus} from "./lib/authCheck";
 
 async function loadZooData(zooId: number) {
-    const zoosResults = await promiseGet("zoos/"+zooId);
+    const authHeaders = new Map([["authorization", getAuthCookie()]]);
+    const zoosResults = await promiseGet("zoos/"+zooId, authHeaders);
     const zooData = zoosResults[0];
     $(".name").append(zooData.name);
     $(".postcode").append(zooData.postcode);
@@ -26,7 +27,8 @@ function addZooSpeciesToList(zooSpecies: SpeciesEntryForZooJson) {
 
 async function addSpeciesButton(zooId: number) {
     $("input#input-zoo_id").val(zooId);
-    const speciesList = await promiseGet("species/");
+    const authHeaders = new Map([["authorization", getAuthCookie()]]);
+    const speciesList = await promiseGet("species/", authHeaders);
     for(let species of speciesList) {
         $("select#species_id").append("<option value="+species.species_id+">"+species.common_name+"</option>");
     }
@@ -41,7 +43,7 @@ async function sendAddSpecies(zooId: number) {
     console.log(zooSpecies);
     const authHeaders = new Map([["authorization", getAuthCookie()]]);
     const newLink: ZooSpeciesLinkJson = await promisePost("zoo_species/", zooSpecies, authHeaders);
-    const speciesData: SpeciesJson[] = await promiseGet("species/"+newLink.species_id);
+    const speciesData: SpeciesJson[] = await promiseGet("species/"+newLink.species_id, authHeaders);
     console.log(speciesData);
     const speciesEntry: SpeciesEntryForZooJson = {
         zoo_species_id: newLink.zoo_species_id,
