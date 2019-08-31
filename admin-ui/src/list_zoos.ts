@@ -1,6 +1,7 @@
 import $ from "jquery";
 import {promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
 import {NewZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {checkLogin, getAuthCookie} from "./lib/authCheck";
 
 function fillTable() {
     const tableElem = $("table tbody");
@@ -29,8 +30,9 @@ function addNewZoo() {
         latitude: inputLatitude,
         longitude: inputLongitude
     };
+    const authHeaders = new Map([["authorization", getAuthCookie()]]);
     console.log(newZoo);
-    promisePost("zoos/", newZoo).then(function() {
+    promisePost("zoos/", newZoo, authHeaders).then(function() {
         formElement.trigger("reset");
     });
 }
@@ -50,8 +52,14 @@ function addFormRow() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    fillTable();
-    addFormRow();
+    const token = getAuthCookie();
+    checkLogin(token).then(function(isLogin) {
+        $("#login-status").text(`You are logged in as ${isLogin.username}`);
+        fillTable();
+        addFormRow();
+    }).catch(function (err) {
+        $("#login-status").html(`You are not logged in. <a href="login.html">Go to login</a>`);
+    });
 });
 
 $("#addZoo").on("submit", function() {
