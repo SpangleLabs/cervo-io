@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>View zoo</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script src="admin_config.ts"></script>
+    <script src="view_zoo.ts"></script>
     <style>
         .latin_name {
             font-style: italic;
@@ -13,69 +12,16 @@
 </head>
 <body>
 <a href="list_zoos.html">Back to zoo list</a><br />
+<div id="login-status"></div>
 Name: <span class="name"></span><br />
 Postcode: <span class="postcode"></span><br />
 Link: <span class="link"></span><br />
 Species list:<br />
 <ul id="species_list"></ul>
 
-<form onsubmit="sendAddSpecies()">
-    <input id="input-zoo_id" type="hidden" name="id" value="" />
+<form id="addSpecies">
     <select id="species_id" name="species_id"></select>
-    <input type="submit"/>
+    <input type="submit" value="Add species to zoo"/>
 </form>
-<script>
-    var getUrlParameter = function getUrlParameter(sParam) {
-        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
-
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : sParameterName[1];
-            }
-        }
-    };
-
-    function loadZooData() {
-        var zooId = getUrlParameter("id");
-        $.get(config["api_url"]+"zoos/"+zooId, function(data) {
-            $(".name").append(data[0].name);
-            $(".postcode").append(data[0].postcode);
-            $(".link").append("<a href='"+data[0].link+"'>"+data[0].link+"</a>");
-            for(var a = 0; a < data[0].species.length; a++) {
-                $("#species_list").append("<li>"+data[0].species[a].common_name+" " +
-                    "<span class='latin_name'>"+data[0].species[a].latin_name+"</span></li>");
-            }
-        });
-    }
-
-    function addSpeciesButton() {
-        $("input#input-zoo_id").val(getUrlParameter("id"));
-        $.get(config["api_url"]+"species/", function(data) {
-            for(var a = 0; a < data.length; a++ ) {
-                $("select#species_id").append("<option value="+data[a].species_id+">"+data[a].common_name+"</option>");
-            }
-        });
-    }
-
-    function sendAddSpecies() {
-        var zooId = getUrlParameter("id");
-        var speciesId = $("select#species_id").find(":selected").val();
-        var zooSpecies = {};
-        zooSpecies.zoo_id = zooId;
-        zooSpecies.species_id = speciesId;
-        console.log(zooSpecies);
-        $.post(config["api_url"]+"zoo_species/", zooSpecies);
-    }
-
-    $(document).ready(function() {
-        loadZooData();
-        addSpeciesButton();
-    });
-</script>
 </body>
 </html>

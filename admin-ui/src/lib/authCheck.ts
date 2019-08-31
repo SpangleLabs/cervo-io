@@ -1,5 +1,6 @@
 import {promiseGet} from "@cervoio/common-ui-lib/src/utilities";
 import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
+import $ from "jquery";
 
 
 export function getAuthCookie(): string {
@@ -12,6 +13,16 @@ export function checkLogin(token: string): Promise<SessionTokenJson> {
     return promiseGet("session/", headers).then(function (response: SessionTokenJson) {
         return response;
     }).catch(function (err) {
+        throw err;
+    });
+}
+
+export function updateLoginStatus() {
+    const token = getAuthCookie();
+    return checkLogin(token).then(async function(isLogin) {
+        $("#login-status").text(`You are logged in as ${isLogin.username}`);
+    }).catch(function (err) {
+        $("#login-status").html(`You are not logged in. <a href="login.html">Go to login</a>`);
         throw err;
     });
 }

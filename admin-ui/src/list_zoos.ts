@@ -1,7 +1,7 @@
 import $ from "jquery";
 import {promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
 import {NewZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {checkLogin, getAuthCookie} from "./lib/authCheck";
+import {getAuthCookie, updateLoginStatus} from "./lib/authCheck";
 
 function addZooRow(zoo: ZooJson): void {
     const tableElem = $("table tbody");
@@ -54,18 +54,13 @@ function addFormRow(): void {
     console.log("added form");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const token = getAuthCookie();
-    checkLogin(token).then(async function(isLogin) {
-        $("#login-status").text(`You are logged in as ${isLogin.username}`);
-        await fillTable();
-        addFormRow();
+document.addEventListener("DOMContentLoaded", async function () {
+    await updateLoginStatus();
+    await fillTable();
+    addFormRow();
 
-        $("form#addZoo").on("submit", function(e) {
-            e.preventDefault();
-            addNewZoo();
-        });
-    }).catch(function (err) {
-        $("#login-status").html(`You are not logged in. <a href="login.html">Go to login</a>`);
+    $("form#addZoo").on("submit", function(e) {
+        e.preventDefault();
+        addNewZoo();
     });
 });
