@@ -38,7 +38,7 @@ function updateLoginStatus(token: string) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    $("#login_form").submit(login);
+    $("#login_form").on("submit", login);
     const cookie = getAuthCookie();
     if(cookie) {
         $("#login-status").text("You currently have an auth cookie set.");

@@ -1,7 +1,7 @@
 import $ from "jquery";
 import {checkLogin, getAuthCookie} from "./lib/authCheck";
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
     const token = getAuthCookie();
     checkLogin(token).then(function(isLogin) {
         $("#login-status").text(`You are logged in as ${isLogin.username}`);
