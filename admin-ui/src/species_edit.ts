@@ -60,7 +60,8 @@ function addNewSpeciesForm(element: JQuery, parentCategoryId: number) {
     });
     element.find("li.add > form.addSpecies").on("submit", async function (e) {
         e.preventDefault();
-        await sendAddSpecies(parentCategoryId);
+        const newSpecies = await sendAddSpecies(parentCategoryId);
+        addSpecies(element, newSpecies);
     });
 }
 
