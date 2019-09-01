@@ -1,12 +1,12 @@
 import $ from "jquery";
-import {promiseGet, promisePost} from "../../common-ui-lib/src/utilities";
+import {promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
 import {
     CategoryJson,
     CategoryLevelJson, FullCategoryJson,
     NewCategoryJson,
     NewSpeciesJson,
     SpeciesJson
-} from "../../common-lib/src/apiInterfaces";
+} from "@cervoio/common-lib/src/apiInterfaces";
 import {getAuthCookie, updateLoginStatus} from "./lib/authCheck";
 
 let categoryLevelCache: CategoryLevelJson[] = [];
