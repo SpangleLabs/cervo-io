@@ -1,9 +1,15 @@
 import $ from "jquery";
-import {updateLoginStatus} from "./lib/authCheck";
-import {promiseGet} from "@cervoio/common-ui-lib/src/utilities";
-import {FullCategoryJson, FullSpeciesJson, FullZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {getAuthCookie, updateLoginStatus} from "./lib/authCheck";
+import {promiseDelete, promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
+import {
+    FullCategoryJson,
+    FullSpeciesJson,
+    FullZooJson,
+    NewZooSpeciesLinkJson
+} from "@cervoio/common-lib/src/apiInterfaces";
 
 const zooSpecies: Map<number, number[]> = new Map<number, number[]>();
+const authHeaders = new Map([["authorization", getAuthCookie()]]);
 let tableElem = $("table#update_table");
 
 function domAddZooRow(zooData: FullZooJson, speciesList: FullSpeciesJson[]) {
@@ -16,8 +22,8 @@ function domAddZooRow(zooData: FullZooJson, speciesList: FullSpeciesJson[]) {
         const zooSpeciesCheckbox = $(`<td id='zoospecies-${zooId}-${speciesId}'>
             <input type='checkbox' ${zooHasSpecies ? "checked " : ""}/>
             </td>`);
-        zooSpeciesCheckbox.on("change", function () {
-            eventToggleCheckbox(zooId, speciesId);
+        zooSpeciesCheckbox.on("change", async function () {
+            await eventToggleCheckbox(zooId, speciesId);
         });
         zooRow.append(zooSpeciesCheckbox);
     }
@@ -32,12 +38,12 @@ function domAddSpeciesColHeaders(speciesList: FullSpeciesJson[]) {
 }
 
 async function promiseGetSpecies(speciesId: number): Promise<FullSpeciesJson> {
-    const species = await promiseGet("species/"+speciesId);
+    const species = await promiseGet("species/"+speciesId, authHeaders);
     return species[0];
 }
 
 async function promiseGetCategory(categoryId: number): Promise<FullCategoryJson> {
-    const categories = await promiseGet("categories/"+categoryId);
+    const categories = await promiseGet("categories/"+categoryId, authHeaders);
     return categories[0];
 }
 
@@ -58,35 +64,35 @@ async function promiseGetSpeciesFromCategory(categoryId: number): Promise<FullSp
 }
 
 async function listZoos(): Promise<FullZooJson[]> {
-    return await promiseGet("zoos/");
+    return await promiseGet("zoos/", authHeaders);
 }
 
-function sendAddSpecies(zooId, speciesId) {
-    var zooSpecies = {};
-    zooSpecies.zoo_id = zooId;
-    zooSpecies.species_id = speciesId;
+async function sendAddSpecies(zooId: number, speciesId: number) {
+    const zooSpecies: NewZooSpeciesLinkJson = {
+        zoo_id: zooId,
+        species_id: speciesId
+    };
+    console.log("Adding connection");
     console.log(zooSpecies);
-    $.post(config["api_url"]+"zoo_species/", zooSpecies);
+    await promisePost("zoo_species/", zooSpecies, authHeaders);
 }
 
-function sendDelSpecies(zooId, speciesId) {
-    var zooSpecies = {};
-    zooSpecies.zoo_id = zooId;
-    zooSpecies.species_id = speciesId;
+async function sendDelSpecies(zooId: number, speciesId: number) {
+    const zooSpecies: NewZooSpeciesLinkJson = {
+        zoo_id: zooId,
+        species_id: speciesId
+    };
+    console.log("Removing connection");
     console.log(zooSpecies);
-    $.ajax({
-        url: config["api_url"]+"zoo_species/",
-        type: "DELETE",
-        data: zooSpecies
-    });
+    await promiseDelete("zoo_species/", zooSpecies, authHeaders);
 }
 
-function eventToggleCheckbox(zooId, speciesId) {
-    var checkboxElem = $("td#zoospecies-"+zooId+"-"+speciesId+" input[type=checkbox]");
+async function eventToggleCheckbox(zooId: number, speciesId: number) {
+    const checkboxElem = $(`td#zoospecies-${zooId}-${speciesId} input[type=checkbox]`);
     if(checkboxElem.is(":checked")) {
-        sendAddSpecies(zooId, speciesId);
+        await sendAddSpecies(zooId, speciesId);
     } else {
-        sendDelSpecies(zooId, speciesId);
+        await sendDelSpecies(zooId, speciesId);
     }
 }
 
