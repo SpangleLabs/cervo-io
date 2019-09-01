@@ -51,8 +51,8 @@ function addNewSpeciesForm(element: JQuery, parentCategoryId: number) {
     element.append("<li class='species add'>" +
         "<span>Add species </span>" +
         "<form class='addSpecies'>" +
-        "<input class='name' type='text' name='name'/>" +
-        "<input class='latin_name' type='text' name='latin_name'>" +
+        "<input class='name' type='text' name='name' placeholder='Common name'/>" +
+        "<input class='latin_name' type='text' name='latin_name' placeholder='latin name'>" +
         "<input type='submit' />" +
         "</form></li>");
     element.find("li.add > span").on("click", function () {
@@ -69,7 +69,7 @@ function addNewCategoryForm(element: JQuery, parentCategoryId: number, currentLe
     let formString = `<li class='category add' id="category-add-${parentCategoryId}">
         <span>Add category </span>
         <form class='addCategory'>
-        <input class='name' type='text' name='name'/>
+        <input class='name' type='text' name='name' placeholder="name"/>
         <select class='category_level_id' name='category_level_id'>`;
     const catLevels = getCategoryLevels();
     for(let categoryLevel of catLevels) {
