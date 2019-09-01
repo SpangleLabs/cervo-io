@@ -34,34 +34,30 @@ function domAddSpeciesColHeaders(speciesList) {
     tableElem.append(colHeaders);
 }
 
-function promiseGetSpecies(speciesId: number): Promise<FullSpeciesJson[]> {
-    //return a species promise which returns species data
-    return promiseGet("species/"+speciesId);
+async function promiseGetSpecies(speciesId: number): Promise<FullSpeciesJson> {
+    const species = await promiseGet("species/"+speciesId);
+    return species[0];
 }
 
-function promiseRawGetCategory(categoryId: number): Promise<FullCategoryJson[]> {
-    return promiseGet("categories/"+categoryId);
+async function promiseGetCategory(categoryId: number): Promise<FullCategoryJson> {
+    const categories = await promiseGet("categories/"+categoryId);
+    return categories[0];
 }
 
-function promiseGetCategory(categoryId: number): Promise<FullSpeciesJson[]> {
-    //return a category promise which returns species promises
-    const categoryPromises: Promise<FullSpeciesJson[]>[] = [];
-    const speciesPromises: Promise<FullSpeciesJson[]>[] = [];
-    const result = promiseRawGetCategory(categoryId).then(function(data) {
-        for(let category of data) {
-            for(let species of category.species) {
-                speciesPromises.push(promiseGetSpecies(species.species_id));
-            }
-            for(let subCategory of category.sub_categories) {
-                categoryPromises.push(promiseGetCategory(subCategory.category_id));
-            }
-        }
-        return Promise.all(categoryPromises);
-    }).then(function(specPromises) {
-        const specPromisesConcat = Array.prototype.concat.apply([],specPromises);
-        return speciesPromises.concat(specPromisesConcat);
-    });
-    return result;
+async function promiseGetSpeciesFromCategory(categoryId: number): Promise<FullSpeciesJson[]> {
+    // Get category data, and collect species and subcategories
+    const categoryData: FullCategoryJson = await promiseGetCategory(categoryId);
+    const promiseSpecies: Promise<FullSpeciesJson[]> = Promise.all(categoryData.species.map(x => promiseGetSpecies(x.species_id)));
+    const promiseSubCatSpecies: Promise<FullSpeciesJson[][]> = Promise.all(categoryData.sub_categories.map(x => promiseGetSpeciesFromCategory(x.category_id)));
+
+    // Await the species data, and the sub categories species list
+    const [species, subCategorySpecies] = await Promise.all([promiseSpecies, promiseSubCatSpecies]);
+
+    // Flatten list of subcategory species
+    let allSpecies: FullSpeciesJson[] = species;
+    subCategorySpecies.forEach(x => allSpecies = allSpecies.concat(x));
+
+    return allSpecies;
 }
 
 function listZoos() {
@@ -103,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const searchParams = new URLSearchParams(window.location.search);
     const categoryId = Number(searchParams.get("category_id"));
     // Get list of species
-    promiseGetCategory(categoryId).then(function(data) {
+    promiseGetSpeciesFromCategory(categoryId).then(function(data) {
         return Promise.all(data);
     }).then(function(speciesData) {
         // Add species to map
