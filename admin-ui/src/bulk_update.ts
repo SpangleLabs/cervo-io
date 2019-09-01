@@ -10,7 +10,6 @@ import {
 
 const zooSpecies: Map<number, number[]> = new Map<number, number[]>();
 const authHeaders = new Map([["authorization", getAuthCookie()]]);
-let tableElem = $("table#update_table");
 
 function domAddZooRow(zooData: FullZooJson, speciesList: FullSpeciesJson[]) {
     const zooRow = $(`<tr>`);
@@ -27,14 +26,14 @@ function domAddZooRow(zooData: FullZooJson, speciesList: FullSpeciesJson[]) {
         });
         zooRow.append(zooSpeciesCheckbox);
     }
-    tableElem.append(zooRow);
+    $("table#update_table").append(zooRow);
 }
 
 function domAddSpeciesColHeaders(speciesList: FullSpeciesJson[]) {
     let colHeaders = "<thead><tr><td></td>";
     colHeaders += speciesList.map(x => `<th><div class="species_name">${x.common_name}</div></th>`).join();
     colHeaders += "</tr></thead>";
-    tableElem.append(colHeaders);
+    $("table#update_table").append(colHeaders);
 }
 
 async function promiseGetSpecies(speciesId: number): Promise<FullSpeciesJson> {
@@ -103,6 +102,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const categoryId = Number(searchParams.get("category_id"));
     // Get list of species
     const speciesList = await promiseGetSpeciesFromCategory(categoryId);
+    console.log(speciesList);
     // Add species to map
     for(let species of speciesList) {
         for(let zoo of species.zoos) {
@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             zooSpecies.set(zoo.zoo_id, zooSpeciesList);
         }
     }
+    console.log(zooSpecies);
     // Add species to dom
     domAddSpeciesColHeaders(speciesList);
     // Get list of zoos
