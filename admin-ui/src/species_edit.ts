@@ -48,24 +48,24 @@ function addSpecies(element: JQuery, speciesData: SpeciesJson) {
 }
 
 function addNewSpeciesForm(element: JQuery, parentCategoryId: number) {
-    element.find("ul").append("<li class='species add'>" +
+    element.append("<li class='species add'>" +
         "<span>Add species </span>" +
         "<form class='addSpecies'>" +
         "<input class='name' type='text' name='name'/>" +
         "<input class='latin_name' type='text' name='latin_name'>" +
         "<input type='submit' />" +
         "</form></li>");
-    element.find("ul > li.add > span").on("click", function () {
+    element.find("li.add > span").on("click", function () {
         displayForm(parentCategoryId);
     });
-    element.find("ul > li.add > form.addSpecies").on("submit", async function (e) {
+    element.find("li.add > form.addSpecies").on("submit", async function (e) {
         e.preventDefault();
         await sendAddSpecies(parentCategoryId);
     });
 }
 
 function addNewCategoryForm(element: JQuery, parentCategoryId: number, currentLevelId?: number) {
-    let formString = `<li class='category add category-add-${parentCategoryId}'>
+    let formString = `<li class='category add' id="category-add-${parentCategoryId}">
         <span>Add category </span>
         <form class='addCategory'>
         <input class='name' type='text' name='name'/>
@@ -77,13 +77,15 @@ function addNewCategoryForm(element: JQuery, parentCategoryId: number, currentLe
     formString += `</select>
         <input type='submit'/>
         </form></li>`;
-    element.find("ul").append(formString);
-    const newElem = $("li.category-add-"+parentCategoryId);
+    element.append(formString);
+    const newElem = $("li#category-add-"+parentCategoryId);
     newElem.find("span").on("click", function() {
         displayForm(parentCategoryId);
     });
-    newElem.find("form.addCategory").on("submit", async function() {
-        await sendAddCategory(parentCategoryId);
+    newElem.find("form.addCategory").on("submit", async function(e) {
+        e.preventDefault();
+        const newCategory = await sendAddCategory(parentCategoryId);
+        addCategory(element, newCategory);
     });
 }
 
@@ -91,8 +93,8 @@ function displayForm(id: number) {
     $("#category-"+id).find("form").show();
 }
 
-async function sendAddSpecies(categoryId: number): Promise<void> {
-    const formElement = $("#category-"+categoryId).find("form.addSpecies");
+async function sendAddSpecies(categoryId: number): Promise<SpeciesJson> {
+    const formElement = $(`#category-${categoryId} form.addSpecies`);
     const inputName = <string>formElement.find("input.name").val();
     const inputLatin = <string>formElement.find("input.latin_name").val();
     const inputObj: NewSpeciesJson = {
@@ -103,25 +105,26 @@ async function sendAddSpecies(categoryId: number): Promise<void> {
     };
     console.log(inputObj);
     const authHeaders = new Map([["authorization", getAuthCookie()]]);
-    await promisePost("species/", inputObj, authHeaders);
+    const result: SpeciesJson = await promisePost("species/", inputObj, authHeaders);
     formElement.trigger("reset");
+    return result;
 }
 
-async function sendAddCategory(categoryId: number): Promise<boolean> {
-    const formElement = $("#category-"+categoryId).find("form.addCategory");
+async function sendAddCategory(parentCategoryId: number): Promise<CategoryJson> {
+    const formElement = $(`#category-add-${parentCategoryId} form.addCategory`);
     const inputName = <string>formElement.find("input.name").val();
     const inputlevelId = Number(formElement.find("select").find(":selected").val());
     const inputObj: NewCategoryJson = {
         name: inputName,
         category_level_id: inputlevelId,
-        parent_category_id: categoryId,
+        parent_category_id: parentCategoryId,
         hidden: false
     };
     console.log(inputObj);
     const authHeaders = new Map([["authorization", getAuthCookie()]]);
-    await promisePost("categories/", inputObj, authHeaders);
+    const result: CategoryJson = await promisePost("categories/", inputObj, authHeaders);
     formElement.trigger("reset");
-    return false;
+    return result;
 }
 
 function loadCategory(id: number) {
@@ -134,20 +137,21 @@ function loadCategory(id: number) {
         listElement.removeClass("closed");
         if(!listElement.has("ul").length) {
             listElement.append("<ul class='"+(isOdd?"even":"odd")+"'></ul>");
-            // Add subcategories and species
-            let currentLevelId = null;
-            for(let subCategory of data[0].sub_categories) {
-                currentLevelId = subCategory.category_level_id;
-                addCategory(listElement.find("ul"), subCategory);
-            }
-            for(let species of data[0].species) {
-                addSpecies(listElement.find("ul"), species);
-            }
+            const categoryMembersElement = listElement.find("ul");
+            // Calculate the current category level ID
+            let currentLevelId = data[0].sub_categories.map(x => x.category_level_id)[0];
             // Adding forms
             if(data[0].category_level_id === 1) {
-                addNewSpeciesForm(listElement, id);
+                addNewSpeciesForm(categoryMembersElement, id);
             } else {
-                addNewCategoryForm(listElement, id, currentLevelId);
+                addNewCategoryForm(categoryMembersElement, id, currentLevelId);
+            }
+            // Add subcategories and species
+            for(let subCategory of data[0].sub_categories) {
+                addCategory(categoryMembersElement, subCategory);
+            }
+            for(let species of data[0].species) {
+                addSpecies(categoryMembersElement, species);
             }
             // If category contains only 1 subcategory, open the subcategory.
             if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
