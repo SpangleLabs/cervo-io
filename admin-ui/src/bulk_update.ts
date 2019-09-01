@@ -1,35 +1,32 @@
 import $ from "jquery";
 import {updateLoginStatus} from "./lib/authCheck";
 import {promiseGet} from "@cervoio/common-ui-lib/src/utilities";
-import {FullCategoryJson, FullSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {FullCategoryJson, FullSpeciesJson, FullZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
-let listSpecies = [];
-let zooSpecies = {};
+const zooSpecies: Map<number, number[]> = new Map<number, number[]>();
 let tableElem = $("table#update_table");
 
-function domAddZooRow(zooData) {
-    var tableBodyElem = $("table#update_table");//" tbody");
-    var zooRow = "<tr><td><a href="+zooData.zoo_id+"'view_zoo.html?id='>"+zooData.name+"</a></td>";
-    for(var a = 0; a < listSpecies.length; a++) {
-        var zooId = zooData.zoo_id;
-        var speciesId = listSpecies[a].species_id;
-        zooRow += "<td id='zoospecies-"+zooId+"-"+speciesId+"'>" +
-            "<input type='checkbox' onchange='eventToggleCheckbox("+zooId+","+speciesId+")'";
-        if(zooSpecies[zooId] && zooSpecies[zooId].indexOf(speciesId) !== -1) {
-            zooRow += "checked ";
-        }
-        zooRow += "/>" +
-            "</td>";
+function domAddZooRow(zooData: FullZooJson, speciesList: FullSpeciesJson[]) {
+    const zooRow = $(`<tr>`);
+    zooRow.append(`<td><a href="view_zoo.html?id=${zooData.zoo_id}">${zooData.name}</a></td>`);
+    for(let species of speciesList) {
+        const zooId = zooData.zoo_id;
+        const speciesId = species.species_id;
+        const zooHasSpecies = zooSpecies.get(zooId) && zooSpecies.get(zooId).indexOf(speciesId) !== -1;
+        const zooSpeciesCheckbox = $(`<td id='zoospecies-${zooId}-${speciesId}'>
+            <input type='checkbox' ${zooHasSpecies ? "checked " : ""}/>
+            </td>`);
+        zooSpeciesCheckbox.on("change", function () {
+            eventToggleCheckbox(zooId, speciesId);
+        });
+        zooRow.append(zooSpeciesCheckbox);
     }
-    zooRow += "</tr>";
-    tableBodyElem.append(zooRow);
+    tableElem.append(zooRow);
 }
 
-function domAddSpeciesColHeaders(speciesList) {
-    var colHeaders = "<thead><tr><td></td>";
-    for(var a = 0; a < speciesList.length; a++) {
-        colHeaders += "<th><div class='species_name'>"+speciesList[a].common_name+"</div></th>";
-    }
+function domAddSpeciesColHeaders(speciesList: FullSpeciesJson[]) {
+    let colHeaders = "<thead><tr><td></td>";
+    colHeaders += speciesList.map(x => `<th><div class="species_name">${x.common_name}</div></th>`).join();
     colHeaders += "</tr></thead>";
     tableElem.append(colHeaders);
 }
@@ -60,8 +57,8 @@ async function promiseGetSpeciesFromCategory(categoryId: number): Promise<FullSp
     return allSpecies;
 }
 
-function listZoos() {
-    return promiseGet("zoos/");
+async function listZoos(): Promise<FullZooJson[]> {
+    return await promiseGet("zoos/");
 }
 
 function sendAddSpecies(zooId, speciesId) {
@@ -99,34 +96,27 @@ document.addEventListener("DOMContentLoaded", async function () {
     const searchParams = new URLSearchParams(window.location.search);
     const categoryId = Number(searchParams.get("category_id"));
     // Get list of species
-    promiseGetSpeciesFromCategory(categoryId).then(function(data) {
-        return Promise.all(data);
-    }).then(function(speciesData) {
-        // Add species to map
-        for(var a = 0; a < speciesData.length; a++) {
-            var species = speciesData[a][0];
-            listSpecies.push(species);
-            var speciesId = species.species_id;
-            for(var b = 0; b < species.zoos.length; b++) {
-                var zooId = species.zoos[b].zoo_id;
-                if(!(zooId in zooSpecies)) {
-                    zooSpecies[zooId] = [];
-                }
-                zooSpecies[zooId].push(speciesId);
+    const speciesList = await promiseGetSpeciesFromCategory(categoryId);
+    // Add species to map
+    for(let species of speciesList) {
+        for(let zoo of species.zoos) {
+            if(!zooSpecies.get(zoo.zoo_id)) {
+                zooSpecies.set(zoo.zoo_id, []);
             }
+            const zooSpeciesList = zooSpecies.get(zoo.zoo_id);
+            zooSpeciesList.push(species.species_id);
+            zooSpecies.set(zoo.zoo_id, zooSpeciesList);
         }
-        // Add species to dom
-        domAddSpeciesColHeaders(listSpecies);
-        // Get list of zoos
-        return listZoos();
-    }).then(function(zooData) {
-        // Add zoo list
-        //tableElem.append("<tbody></tbody>");
-        for(var a = 0; a < zooData.length; a++) {
-            domAddZooRow(zooData[a]);
-            if(a % 20 === 19) {
-                domAddSpeciesColHeaders(listSpecies);
-            }
+    }
+    // Add species to dom
+    domAddSpeciesColHeaders(speciesList);
+    // Get list of zoos
+    const zooList = await listZoos();
+    // Add zoo list
+    for(let a = 0; a < zooList.length; a++) {
+        domAddZooRow(zooList[a], speciesList);
+        if(a % 20 === 19) {
+            domAddSpeciesColHeaders(speciesList);
         }
-    });
+    }
 });
