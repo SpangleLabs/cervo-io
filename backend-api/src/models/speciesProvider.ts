@@ -107,7 +107,7 @@ export class SpeciesProvider extends AbstractProvider {
     addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
         return this.connection().then(function (conn) {
             const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`,`hidden`) " +
-                "values (?,?,?)", [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]);
+                "values (?,?,?,?)", [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]);
             conn.end();
             return result.then(function (data: NewEntryData) {
                 const result: SpeciesJson = {
