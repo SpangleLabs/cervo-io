@@ -53,6 +53,7 @@ function addNewSpeciesForm(element: JQuery, parentCategoryId: number) {
         "<form class='addSpecies'>" +
         "<input class='name' type='text' name='name' placeholder='Common name'/>" +
         "<input class='latin_name' type='text' name='latin_name' placeholder='latin name'>" +
+        "<label>Hidden?<input class='hidden' type='checkbox' name='hidden' /></label>" +
         "<input type='submit' />" +
         "</form></li>");
     element.find("li.add > span").on("click", function () {
@@ -77,6 +78,7 @@ function addNewCategoryForm(element: JQuery, parentCategoryId: number, currentLe
     }
     formString += `</select>
         <input type='submit'/>
+        <label>Hidden?<input class='hidden' type='checkbox' name='hidden' /></label>
         </form></li>`;
     element.append(formString);
     const newElem = $("li#category-add-"+parentCategoryId);
@@ -97,12 +99,13 @@ function displayForm(id: number) {
 async function sendAddSpecies(categoryId: number): Promise<SpeciesJson> {
     const formElement = $(`#category-${categoryId} form.addSpecies`);
     const inputName = <string>formElement.find("input.name").val();
-    const inputLatin = <string>formElement.find("input.latin_name").val();
+    const inputLatin = String(formElement.find("input.latin_name").val());
+    const hidden = Boolean(formElement.find("input.hidden").is(":checked"));
     const inputObj: NewSpeciesJson = {
         common_name: inputName,
         latin_name: inputLatin,
         category_id: categoryId,
-        hidden: false
+        hidden: hidden
     };
     console.log(inputObj);
     const authHeaders = new Map([["authorization", getAuthCookie()]]);
@@ -113,13 +116,14 @@ async function sendAddSpecies(categoryId: number): Promise<SpeciesJson> {
 
 async function sendAddCategory(parentCategoryId: number): Promise<CategoryJson> {
     const formElement = $(`#category-add-${parentCategoryId} form.addCategory`);
-    const inputName = <string>formElement.find("input.name").val();
-    const inputlevelId = Number(formElement.find("select").find(":selected").val());
+    const inputName = String(formElement.find("input.name").val());
+    const inputLevelId = Number(formElement.find("select").find(":selected").val());
+    const hidden = Boolean(formElement.find("input.hidden").is(":checked"));
     const inputObj: NewCategoryJson = {
         name: inputName,
-        category_level_id: inputlevelId,
+        category_level_id: inputLevelId,
         parent_category_id: parentCategoryId,
-        hidden: false
+        hidden: hidden
     };
     console.log(inputObj);
     const authHeaders = new Map([["authorization", getAuthCookie()]]);
