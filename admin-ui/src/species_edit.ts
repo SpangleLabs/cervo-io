@@ -64,19 +64,19 @@ function addNewSpeciesForm(element: JQuery, parentCategoryId: number) {
     });
 }
 
-function addNewCategoryForm(element: JQuery, parentCategoryId: number) {
-    let formString = "<li class='category add category-add-"+parentCategoryId+"'>" +
-        "<span>Add category </span>" +
-        "<form class='addCategory'>" +
-        "<input class='name' type='text' name='name'/>" +
-        "<select class='category_level_id' name='category_level_id'>";
+function addNewCategoryForm(element: JQuery, parentCategoryId: number, currentLevelId?: number) {
+    let formString = `<li class='category add category-add-${parentCategoryId}'>
+        <span>Add category </span>
+        <form class='addCategory'>
+        <input class='name' type='text' name='name'/>
+        <select class='category_level_id' name='category_level_id'>`;
     const catLevels = getCategoryLevels();
     for(let categoryLevel of catLevels) {
-        formString += "<option value='"+categoryLevel.category_level_id+"'>"+categoryLevel.name+"</option>";
+        formString += `<option value='${categoryLevel.category_level_id}' ${categoryLevel.category_level_id == currentLevelId ? "selected" : ""}>${categoryLevel.name}</option>`;
     }
-    formString += "</select>" +
-        "<input type='submit'/>" +
-        "</form></li>";
+    formString += `</select>
+        <input type='submit'/>
+        </form></li>`;
     element.find("ul").append(formString);
     const newElem = $("li.category-add-"+parentCategoryId);
     newElem.find("span").on("click", function() {
@@ -135,17 +135,19 @@ function loadCategory(id: number) {
         if(!listElement.has("ul").length) {
             listElement.append("<ul class='"+(isOdd?"even":"odd")+"'></ul>");
             // Add subcategories and species
-            $.each(data[0].sub_categories, function (index, itemData) {
-                addCategory(listElement.find("ul"), itemData);
-            });
-            $.each(data[0].species, function (index, itemData) {
-                addSpecies(listElement.find("ul"), itemData);
-            });
+            let currentLevelId = null;
+            for(let subCategory of data[0].sub_categories) {
+                currentLevelId = subCategory.category_level_id;
+                addCategory(listElement.find("ul"), subCategory);
+            }
+            for(let species of data[0].species) {
+                addSpecies(listElement.find("ul"), species);
+            }
             // Adding forms
             if(data[0].category_level_id === 1) {
                 addNewSpeciesForm(listElement, id);
             } else {
-                addNewCategoryForm(listElement, id);
+                addNewCategoryForm(listElement, id, currentLevelId);
             }
             // If category contains only 1 subcategory, open the subcategory.
             if(data[0].sub_categories.length === 1 && data[0].species.length === 0) {
