@@ -2,7 +2,6 @@ import {SessionTokenJson} from "../../../common-lib/src/apiInterfaces";
 import * as React from "react";
 import {checkLogin, getAuthCookie} from "../lib/authCheck";
 
-interface Empty {}
 interface SessionProps {
     session: SessionTokenJson
 }
@@ -11,13 +10,13 @@ interface LoginStatusState {
     session: SessionTokenJson | null
 }
 
-class LoginStatusLoggedin extends React.Component<SessionProps, Empty> {
+class LoginStatusLoggedin extends React.Component<SessionProps, {}> {
     render() {
         return <div>You are logged in as {this.props.session.username}</div>;
     }
 }
 
-export class LoginStatus extends React.Component<Empty, LoginStatusState> {
+export class LoginStatus extends React.Component<{}, LoginStatusState> {
     token: string;
 
     constructor(props: any) {
@@ -31,11 +30,8 @@ export class LoginStatus extends React.Component<Empty, LoginStatusState> {
         checkLogin(this.token).then(function(loginSession) {
             self.setState({checkedLogin: true, session: loginSession});
         }).catch(function (err) {
-            self.setState({checkedLogin: true});
+            self.setState({checkedLogin: true, session: null});
         });
-    }
-
-    componentWillUnmount(): void {
     }
 
     render() {
