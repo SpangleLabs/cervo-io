@@ -1,8 +1,10 @@
 import * as React from "react";
 import {AnimalData, SpeciesData} from "../animalData";
+import {SelectedSpecies} from "../selectedSpecies";
 
 interface View {
-    animalData: AnimalData
+    animalData: AnimalData;
+    selection: SelectedSpecies;
 }
 interface SearchState {
     searchTerm: string;
@@ -10,11 +12,19 @@ interface SearchState {
     speciesList: SpeciesData[];
 }
 interface SearchResultProps {
-    searchTerm: string,
-    species: SpeciesData
+    searchTerm: string;
+    species: SpeciesData;
+    selection: SelectedSpecies;
+}
+interface HilightedTextProps {
+    text: string;
+    searchTerm: string;
+}
+interface IsSelected {
+    selected: boolean
 }
 
-class SearchHilightedText extends React.Component<{text: string, searchTerm: string}, {}> {
+class SearchHilightedText extends React.Component<HilightedTextProps, {}> {
     render() {
         const searchRegex = new RegExp(this.props.searchTerm, "gi");
         this.props.text.split(searchRegex);
@@ -31,13 +41,36 @@ class SearchHilightedText extends React.Component<{text: string, searchTerm: str
     }
 }
 
-class SearchResult extends React.Component<SearchResultProps, {}> {
+class TickBox extends React.Component<IsSelected, {}> {
+    render() {
+        return <img
+            src={this.props.selected ? "images/box_checked.svg" : "images/box_unchecked.svg"}
+            alt={this.props.selected ? "✔" : "➕"}
+        />
+    }
+}
+
+class SearchResult extends React.Component<SearchResultProps, IsSelected> {
+    constructor(props: SearchResultProps) {
+        super(props);
+        this.state = {selected: this.props.selection.containsSpecies(this.props.species.id)};
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick() {
+        this.props.selection.toggleSpecies(this.props.species.id);
+        this.setState({selected: this.props.selection.containsSpecies(this.props.species.id)});
+    }
+
     render() {
         const searchTerm = this.props.searchTerm;
         const species = this.props.species;
         return (<li>
-            <span className="common_name"><SearchHilightedText text={species.commonName} searchTerm={searchTerm} /></span>
-            <span className="latin_name"><SearchHilightedText text={species.latinName} searchTerm={searchTerm} /></span>
+            <span className="clickable" onClick={this.onClick}>
+                <span className="common_name"><SearchHilightedText text={species.commonName} searchTerm={searchTerm} /></span>
+                <span className="latin_name"><SearchHilightedText text={species.latinName} searchTerm={searchTerm} /></span>
+                <TickBox selected={this.state.selected} />
+            </span>
         </li>);
     }
 }
@@ -60,7 +93,7 @@ export class SearchViewComponent extends React.Component<View, SearchState> {
         const lastSearch = this.state.searchTerm;
         this.setState(function(state) {
             return {
-                lastSearch: lastSearch
+                lastSearch: state.searchTerm
             }
         });
         const species = await this.props.animalData.promiseSearchSpecies(lastSearch);
@@ -69,7 +102,7 @@ export class SearchViewComponent extends React.Component<View, SearchState> {
 
     render() {
         const speciesElements = this.state.speciesList.map(
-            (species) => <SearchResult key={species.id} species={species} searchTerm={this.state.lastSearch} />
+            (species) => <SearchResult key={species.id} species={species} searchTerm={this.state.lastSearch} selection={this.props.selection}/>
             );
         return (
             <div>
