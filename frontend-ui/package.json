@@ -26,8 +26,12 @@
   },
   "homepage": "https://github.com/joshcoales/zoosite#readme",
   "dependencies": {
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
     "jquery": "^3.4.1",
-    "load-google-maps-api": "^2.0.1"
+    "load-google-maps-api": "^2.0.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
   },
   "devDependencies": {
     "@cervoio/common-lib": "../common-lib",
