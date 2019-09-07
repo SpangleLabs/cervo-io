@@ -1,11 +1,8 @@
 import * as React from "react";
-import {AnimalData, SpeciesData} from "../animalData";
+import {SpeciesData} from "../animalData";
 import {SelectedSpecies} from "../selectedSpecies";
+import {ViewProps} from "./views";
 
-interface View {
-    animalData: AnimalData;
-    selection: SelectedSpecies;
-}
 interface SearchState {
     searchTerm: string;
     lastSearch: string;
@@ -75,8 +72,8 @@ class SearchResult extends React.Component<SearchResultProps, IsSelected> {
     }
 }
 
-export class SearchViewComponent extends React.Component<View, SearchState> {
-    constructor(props: View) {
+export class SearchViewComponent extends React.Component<ViewProps, SearchState> {
+    constructor(props: ViewProps) {
         super(props);
         this.state = {searchTerm: "", lastSearch: "", speciesList: []};
         this.onUpdate = this.onUpdate.bind(this);

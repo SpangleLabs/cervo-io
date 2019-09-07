@@ -20,6 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
         selector.initialise(animalData, selection);
 
         $("input#postcode").on("input", () => selection.updateZooDistances());
-        $("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
+        //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
     });
 });
