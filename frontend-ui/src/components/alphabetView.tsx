@@ -1,24 +1,34 @@
 import * as React from "react";
 import {ViewProps} from "./views";
 
-
+interface AlphabetLetterProps {
+    letter: string,
+    odd: boolean,
+    valid: boolean,
+    selected: boolean,
+    onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
+}
 // class AlphabetLetterResults extends React.Component<{}, {}> {
 //     render() {
 //         return <ul id="letter-results"></ul>
 //     }
 // }
 
-class AlphabetLetter extends React.Component<{letter: string, odd: boolean, valid: boolean}, {}> {
+class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
+    constructor(props: AlphabetLetterProps) {
+        super(props);
+    }
+
     render() {
-        const classes = `letter-list ${this.props.odd ? "odd" : "even"} ${this.props.valid? "clickable" : "disabled"}`;
-        return <span className={classes}>{this.props.letter}</span>
+        const classes = `letter-list ${this.props.odd ? "odd" : "even"} ${this.props.valid? "clickable" : "disabled"} ${this.props.selected ? "selected" : ""}`;
+        return <span className={classes} onClick={this.props.onClick}>{this.props.letter}</span>
     }
 }
 
-export class AlphabetViewComponent extends React.Component<ViewProps, {validLetters: string[]}> {
+export class AlphabetViewComponent extends React.Component<ViewProps, {validLetters: string[], selectedLetter: string}> {
     constructor(props: ViewProps) {
         super(props);
-        this.state = {validLetters: []};
+        this.state = {validLetters: [], selectedLetter: ""};
     }
 
     async componentDidMount(): Promise<void> {
@@ -26,10 +36,26 @@ export class AlphabetViewComponent extends React.Component<ViewProps, {validLett
         this.setState({validLetters: validLetters});
     }
 
+    letterClick(letter: string) {
+        this.setState({selectedLetter: letter});
+    }
+
     render() {
         const alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().split("");
         const validLetters = this.state.validLetters;
-        const letters = alphabet.map((letter, index) => <AlphabetLetter key={letter} letter={letter} odd={index%2==1} valid={validLetters.includes(letter)}/>);
+        const self = this;
+        const letters = alphabet.map(
+            function (letter, index) {
+                const letterClick = self.letterClick.bind(self, letter);
+                const valid = validLetters.includes(letter);
+                return <AlphabetLetter
+                    key={letter}
+                    letter={letter}
+                    odd={index % 2 == 1}
+                    valid={valid}
+                    selected={letter == self.state.selectedLetter}
+                    onClick={valid ? letterClick : null}/>
+            });
         return <div id="letter-list">{letters}</div>
     }
 }
