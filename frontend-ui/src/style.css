@@ -125,6 +125,11 @@ span[onclick], li[onclick], .letter-list:not(.disabled), .clickable {
     cursor: pointer;
 }
 
+/* Styling selected species items */
+span.species.selected {
+    background-color: powderblue;
+}
+
 /*Below is all the actual sections of the website for desktop and mobile*/
 #main {
     height: 100%;

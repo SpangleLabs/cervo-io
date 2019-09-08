@@ -49,10 +49,11 @@ class SearchResult extends React.Component<SearchResultProps, IsSelected> {
     }
 
     render() {
+        const className = `clickable species ${this.state.selected ? "selected" : ""}`;
         const searchTerm = this.props.searchTerm;
         const species = this.props.species;
         return (<li>
-            <span className="clickable" onClick={this.onClick}>
+            <span className={className} onClick={this.onClick}>
                 <span className="common_name"><SearchHilightedText text={species.commonName} searchTerm={searchTerm} /></span>
                 <span className="latin_name"><SearchHilightedText text={species.latinName} searchTerm={searchTerm} /></span>
                 <TickBox selected={this.state.selected} />

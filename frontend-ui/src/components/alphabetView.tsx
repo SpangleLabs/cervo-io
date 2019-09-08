@@ -2,6 +2,7 @@ import * as React from "react";
 import {ViewProps} from "./views";
 import {SpeciesData} from "../animalData";
 import {IsSelected, TickBox} from "./tickbox";
+import {SelectedSpecies} from "../selectedSpecies";
 
 interface AlphabetLetterProps {
     letter: string,
@@ -11,16 +12,24 @@ interface AlphabetLetterProps {
     onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
 }
 
-class AlphabetLetterResult extends React.Component<{species: SpeciesData}, IsSelected> {
-    constructor(props: {species: SpeciesData}) {
+class AlphabetLetterResult extends React.Component<{species: SpeciesData, selection: SelectedSpecies}, IsSelected> {
+    constructor(props: {species: SpeciesData, selection: SelectedSpecies}) {
         super(props);
-        this.state = {selected: false};
+        this.state = {selected: this.props.selection.containsSpecies(this.props.species.id)};
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick() {
+        this.props.selection.toggleSpecies(this.props.species.id);
+        this.setState({selected: this.props.selection.containsSpecies(this.props.species.id)});
     }
 
     render() {
+        const className = `species clickable ${this.state.selected ? "selected" : ""}`;
         return <li>
-            <span className="selector clickable">{this.props.species.commonName}
-            <TickBox selected={this.state.selected} />
+            <span className={className} onClick={this.onClick}>
+                <span className="common_name">{this.props.species.commonName}</span>
+                <TickBox selected={this.state.selected} />
             </span>
         </li>
     }
@@ -70,7 +79,7 @@ export class AlphabetViewComponent extends React.Component<ViewProps, {validLett
                     selected={letter == self.state.selectedLetter}
                     onClick={valid ? letterClick : null}/>
             });
-        const speciesList = this.state.speciesList.map((species) => <AlphabetLetterResult species={species} />);
+        const speciesList = this.state.speciesList.map((species) => <AlphabetLetterResult key={species.id} species={species} selection={this.props.selection}/>);
         return <>
                 <div id="letter-list">{letters}</div>
                 <ul id="letter-results">{speciesList}</ul>
