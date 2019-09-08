@@ -1,5 +1,6 @@
 import * as React from "react";
 import {ViewProps} from "./views";
+import {SpeciesData} from "../animalData";
 
 interface AlphabetLetterProps {
     letter: string,
@@ -8,11 +9,13 @@ interface AlphabetLetterProps {
     selected: boolean,
     onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
 }
-// class AlphabetLetterResults extends React.Component<{}, {}> {
-//     render() {
-//         return <ul id="letter-results"></ul>
-//     }
-// }
+
+class AlphabetLetterResults extends React.Component<{speciesList: SpeciesData[]}, {}> {
+    render() {
+        const speciesList = this.props.speciesList.map((species) => <li>{species.commonName}</li>);
+        return <ul id="letter-results">{speciesList}</ul>
+    }
+}
 
 class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
     constructor(props: AlphabetLetterProps) {
@@ -25,10 +28,10 @@ class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
     }
 }
 
-export class AlphabetViewComponent extends React.Component<ViewProps, {validLetters: string[], selectedLetter: string}> {
+export class AlphabetViewComponent extends React.Component<ViewProps, {validLetters: string[], selectedLetter: string, speciesList: SpeciesData[]}> {
     constructor(props: ViewProps) {
         super(props);
-        this.state = {validLetters: [], selectedLetter: ""};
+        this.state = {validLetters: [], selectedLetter: "", speciesList: []};
     }
 
     async componentDidMount(): Promise<void> {
@@ -36,8 +39,10 @@ export class AlphabetViewComponent extends React.Component<ViewProps, {validLett
         this.setState({validLetters: validLetters});
     }
 
-    letterClick(letter: string) {
+    async letterClick(letter: string) {
         this.setState({selectedLetter: letter});
+        const speciesList = await this.props.animalData.promiseSpeciesByLetter(letter);
+        this.setState({speciesList: speciesList});
     }
 
     render() {
@@ -56,6 +61,9 @@ export class AlphabetViewComponent extends React.Component<ViewProps, {validLett
                     selected={letter == self.state.selectedLetter}
                     onClick={valid ? letterClick : null}/>
             });
-        return <div id="letter-list">{letters}</div>
+        return <>
+                <div id="letter-list">{letters}</div>
+                <AlphabetLetterResults speciesList={this.state.speciesList} />
+            </>
     }
 }
