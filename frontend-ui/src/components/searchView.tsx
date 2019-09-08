@@ -2,6 +2,7 @@ import * as React from "react";
 import {SpeciesData} from "../animalData";
 import {SelectedSpecies} from "../selectedSpecies";
 import {ViewProps} from "./views";
+import {IsSelected, TickBox} from "./tickbox";
 
 interface SearchState {
     searchTerm: string;
@@ -16,9 +17,6 @@ interface SearchResultProps {
 interface HilightedTextProps {
     text: string;
     searchTerm: string;
-}
-interface IsSelected {
-    selected: boolean
 }
 
 class SearchHilightedText extends React.Component<HilightedTextProps, {}> {
@@ -35,15 +33,6 @@ class SearchHilightedText extends React.Component<HilightedTextProps, {}> {
         }
         result.push(split[split.length - 1]);
         return result;
-    }
-}
-
-class TickBox extends React.Component<IsSelected, {}> {
-    render() {
-        return <img
-            src={this.props.selected ? "images/box_checked.svg" : "images/box_unchecked.svg"}
-            alt={this.props.selected ? "✔" : "➕"}
-        />
     }
 }
 

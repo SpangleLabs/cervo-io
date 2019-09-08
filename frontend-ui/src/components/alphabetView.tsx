@@ -1,6 +1,7 @@
 import * as React from "react";
 import {ViewProps} from "./views";
 import {SpeciesData} from "../animalData";
+import {IsSelected, TickBox} from "./tickbox";
 
 interface AlphabetLetterProps {
     letter: string,
@@ -10,10 +11,18 @@ interface AlphabetLetterProps {
     onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
 }
 
-class AlphabetLetterResults extends React.Component<{speciesList: SpeciesData[]}, {}> {
+class AlphabetLetterResult extends React.Component<{species: SpeciesData}, IsSelected> {
+    constructor(props: {species: SpeciesData}) {
+        super(props);
+        this.state = {selected: false};
+    }
+
     render() {
-        const speciesList = this.props.speciesList.map((species) => <li>{species.commonName}</li>);
-        return <ul id="letter-results">{speciesList}</ul>
+        return <li>
+            <span className="selector clickable">{this.props.species.commonName}
+            <TickBox selected={this.state.selected} />
+            </span>
+        </li>
     }
 }
 
@@ -61,9 +70,10 @@ export class AlphabetViewComponent extends React.Component<ViewProps, {validLett
                     selected={letter == self.state.selectedLetter}
                     onClick={valid ? letterClick : null}/>
             });
+        const speciesList = this.state.speciesList.map((species) => <AlphabetLetterResult species={species} />);
         return <>
                 <div id="letter-list">{letters}</div>
-                <AlphabetLetterResults speciesList={this.state.speciesList} />
+                <ul id="letter-results">{speciesList}</ul>
             </>
     }
 }
