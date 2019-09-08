@@ -4,6 +4,10 @@ import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 import {View} from "./views";
 import {SelectedSpecies} from "./selectedSpecies";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
+import * as ReactDOM from "react-dom";
+//import {AlphabetViewComponent} from "./components/alphabetView";
+import * as React from "react";
+import {TaxonomyViewComponent} from "./components/taxonomyView";
 
 
 /**
@@ -17,27 +21,28 @@ export class TaxonomyView extends View {
 
     constructor(animalData: AnimalData, selection: SelectedSpecies, categoryLevels: CategoryLevelJson[], baseCategories: CategoryData[]) {
         super($("#animals-taxonomic"), animalData, selection);
-        this.cacheCategoryLevel = [];
-        this.categories = new Map<string, TaxonomyCategory>();
-        this.species = new Map<string, TaxonomySpecies>();
-
-        this.cacheCategoryLevel = categoryLevels;
-        this.baseTaxoCategories = [];
-        for (const categoryData of baseCategories) {
-            const newCategory: TaxonomyCategory = new TaxonomyCategory(categoryData, this);
-            const categoryKey = categoryData.id.toString();
-            this.categories.set(categoryKey, newCategory);
-            this.baseTaxoCategories.push(newCategory);
-        }
+        ReactDOM.render(<TaxonomyViewComponent animalData={animalData} selection={selection} />, document.getElementById("animals-taxonomic"));
+        // this.cacheCategoryLevel = [];
+        // this.categories = new Map<string, TaxonomyCategory>();
+        // this.species = new Map<string, TaxonomySpecies>();
+        //
+        // this.cacheCategoryLevel = categoryLevels;
+        // this.baseTaxoCategories = [];
+        // for (const categoryData of baseCategories) {
+        //     const newCategory: TaxonomyCategory = new TaxonomyCategory(categoryData, this);
+        //     const categoryKey = categoryData.id.toString();
+        //     this.categories.set(categoryKey, newCategory);
+        //     this.baseTaxoCategories.push(newCategory);
+        // }
     }
-
-    expandBaseCategories(): Promise<void> {
-        const self = this;
-        return Promise.all(
-            self.baseTaxoCategories.map(x => x.loadSubElements(true, false))
-        ).then();
-    }
-
+    //
+    // expandBaseCategories(): Promise<void> {
+    //     const self = this;
+    //     return Promise.all(
+    //         self.baseTaxoCategories.map(x => x.loadSubElements(true, false))
+    //     ).then();
+    // }
+    //
     getCategoryLevel(id: number): CategoryLevelJson | null {
         return this.cacheCategoryLevel.find(x=>x.category_level_id === id);
     }

@@ -67,7 +67,7 @@ export class ViewSelector {
         taxoPromise = promiseSpinner(rootElem,taxoPromise);
         // Promise to expand the taxonomy view
         const expandBasePromise = taxoPromise.then(function(taxonomyView) {
-            return taxonomyView.expandBaseCategories();
+            return //taxonomyView.expandBaseCategories();
         }).then();
         // When both are done, return the taxonomy view
         return Promise.all([taxoPromise, expandBasePromise]).then(function(data: [TaxonomyView, void]) {
