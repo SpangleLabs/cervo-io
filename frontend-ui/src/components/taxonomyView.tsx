@@ -7,6 +7,7 @@ import {CategoryLevelJson} from "../../../common-lib/src/apiInterfaces";
 interface CategoryProps extends ViewProps {
     category: CategoryData;
     categoryLevels: CategoryLevelJson[];
+    autoExpand: boolean;
     odd: boolean;
 }
 interface CategoryState {
@@ -28,6 +29,12 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
         this.state = {expand: false, selected: false, gotFullData: false, subCategories: [], species: []};
         this.expand = this.expand.bind(this);
         this.select = this.select.bind(this);
+    }
+
+    async componentDidMount() {
+        if(this.props.autoExpand) {
+            this.expand();
+        }
     }
 
     categoryLevelName() {
@@ -76,6 +83,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                             animalData={this.props.animalData}
                             selection={this.props.selection}
                             odd={!this.props.odd}
+                            autoExpand={this.state.subCategories.length == 1}
                         />)}
             </ul>
         </li>
@@ -104,6 +112,7 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
                     categoryLevels={this.state.categoryLevels}
                     category={category}
                     odd={true}
+                    autoExpand={true}
                     />);
         return <ul className="odd">
             {baseCategories}
