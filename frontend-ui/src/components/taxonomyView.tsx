@@ -7,6 +7,7 @@ import {CategoryLevelJson} from "../../../common-lib/src/apiInterfaces";
 interface CategoryProps extends ViewProps {
     category: CategoryData;
     categoryLevels: CategoryLevelJson[];
+    odd: boolean;
 }
 interface CategoryState {
     expand: boolean,
@@ -47,6 +48,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
 
     async expand() {
         await this.populate();
+        this.setState((state) => {return {expand: !state.expand}});
         console.log("Expand me " + this.props.category.name);
     }
 
@@ -55,7 +57,9 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
     }
 
     render() {
-        return <li className="category">
+        const liClassName = `category ${this.state.expand ? "open" : "closed"}`;
+        const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.state.expand ? "" : "hidden"}`;
+        return <li className={liClassName}>
             <span className="clickable" onClick={this.expand}>
                 <span className="category_name">{this.props.category.name}</span>
                 <span className="category_level">{this.categoryLevelName()}</span>
@@ -63,8 +67,16 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
             <span className="clickable selector" onClick={this.select}>
                 <TickBox selected={this.state.selected} />
             </span>
-            <ul className="odd">
-                {this.state.subCategories.map((category) => <TaxonomyCategory category={category} categoryLevels={this.props.categoryLevels} animalData={this.props.animalData} selection={this.props.selection} />)}
+            <ul className={ulClassName}>
+                {this.state.subCategories.map(
+                    (category) =>
+                        <TaxonomyCategory
+                            category={category}
+                            categoryLevels={this.props.categoryLevels}
+                            animalData={this.props.animalData}
+                            selection={this.props.selection}
+                            odd={!this.props.odd}
+                        />)}
             </ul>
         </li>
     }
@@ -91,9 +103,10 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
                     selection={this.props.selection}
                     categoryLevels={this.state.categoryLevels}
                     category={category}
+                    odd={true}
                     />);
-        return <>
+        return <ul className="odd">
             {baseCategories}
-        </>
+        </ul>
     }
 }
