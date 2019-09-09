@@ -3,7 +3,13 @@ import {ViewProps} from "./views";
 import {CategoryData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
 import {CategoryLevelJson} from "../../../common-lib/src/apiInterfaces";
+import {SelectedSpecies} from "../selectedSpecies";
 
+
+interface TaxonomyViewState {
+    baseCategories: CategoryData[];
+    categoryLevels: CategoryLevelJson[];
+}
 interface CategoryProps extends ViewProps {
     category: CategoryData;
     categoryLevels: CategoryLevelJson[];
@@ -17,10 +23,31 @@ interface CategoryState {
     subCategories: CategoryData[],
     species: SpeciesData[]
 }
+interface SpeciesProps {
+    species: SpeciesData;
+    selection: SelectedSpecies;
+    selected: boolean;
+    onSelect: () => void
+}
+interface SpeciesState {
+}
 
-interface TaxonomyViewState {
-    baseCategories: CategoryData[];
-    categoryLevels: CategoryLevelJson[];
+
+class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
+    constructor(props: SpeciesProps) {
+        super(props);
+    }
+
+    render() {
+        const className = `species ${this.props.selected ? "selected" : ""}`;
+        return <li className={className}>
+            <span className="clickable" onClick={this.props.onSelect}>
+                <span className="species_name">{this.props.species.commonName}</span>
+                <span className="latin_name">{this.props.species.latinName}</span>
+                <TickBox selected={this.props.selected} />
+            </span>
+        </li>
+    }
 }
 
 class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
@@ -28,7 +55,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
         super(props);
         this.state = {expand: false, selected: false, gotFullData: false, subCategories: [], species: []};
         this.expand = this.expand.bind(this);
-        this.select = this.select.bind(this);
+        this.selectCategory = this.selectCategory.bind(this);
     }
 
     async componentDidMount() {
@@ -59,8 +86,14 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
         console.log("Expand me " + this.props.category.name);
     }
 
-    select() {
+    selectCategory() {
         console.log("Select me " + this.props.category.name);
+    }
+
+    selectSpecies(speciesId: number) {
+        console.log("Selected child species :"+speciesId);
+        this.props.selection.toggleSpecies(speciesId);
+        this.forceUpdate();
     }
 
     render() {
@@ -71,7 +104,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                 <span className="category_name">{this.props.category.name}</span>
                 <span className="category_level">{this.categoryLevelName()}</span>
             </span>
-            <span className="clickable selector" onClick={this.select}>
+            <span className="clickable selector" onClick={this.selectCategory}>
                 <TickBox selected={this.state.selected} />
             </span>
             <ul className={ulClassName}>
@@ -84,7 +117,17 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                             selection={this.props.selection}
                             odd={!this.props.odd}
                             autoExpand={this.state.subCategories.length == 1}
-                        />)}
+                        />
+                )}
+                {this.state.species.map(
+                    (species) =>
+                        <TaxonomySpecies
+                            species={species}
+                            selection={this.props.selection}
+                            selected={this.props.selection.containsSpecies(species.id)}
+                            onSelect={this.selectSpecies.bind(this, species.id)}
+                        />
+                )}
             </ul>
         </li>
     }
