@@ -83,7 +83,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
     async expand() {
         await this.populate();
         this.setState((state) => {return {expand: !state.expand}});
-        console.log("Expand me " + this.props.category.name);
+        //console.log("Expand me " + this.props.category.name);
     }
 
     selectCategory() {
@@ -105,6 +105,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                 {this.state.subCategories.map(
                     (category) =>
                         <TaxonomyCategory
+                            key={"category-"+category.id}
                             category={category}
                             categoryLevels={this.props.categoryLevels}
                             animalData={this.props.animalData}
@@ -118,6 +119,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                 {this.state.species.map(
                     (species) =>
                         <TaxonomySpecies
+                            key={"species-"+species.id}
                             species={species}
                             selected={this.props.selectedSpecies.includes(species.id)}
                             onSelect={this.props.onSelectSpecies.bind(null, species.id)}
@@ -152,6 +154,7 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
         const baseCategories = this.state.baseCategories.map(
             (category) =>
                 <TaxonomyCategory
+                    key = {"category-"+category.id}
                     animalData={this.props.animalData}
                     selection={this.props.selection}
                     categoryLevels={this.state.categoryLevels}
