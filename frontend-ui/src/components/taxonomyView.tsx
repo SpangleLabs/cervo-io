@@ -3,7 +3,6 @@ import {ViewProps} from "./views";
 import {CategoryData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
 import {CategoryLevelJson} from "../../../common-lib/src/apiInterfaces";
-import {SelectedSpecies} from "../selectedSpecies";
 
 
 interface TaxonomyViewState {
@@ -15,6 +14,8 @@ interface CategoryProps extends ViewProps {
     categoryLevels: CategoryLevelJson[];
     autoExpand: boolean;
     odd: boolean;
+    selectedSpecies: number[];
+    onSelectSpecies: (speciesId: number) => void
 }
 interface CategoryState {
     expand: boolean,
@@ -25,7 +26,6 @@ interface CategoryState {
 }
 interface SpeciesProps {
     species: SpeciesData;
-    selection: SelectedSpecies;
     selected: boolean;
     onSelect: () => void
 }
@@ -90,12 +90,6 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
         console.log("Select me " + this.props.category.name);
     }
 
-    selectSpecies(speciesId: number) {
-        console.log("Selected child species :"+speciesId);
-        this.props.selection.toggleSpecies(speciesId);
-        this.forceUpdate();
-    }
-
     render() {
         const liClassName = `category ${this.state.expand ? "open" : "closed"}`;
         const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.state.expand ? "" : "hidden"}`;
@@ -117,15 +111,16 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                             selection={this.props.selection}
                             odd={!this.props.odd}
                             autoExpand={this.state.subCategories.length == 1}
+                            selectedSpecies={this.props.selectedSpecies}
+                            onSelectSpecies={this.props.onSelectSpecies}
                         />
                 )}
                 {this.state.species.map(
                     (species) =>
                         <TaxonomySpecies
                             species={species}
-                            selection={this.props.selection}
-                            selected={this.props.selection.containsSpecies(species.id)}
-                            onSelect={this.selectSpecies.bind(this, species.id)}
+                            selected={this.props.selectedSpecies.includes(species.id)}
+                            onSelect={this.props.onSelectSpecies.bind(null, species.id)}
                         />
                 )}
             </ul>
@@ -137,6 +132,7 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
     constructor(props: ViewProps) {
         super(props);
         this.state = {baseCategories: [], categoryLevels: []};
+        this.onSelectSpecies = this.onSelectSpecies.bind(this);
     }
 
     async componentDidMount(): Promise<void> {
@@ -144,6 +140,12 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
         const baseCategoriesPromise = this.props.animalData.promiseBaseCategories();
         const [categoryLevels, baseCategories] = await Promise.all([categoryLevelsPromise, baseCategoriesPromise]);
         this.setState({baseCategories: baseCategories, categoryLevels: categoryLevels});
+    }
+
+    onSelectSpecies(speciesId: number) {
+        console.log("Top level select species: "+speciesId);
+        this.props.selection.toggleSpecies(speciesId);
+        this.forceUpdate();
     }
 
     render() {
@@ -156,6 +158,8 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
                     category={category}
                     odd={true}
                     autoExpand={true}
+                    selectedSpecies={this.props.selection.selectedSpeciesIds}
+                    onSelectSpecies={this.onSelectSpecies}
                     />);
         return <ul className="odd">
             {baseCategories}
