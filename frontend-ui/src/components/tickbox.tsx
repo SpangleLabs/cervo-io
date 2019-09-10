@@ -1,4 +1,5 @@
 import * as React from "react";
+import {BoxChecked, BoxUnchecked} from "./images";
 
 export interface IsSelected {
     selected: boolean
@@ -6,9 +7,10 @@ export interface IsSelected {
 
 export class TickBox extends React.Component<IsSelected, {}> {
     render() {
-        return <img
-            src={this.props.selected ? "images/box_checked.svg" : "images/box_unchecked.svg"}
-            alt={this.props.selected ? "✔" : "➕"}
-        />
+        if(this.props.selected) {
+            return <BoxChecked />
+        } else {
+            return <BoxUnchecked />
+        }
     }
 }
