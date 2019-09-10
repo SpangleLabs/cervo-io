@@ -4,12 +4,8 @@ body {
     font-size: 22px;
 }
 
-/* Hide alphabetic and search by default */
-#animals-alphabetic {
-    display: none;
-}
-#animals-search {
-    display: none;
+.hidden {
+    display:none;
 }
 
 /* Style for taxonomy category list, but also selected species and selected zoos lists */
