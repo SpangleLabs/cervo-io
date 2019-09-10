@@ -72,7 +72,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
         if(this.props.autoSelect != prevProps.autoSelect) {
             console.log("Auto select changed");
             this.setState({selected: this.props.autoSelect});
-            this.selectChildSpecies();
+            this.selectChildSpecies(this.props.autoSelect);
         }
     }
 
