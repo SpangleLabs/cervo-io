@@ -3,11 +3,13 @@ import {SpeciesData} from "../animalData";
 import {SelectedSpecies} from "../selectedSpecies";
 import {ViewProps} from "./views";
 import {IsSelected, TickBox} from "./tickbox";
+import {Spinner} from "./images";
 
 interface SearchState {
     searchTerm: string;
     lastSearch: string;
     speciesList: SpeciesData[];
+    isLoading: boolean;
 }
 interface SearchResultProps {
     searchTerm: string;
@@ -65,7 +67,7 @@ class SearchResult extends React.Component<SearchResultProps, IsSelected> {
 export class SearchViewComponent extends React.Component<ViewProps, SearchState> {
     constructor(props: ViewProps) {
         super(props);
-        this.state = {searchTerm: "", lastSearch: "", speciesList: []};
+        this.state = {searchTerm: "", lastSearch: "", speciesList: [], isLoading: false};
         this.onUpdate = this.onUpdate.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
@@ -80,11 +82,12 @@ export class SearchViewComponent extends React.Component<ViewProps, SearchState>
         const lastSearch = this.state.searchTerm;
         this.setState(function(state) {
             return {
-                lastSearch: state.searchTerm
+                lastSearch: state.searchTerm,
+                isLoading: true
             }
         });
         const species = await this.props.animalData.promiseSearchSpecies(lastSearch);
-        this.setState({speciesList: species});
+        this.setState({speciesList: species, isLoading: false});
     }
 
     render() {
@@ -99,6 +102,7 @@ export class SearchViewComponent extends React.Component<ViewProps, SearchState>
                         <input type="text" value={this.state.searchTerm} onChange={this.onUpdate}/>
                     </label>
                     <input type="submit"/>
+                    {this.state.isLoading ? <Spinner /> : ""}
                 </form>
                 <ul>
                     {speciesElements}

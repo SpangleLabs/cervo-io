@@ -3,11 +3,13 @@ import {ViewProps} from "./views";
 import {CategoryData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
 import {CategoryLevelJson} from "../../../common-lib/src/apiInterfaces";
+import {Spinner} from "./images";
 
 
 interface TaxonomyViewState {
     baseCategories: CategoryData[];
     categoryLevels: CategoryLevelJson[];
+    isLoading: boolean
 }
 interface CategoryProps extends ViewProps {
     category: CategoryData;
@@ -23,7 +25,8 @@ interface CategoryState {
     selected: boolean,
     gotFullData: boolean,
     subCategories: CategoryData[],
-    species: SpeciesData[]
+    species: SpeciesData[],
+    isLoading: boolean
 }
 interface SpeciesProps {
     species: SpeciesData;
@@ -54,7 +57,7 @@ class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
 class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
     constructor(props: CategoryProps) {
         super(props);
-        this.state = {expand: false, selected: false, gotFullData: false, subCategories: [], species: []};
+        this.state = {expand: false, selected: false, gotFullData: false, subCategories: [], species: [], isLoading: false};
         this.expand = this.expand.bind(this);
         this.selectCategory = this.selectCategory.bind(this);
     }
@@ -70,7 +73,6 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
 
     async componentDidUpdate(prevProps: CategoryProps) {
         if(this.props.autoSelect != prevProps.autoSelect) {
-            console.log("Auto select changed");
             this.setState({selected: this.props.autoSelect});
             this.selectChildSpecies(this.props.autoSelect);
         }
@@ -87,15 +89,16 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
 
     async populate() {
         if (!this.state.gotFullData) {
+            this.setState({isLoading: true});
             const [subCategories, species] = await Promise.all([this.props.category.getSubCategories(), this.props.category.getSpecies()]);
             this.setState({gotFullData: true, subCategories: subCategories, species: species});
+            this.setState({isLoading: false});
         }
     }
 
     async expand() {
         await this.populate();
         this.setState((state) => {return {expand: !state.expand}});
-        //console.log("Expand me " + this.props.category.name);
     }
 
     async selectCategory(selected?: boolean) {
@@ -125,6 +128,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
             <span className="clickable selector" onClick={this.selectCategory.bind(this, undefined)}>
                 <TickBox selected={this.state.selected} />
             </span>
+            {this.state.isLoading ? <Spinner /> : ""}
             <ul className={ulClassName}>
                 {this.state.subCategories.map(
                     (category) =>
@@ -158,19 +162,19 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
 export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyViewState> {
     constructor(props: ViewProps) {
         super(props);
-        this.state = {baseCategories: [], categoryLevels: []};
+        this.state = {baseCategories: [], categoryLevels: [], isLoading: false};
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
     }
 
     async componentDidMount(): Promise<void> {
         const categoryLevelsPromise = this.props.animalData.promiseCategoryLevels();
         const baseCategoriesPromise = this.props.animalData.promiseBaseCategories();
+        this.setState({isLoading: true});
         const [categoryLevels, baseCategories] = await Promise.all([categoryLevelsPromise, baseCategoriesPromise]);
-        this.setState({baseCategories: baseCategories, categoryLevels: categoryLevels});
+        this.setState({baseCategories: baseCategories, categoryLevels: categoryLevels, isLoading: false});
     }
 
     onSelectSpecies(speciesId: number, selected?: boolean) {
-        console.log("Top level select species: "+speciesId + selected);
         if(selected == undefined) {
             this.props.selection.toggleSpecies(speciesId);
         } else if(selected) {
@@ -197,6 +201,7 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
                     onSelectSpecies={this.onSelectSpecies}
                     />);
         return <ul className="odd">
+            {this.state.isLoading ? <Spinner/> : ""}
             {baseCategories}
         </ul>
     }
