@@ -1,12 +1,10 @@
-import {AnimalData, CategoryData} from "./animalData";
+import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
 import {TaxonomyView} from "./taxonomyView";
 import {AlphabetView} from "./alphabetView";
 import {SearchView} from "./searchView";
 import $ from "jquery";
 import {View} from "./views";
-import {promiseSpinner} from "@cervoio/common-ui-lib/src/utilities";
-import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 /**
  * Handle (and update) which view is active
@@ -34,51 +32,10 @@ export class ViewSelector {
         });
     }
 
-    initialiseViews(animalData: AnimalData, selection: SelectedSpecies): Promise<void> {
-        const rootElem = $("#animals-taxonomic");
-        const viewSelector = this;
-        return Promise.all(
-            [
-                this.initialiseTaxonomyView(animalData, selection),
-                this.initialiseAlphabetView(animalData, selection)
-            ]
-        ).then(function (views) {
-            viewSelector.views["taxonomical"] = views[0];
-            viewSelector.views["alphabetical"] = views[1];
-            viewSelector.views["search"] = new SearchView(animalData, selection);
-        }, function(err) {
-            console.log(err);
-            const errorMsg = $("<span />").addClass("error").text("Failed to connect to API");
-            rootElem.append(errorMsg);
-        });
-    }
-
-    initialiseTaxonomyView(animalData: AnimalData, selection: SelectedSpecies): Promise<TaxonomyView> {
-        const rootElem = $("#animals-taxonomic");
-        // Create promise to create taxonomy view
-        let taxoPromise = Promise.all(
-            [
-                animalData.promiseCategoryLevels(),
-                animalData.promiseBaseCategories()
-            ]
-        ).then(function (data: [CategoryLevelJson[], CategoryData[]]) {
-            return new TaxonomyView(animalData, selection, data[0], data[1]);
-        });
-        taxoPromise = promiseSpinner(rootElem,taxoPromise);
-        // Promise to expand the taxonomy view
-        const expandBasePromise = taxoPromise.then(function(taxonomyView) {
-            return //taxonomyView.expandBaseCategories();
-        }).then();
-        // When both are done, return the taxonomy view
-        return Promise.all([taxoPromise, expandBasePromise]).then(function(data: [TaxonomyView, void]) {
-            return data[0];
-        });
-    }
-
-    initialiseAlphabetView(animalData: AnimalData, selection: SelectedSpecies): Promise<AlphabetView> {
-        return animalData.promiseValidFirstLetters().then(function(validLetters) {
-            return new AlphabetView(animalData, selection, validLetters);
-        });
+    async initialiseViews(animalData: AnimalData, selection: SelectedSpecies): Promise<void> {
+        this.views["taxonomical"] = new TaxonomyView(animalData, selection);
+        this.views["alphabetical"] = new AlphabetView(animalData, selection);
+        this.views["search"] = new SearchView(animalData, selection);
     }
 
     wireUpdates() {

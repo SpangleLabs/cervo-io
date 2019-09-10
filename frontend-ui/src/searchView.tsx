@@ -12,8 +12,6 @@ import {SearchViewComponent} from "./components/searchView";
  * Take user input and search for species, list results (highlight search term in names).
  */
 export class SearchView extends View {
-    searchBox: JQuery<HTMLElement>;
-    searchResults: JQuery<HTMLElement>;
 
     constructor(animalData: AnimalData, selection: SelectedSpecies) {
         super($("#animals-search"), animalData, selection);
