@@ -2,8 +2,8 @@ import * as React from "react";
 import {ViewProps} from "./views";
 import {SpeciesData} from "../animalData";
 import {IsSelected, TickBox} from "./tickbox";
-import {SelectedSpecies} from "../selectedSpecies";
 import {Spinner} from "./images";
+import {SelectionController} from "../selectionController";
 
 interface AlphabetLetterProps {
     letter: string,
@@ -20,8 +20,8 @@ interface AlphabetViewState {
     isLoading: boolean;
 }
 
-class AlphabetLetterResult extends React.Component<{species: SpeciesData, selection: SelectedSpecies}, IsSelected> {
-    constructor(props: {species: SpeciesData, selection: SelectedSpecies}) {
+class AlphabetLetterResult extends React.Component<{species: SpeciesData, selection: SelectionController}, IsSelected> {
+    constructor(props: {species: SpeciesData, selection: SelectionController}) {
         super(props);
         this.state = {selected: this.props.selection.containsSpecies(this.props.species.id)};
         this.onClick = this.onClick.bind(this);

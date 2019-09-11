@@ -1,7 +1,7 @@
 import {AnimalData} from "../animalData";
-import {SelectedSpecies} from "../selectedSpecies";
+import {SelectionController} from "../selectionController";
 
 export interface ViewProps {
     animalData: AnimalData;
-    selection: SelectedSpecies;
+    selection: SelectionController;
 }

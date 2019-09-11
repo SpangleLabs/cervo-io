@@ -1,12 +1,10 @@
-import $ from "jquery";
+//import $ from "jquery";
 import {AnimalData} from "./animalData";
 import {SelectedSpecies} from "./selectedSpecies";
 import {PageMap} from "./pageMap";
 import {ViewSelector} from "./viewSelector";
 import {Map} from "./Map";
-
-let selector: ViewSelector;
-let selection: SelectedSpecies;
+import {SelectionController} from "./selectionController";
 
 document.addEventListener("DOMContentLoaded", function () {
     let mapElement = document.getElementById('map');
@@ -15,11 +13,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const googleMap = Map.createMap(googleMaps, mapElement);
         const map = new PageMap(googleMap);
         const animalData: AnimalData = new AnimalData();
-        selection = new SelectedSpecies(animalData, map);
-        selector = new ViewSelector();
-        selector.initialise(animalData, selection);
+        //const selection = new SelectedSpecies(animalData, map);
+        const newSelection = new SelectionController();
 
-        $("input#postcode").on("input", () => selection.updateZooDistances());
+        new ViewSelector(animalData, newSelection);
+
+        new SelectedSpecies(newSelection);
+
+        //$("input#postcode").on("input", () => selection.updateZooDistances());
         //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
     });
 });

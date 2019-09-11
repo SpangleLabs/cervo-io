@@ -1,9 +1,9 @@
 import * as React from "react";
 import {SpeciesData} from "../animalData";
-import {SelectedSpecies} from "../selectedSpecies";
 import {ViewProps} from "./views";
 import {IsSelected, TickBox} from "./tickbox";
 import {Spinner} from "./images";
+import {SelectionController} from "../selectionController";
 
 interface SearchState {
     searchTerm: string;
@@ -14,7 +14,7 @@ interface SearchState {
 interface SearchResultProps {
     searchTerm: string;
     species: SpeciesData;
-    selection: SelectedSpecies;
+    selection: SelectionController;
 }
 interface HilightedTextProps {
     text: string;
