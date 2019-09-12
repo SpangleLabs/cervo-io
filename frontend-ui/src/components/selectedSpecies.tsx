@@ -5,17 +5,22 @@ import {TickBox} from "./tickbox";
 import {ZooJson} from "../../../common-lib/src/apiInterfaces";
 import {PageMap} from "../pageMap";
 
-interface SelectedSpeciesComponentState extends ViewProps {
+interface SelectedSpeciesComponentProps extends ViewProps {
     selectedZoos: ZooJson[];
     pageMap: PageMap;
+}
+interface SelectedSpeciesComponentState {
+    postcode: string;
+    postcodeError: boolean;
 }
 
 interface SelectedSpeciesResultProps {
     species: SpeciesData;
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
-interface PostcodeEntryState {
+interface PostcodeEntryProps {
     postcode: string;
+    onUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
     error: boolean;
 }
 interface SelectedZooResultProps {
@@ -40,33 +45,17 @@ export class SelectedSpeciesResult extends React.Component<SelectedSpeciesResult
     }
 }
 
-class PostcodeEntry extends React.Component<{}, PostcodeEntryState> {
-    constructor(props: {}) {
+class PostcodeEntry extends React.Component<PostcodeEntryProps, {}> {
+    constructor(props: PostcodeEntryProps) {
         super(props);
-        this.state = {postcode: "", error: false};
-        this.onUpdate = this.onUpdate.bind(this);
-    }
-
-    onUpdate(e: React.FormEvent<HTMLInputElement>) {
-        e.preventDefault();
-        const postcodeEntry = e.currentTarget.value;
-        if(postcodeEntry.length === 0) {
-            this.setState({error: false});
-            return;
-        }
-        if(postcodeEntry.length <= 3) {
-            this.setState({error: true, postcode: e.currentTarget.value});
-            return;
-        }
-        this.setState({postcode: e.currentTarget.value})
     }
 
     render() {
-        const errorClass = `error ${this.state.error ? "" : "hidden"}`;
+        const errorClass = `error ${this.props.error ? "" : "hidden"}`;
         return <>
             <label>
                 Enter your postcode to get distances to selected zoos:
-                <input id="postcode" type="text" value={this.state.postcode} onChange={this.onUpdate} />
+                <input id="postcode" type="text" value={this.props.postcode} onChange={this.props.onUpdate} />
             </label>
             <span className={errorClass}>Invalid postcode.</span>
         </>
@@ -92,9 +81,25 @@ class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
     }
 }
 
-export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesComponentState, {}> {
-    constructor(props: SelectedSpeciesComponentState) {
+export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesComponentProps, SelectedSpeciesComponentState> {
+    constructor(props: SelectedSpeciesComponentProps) {
         super(props);
+        this.state = {postcode: "", postcodeError: false};
+        this.onPostcodeUpdate = this.onPostcodeUpdate.bind(this);
+    }
+
+    onPostcodeUpdate(e: React.FormEvent<HTMLInputElement>) {
+        e.preventDefault();
+        const postcodeEntry = e.currentTarget.value;
+        this.setState({postcode: postcodeEntry});
+        if(postcodeEntry.length === 0) {
+            this.setState({postcodeError: false});
+            return;
+        }
+        if(postcodeEntry.length <= 3) {
+            this.setState({postcodeError: true});
+            return;
+        }
     }
 
     render() {
@@ -108,7 +113,11 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
                     />)
                 }
             </ul>
-            <PostcodeEntry />
+            <PostcodeEntry
+                postcode={this.state.postcode}
+                error={this.state.postcodeError}
+                onUpdate={this.onPostcodeUpdate}
+            />
             <h2>Zoos with selected species ({this.props.selectedZoos.length})</h2>
             <ul id="selected-zoos">
                 {this.props.selectedZoos.map((zoo) => <SelectedZooResult zoo={zoo} pageMap={this.props.pageMap} />)}
