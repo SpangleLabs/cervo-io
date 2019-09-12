@@ -3,9 +3,11 @@ import {SpeciesData} from "../animalData";
 import {ViewProps} from "./views";
 import {TickBox} from "./tickbox";
 import {ZooJson} from "../../../common-lib/src/apiInterfaces";
+import {PageMap} from "../pageMap";
 
 interface SelectedSpeciesComponentState extends ViewProps {
-    selectedZooIds: number[];
+    selectedZoos: ZooJson[];
+    pageMap: PageMap;
 }
 
 interface SelectedSpeciesResultProps {
@@ -18,6 +20,7 @@ interface PostcodeEntryState {
 }
 interface SelectedZooResultProps {
     zoo: ZooJson;
+    pageMap: PageMap;
 }
 
 export class SelectedSpeciesResult extends React.Component<SelectedSpeciesResultProps, {}> {
@@ -71,9 +74,13 @@ class PostcodeEntry extends React.Component<{}, PostcodeEntryState> {
 }
 
 class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
+    constructor(props: SelectedZooResultProps) {
+        super(props);
+        this.onClick = this.onClick.bind(this);
+    }
 
     onClick() {
-        //self.map.toggleInfoWindow(this.props.zoo.id);
+        this.props.pageMap.toggleInfoWindow(this.props.zoo.zoo_id);
     }
 
     render() {
@@ -92,7 +99,6 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
 
     render() {
         const selectedSpecies = this.props.selectedSpeciesIds.map((speciesId) => {return this.props.animalData.species.get(speciesId)});
-        const selectedZoos: ZooJson[] = [];//this.props.selectedZooIds.map((zooId) => {return this.props.animalData.zoos.get(zooId)});
         return <><h2>Selected species ({this.props.selectedSpeciesIds.length})</h2>
             <ul>
                 {selectedSpecies.map((species) =>
@@ -103,9 +109,9 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
                 }
             </ul>
             <PostcodeEntry />
-            <h2>Zoos with selected species ({this.props.selectedZooIds.length})</h2>
+            <h2>Zoos with selected species ({this.props.selectedZoos.length})</h2>
             <ul id="selected-zoos">
-                {selectedZoos.map((zoo) => <SelectedZooResult zoo={zoo} />)}
+                {this.props.selectedZoos.map((zoo) => <SelectedZooResult zoo={zoo} pageMap={this.props.pageMap} />)}
             </ul>
         </>
     }

@@ -8,6 +8,7 @@ import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
+import {ZooJson} from "../../common-lib/src/apiInterfaces";
 
 interface MainProps {
     pageMap: PageMap;
@@ -15,13 +16,13 @@ interface MainProps {
 interface MainState {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
-    selectedZooIds: number[];
+    selectedZoos: ZooJson[];
 }
 
 class MainComponent extends React.Component <MainProps, MainState> {
     constructor(props: MainProps) {
         super(props);
-        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZooIds: []};
+        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZoos: []};
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
     }
 
@@ -44,6 +45,23 @@ class MainComponent extends React.Component <MainProps, MainState> {
                 this.setState((state) => { return {selectedSpeciesIds: state.selectedSpeciesIds.filter((id) => speciesId != id)}});
             }
         }
+        this.updateSelectedZoos().then();
+    }
+
+    async updateSelectedZoos() {
+        const selectedSpecies = this.state.selectedSpeciesIds.map((speciesId) => this.state.animalData.species.get(speciesId));
+        const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
+        let selectedZoos: ZooJson[] = [];
+        for (const zooList of selectedZooses) {
+            selectedZoos = selectedZoos.concat(zooList);
+        }
+        this.setState({selectedZoos: selectedZoos});
+        this.updateZooMapMarkers(selectedZoos);
+    }
+
+    updateZooMapMarkers(selectedZoos: ZooJson[]) {
+        this.props.pageMap.hideAllMarkers(selectedZoos.map(x => String(x.zoo_id)));
+        selectedZoos.forEach(x => this.props.pageMap.getZooMarker(x).setVisible(true));
     }
 
     containsSpecies(speciesId: number): boolean {
@@ -63,7 +81,8 @@ class MainComponent extends React.Component <MainProps, MainState> {
                 selectedSpeciesIds={this.state.selectedSpeciesIds}
                 onSelectSpecies={this.onSelectSpecies}
                 animalData={this.state.animalData}
-                selectedZooIds={this.state.selectedZooIds}
+                selectedZoos={this.state.selectedZoos}
+                pageMap={this.props.pageMap}
             />
         </>
     }
