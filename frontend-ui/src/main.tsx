@@ -15,12 +15,13 @@ interface MainProps {
 interface MainState {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
+    selectedZooIds: number[];
 }
 
 class MainComponent extends React.Component <MainProps, MainState> {
     constructor(props: MainProps) {
         super(props);
-        this.state = {animalData: new AnimalData(), selectedSpeciesIds: []};
+        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZooIds: []};
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
     }
 
@@ -62,6 +63,7 @@ class MainComponent extends React.Component <MainProps, MainState> {
                 selectedSpeciesIds={this.state.selectedSpeciesIds}
                 onSelectSpecies={this.onSelectSpecies}
                 animalData={this.state.animalData}
+                selectedZooIds={this.state.selectedZooIds}
             />
         </>
     }

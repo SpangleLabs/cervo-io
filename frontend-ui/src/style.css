@@ -110,9 +110,6 @@ form {
     color: red;
     font-weight: bold;
 }
-#invalid-postcode {
-    display: none;
-}
 
 /* Styling selected zoos list */
 #selected-zoos .distance {
