@@ -61,6 +61,7 @@ class MainComponent extends React.Component <MainProps, MainState> {
             <SelectedSpeciesComponent
                 selectedSpeciesIds={this.state.selectedSpeciesIds}
                 onSelectSpecies={this.onSelectSpecies}
+                animalData={this.state.animalData}
             />
         </>
     }
