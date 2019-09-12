@@ -1,8 +1,5 @@
-//import $ from "jquery";
 import {AnimalData} from "./animalData";
-//import {SelectedSpecies} from "./selectedSpecies";
 import {PageMap} from "./pageMap";
-//import {ViewSelector} from "./viewSelector";
 import {GoogleMap} from "./Map";
 import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
