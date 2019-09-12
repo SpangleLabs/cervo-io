@@ -10,7 +10,7 @@ export class SelectedSpeciesComponent extends React.Component<{selectionControll
 
     render() {
         return <><h2>Selected species ({this.props.selectionController.selectedSpeciesIds.length})</h2>
-            <ul>{this.props.selectionController.selectedSpeciesIds.map((e) => <li>e</li>)}</ul>
+            <ul>{this.props.selectionController.selectedSpeciesIds.map((e) => <li>{e}</li>)}</ul>
             <label>
                 Enter your postcode to get distances to selected zoos:
                 <input id="postcode" type="text"/>
