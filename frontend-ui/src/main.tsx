@@ -10,10 +10,24 @@ import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
 
-class MainComponent extends React.Component <{pageMap: PageMap}, {animalData: AnimalData, selectionController: SelectionController}> {
-    constructor(props: {pageMap: PageMap}) {
+interface MainProps {
+    pageMap: PageMap;
+}
+interface MainState {
+    animalData: AnimalData;
+    selectionController: SelectionController;
+    update: boolean;
+}
+
+class MainComponent extends React.Component <MainProps, MainState> {
+    constructor(props: MainProps) {
         super(props);
-        this.state = {animalData: new AnimalData(), selectionController: new SelectionController()};
+        this.onSelectionUpdate = this.onSelectionUpdate.bind(this);
+        this.state = {animalData: new AnimalData(), selectionController: new SelectionController(this.onSelectionUpdate), update: false};
+    }
+
+    onSelectionUpdate() {
+        this.setState({update: true});
     }
 
     render() {
