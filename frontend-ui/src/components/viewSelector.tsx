@@ -60,15 +60,27 @@ export class ViewSelectorComponent extends React.Component<ViewProps, ViewSelect
             </div>
             <div id="animals-taxonomic"
                  className={this.state.currentView == ViewsEnum.Taxonomic ? "" : "hidden"}>
-                <TaxonomyViewComponent animalData={this.props.animalData} selection={this.props.selection} />
+                <TaxonomyViewComponent
+                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    onSelectSpecies={this.props.onSelectSpecies}
+                    animalData={this.props.animalData}
+                />
             </div>
             <div id="animals-alphabetic"
                  className={this.state.currentView == ViewsEnum.Alphabetical ? "" : "hidden"}>
-                <AlphabetViewComponent animalData={this.props.animalData} selection={this.props.selection} />
+                <AlphabetViewComponent
+                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    onSelectSpecies={this.props.onSelectSpecies}
+                    animalData={this.props.animalData}
+                />
             </div>
             <div id="animals-search"
                  className={this.state.currentView == ViewsEnum.Search ? "" : "hidden"}>
-                <SearchViewComponent animalData={this.props.animalData} selection={this.props.selection} />
+                <SearchViewComponent
+                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    onSelectSpecies={this.props.onSelectSpecies}
+                    animalData={this.props.animalData}
+                />
             </div>
         </div>
     }

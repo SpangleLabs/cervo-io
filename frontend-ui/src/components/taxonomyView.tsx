@@ -17,8 +17,6 @@ interface CategoryProps extends ViewProps {
     autoExpand: boolean;
     autoSelect: boolean;
     odd: boolean;
-    selectedSpecies: number[];
-    onSelectSpecies: (speciesId: number, selected?: boolean) => void
 }
 interface CategoryState {
     expand: boolean,
@@ -104,12 +102,13 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
     async selectCategory(selected?: boolean) {
         if(selected == undefined) {
             this.setState((state) => {
+                this.selectChildSpecies(!state.selected);
                 return {selected: !state.selected}
             });
         } else {
             this.setState({selected: selected});
+            this.selectChildSpecies(selected);
         }
-        this.selectChildSpecies(selected);
     }
 
     async selectChildSpecies(selected?: boolean) {
@@ -137,11 +136,10 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                             category={category}
                             categoryLevels={this.props.categoryLevels}
                             animalData={this.props.animalData}
-                            selection={this.props.selection}
                             odd={!this.props.odd}
                             autoExpand={this.state.subCategories.length == 1}
                             autoSelect={this.state.selected}
-                            selectedSpecies={this.props.selectedSpecies}
+                            selectedSpeciesIds={this.props.selectedSpeciesIds}
                             onSelectSpecies={this.props.onSelectSpecies}
                         />
                 )}
@@ -150,7 +148,7 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                         <TaxonomySpecies
                             key={"species-"+species.id}
                             species={species}
-                            selected={this.props.selectedSpecies.includes(species.id)}
+                            selected={this.props.selectedSpeciesIds.includes(species.id)}
                             onSelect={this.props.onSelectSpecies.bind(null, species.id, undefined)}
                         />
                 )}
@@ -163,7 +161,6 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
     constructor(props: ViewProps) {
         super(props);
         this.state = {baseCategories: [], categoryLevels: [], isLoading: false};
-        this.onSelectSpecies = this.onSelectSpecies.bind(this);
     }
 
     async componentDidMount(): Promise<void> {
@@ -174,31 +171,19 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
         this.setState({baseCategories: baseCategories, categoryLevels: categoryLevels, isLoading: false});
     }
 
-    onSelectSpecies(speciesId: number, selected?: boolean) {
-        if(selected == undefined) {
-            this.props.selection.toggleSpecies(speciesId);
-        } else if(selected) {
-            this.props.selection.addSpecies(speciesId);
-        } else {
-            this.props.selection.removeSpecies(speciesId);
-        }
-        this.forceUpdate();
-    }
-
     render() {
         const baseCategories = this.state.baseCategories.map(
             (category) =>
                 <TaxonomyCategory
                     key = {"category-"+category.id}
                     animalData={this.props.animalData}
-                    selection={this.props.selection}
+                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    onSelectSpecies={this.props.onSelectSpecies}
                     categoryLevels={this.state.categoryLevels}
                     category={category}
                     odd={true}
                     autoExpand={true}
                     autoSelect={false}
-                    selectedSpecies={this.props.selection.selectedSpeciesIds}
-                    onSelectSpecies={this.onSelectSpecies}
                     />);
         return <ul className="odd">
             {this.state.isLoading ? <Spinner/> : ""}

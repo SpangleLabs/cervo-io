@@ -1,9 +1,8 @@
 import * as React from "react";
 import {ViewProps} from "./views";
 import {SpeciesData} from "../animalData";
-import {IsSelected, TickBox} from "./tickbox";
+import {TickBox} from "./tickbox";
 import {Spinner} from "./images";
-import {SelectionController} from "../selectionController";
 
 interface AlphabetLetterProps {
     letter: string,
@@ -20,24 +19,29 @@ interface AlphabetViewState {
     isLoading: boolean;
 }
 
-class AlphabetLetterResult extends React.Component<{species: SpeciesData, selection: SelectionController}, IsSelected> {
-    constructor(props: {species: SpeciesData, selection: SelectionController}) {
+interface AlphabetLetterResultProps {
+    species: SpeciesData;
+    selectedSpeciesIds: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
+}
+
+class AlphabetLetterResult extends React.Component<AlphabetLetterResultProps, {}> {
+    constructor(props: AlphabetLetterResultProps) {
         super(props);
-        this.state = {selected: this.props.selection.containsSpecies(this.props.species.id)};
         this.onClick = this.onClick.bind(this);
     }
 
     onClick() {
-        this.props.selection.toggleSpecies(this.props.species.id);
-        this.setState({selected: this.props.selection.containsSpecies(this.props.species.id)});
+        this.props.onSelectSpecies(this.props.species.id);
     }
 
     render() {
-        const className = `species clickable ${this.state.selected ? "selected" : ""}`;
+        const selected = this.props.selectedSpeciesIds.includes(this.props.species.id);
+        const className = `species clickable ${selected ? "selected" : ""}`;
         return <li>
             <span className={className} onClick={this.onClick}>
                 <span className="common_name">{this.props.species.commonName}</span>
-                <TickBox selected={this.state.selected} />
+                <TickBox selected={selected} />
             </span>
         </li>
     }
@@ -87,7 +91,14 @@ export class AlphabetViewComponent extends React.Component<ViewProps, AlphabetVi
                     selected={letter == self.state.selectedLetter}
                     onClick={valid ? letterClick : null}/>
             });
-        const speciesList = this.state.speciesList.map((species) => <AlphabetLetterResult key={species.id} species={species} selection={this.props.selection}/>);
+        const speciesList = this.state.speciesList.map(
+            (species) =>
+                <AlphabetLetterResult
+                    key={species.id}
+                    species={species}
+                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    onSelectSpecies={this.props.onSelectSpecies}
+                />);
         return <>
                 <div id="letter-list">{letters}</div>
                 {this.state.isLoading ? <Spinner /> : ""}

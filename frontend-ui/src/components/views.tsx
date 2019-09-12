@@ -1,7 +1,7 @@
 import {AnimalData} from "../animalData";
-import {SelectionController} from "../selectionController";
 
 export interface ViewProps {
     animalData: AnimalData;
-    selection: SelectionController;
+    selectedSpeciesIds: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }

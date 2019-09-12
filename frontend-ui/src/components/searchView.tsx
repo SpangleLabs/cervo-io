@@ -1,9 +1,8 @@
 import * as React from "react";
 import {SpeciesData} from "../animalData";
 import {ViewProps} from "./views";
-import {IsSelected, TickBox} from "./tickbox";
+import {TickBox} from "./tickbox";
 import {Spinner} from "./images";
-import {SelectionController} from "../selectionController";
 
 interface SearchState {
     searchTerm: string;
@@ -14,7 +13,8 @@ interface SearchState {
 interface SearchResultProps {
     searchTerm: string;
     species: SpeciesData;
-    selection: SelectionController;
+    selectedSpeciesIds: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
 interface HilightedTextProps {
     text: string;
@@ -38,27 +38,26 @@ class SearchHilightedText extends React.Component<HilightedTextProps, {}> {
     }
 }
 
-class SearchResult extends React.Component<SearchResultProps, IsSelected> {
+class SearchResult extends React.Component<SearchResultProps, {}> {
     constructor(props: SearchResultProps) {
         super(props);
-        this.state = {selected: this.props.selection.containsSpecies(this.props.species.id)};
         this.onClick = this.onClick.bind(this);
     }
 
     onClick() {
-        this.props.selection.toggleSpecies(this.props.species.id);
-        this.setState({selected: this.props.selection.containsSpecies(this.props.species.id)});
+        this.props.onSelectSpecies(this.props.species.id);
     }
 
     render() {
-        const className = `clickable species ${this.state.selected ? "selected" : ""}`;
+        const selected = this.props.selectedSpeciesIds.includes(this.props.species.id);
+        const className = `clickable species ${selected ? "selected" : ""}`;
         const searchTerm = this.props.searchTerm;
         const species = this.props.species;
         return (<li>
             <span className={className} onClick={this.onClick}>
                 <span className="common_name"><SearchHilightedText text={species.commonName} searchTerm={searchTerm} /></span>
                 <span className="latin_name"><SearchHilightedText text={species.latinName} searchTerm={searchTerm} /></span>
-                <TickBox selected={this.state.selected} />
+                <TickBox selected={selected} />
             </span>
         </li>);
     }
@@ -92,7 +91,14 @@ export class SearchViewComponent extends React.Component<ViewProps, SearchState>
 
     render() {
         const speciesElements = this.state.speciesList.map(
-            (species) => <SearchResult key={species.id} species={species} searchTerm={this.state.lastSearch} selection={this.props.selection}/>
+            (species) =>
+                <SearchResult
+                    key={species.id}
+                    species={species}
+                    searchTerm={this.state.lastSearch}
+                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    onSelectSpecies={this.props.onSelectSpecies}
+                />
             );
         return (
             <div>

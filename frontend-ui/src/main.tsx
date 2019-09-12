@@ -4,7 +4,6 @@ import {AnimalData} from "./animalData";
 import {PageMap} from "./pageMap";
 //import {ViewSelector} from "./viewSelector";
 import {Map} from "./Map";
-import {SelectionController} from "./selectionController";
 import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
@@ -15,27 +14,54 @@ interface MainProps {
 }
 interface MainState {
     animalData: AnimalData;
-    selectionController: SelectionController;
-    update: boolean;
+    selectedSpeciesIds: number[];
 }
 
 class MainComponent extends React.Component <MainProps, MainState> {
     constructor(props: MainProps) {
         super(props);
-        this.onSelectionUpdate = this.onSelectionUpdate.bind(this);
-        this.state = {animalData: new AnimalData(), selectionController: new SelectionController(this.onSelectionUpdate), update: false};
+        this.state = {animalData: new AnimalData(), selectedSpeciesIds: []};
+        this.onSelectSpecies = this.onSelectSpecies.bind(this);
     }
 
-    onSelectionUpdate() {
-        this.setState({update: true});
+    onSelectSpecies(speciesId: number, selected?: boolean) {
+        if(selected == undefined) {
+            // Toggle species
+            if(this.containsSpecies(speciesId)) {
+                this.setState((state) => { return {selectedSpeciesIds: state.selectedSpeciesIds.filter((id) => speciesId != id)}});
+            } else {
+                this.setState((state) => { return {selectedSpeciesIds: state.selectedSpeciesIds.concat(speciesId)}});
+            }
+        } else if(selected) {
+            // Add species
+            if(!this.containsSpecies(speciesId)) {
+                this.setState((state) => { return {selectedSpeciesIds: state.selectedSpeciesIds.concat(speciesId)}});
+            }
+        } else {
+            // Remove species
+            if(this.containsSpecies(speciesId)) {
+                this.setState((state) => { return {selectedSpeciesIds: state.selectedSpeciesIds.filter((id) => speciesId != id)}});
+            }
+        }
+    }
+
+    containsSpecies(speciesId: number): boolean {
+        return this.state.selectedSpeciesIds.includes(speciesId);
     }
 
     render() {
         return <>
             <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a><br />
             <h1>Select which species you are interested in</h1>
-            <ViewSelectorComponent selection={this.state.selectionController} animalData={this.state.animalData} />
-            <SelectedSpeciesComponent selectionController={this.state.selectionController} />
+            <ViewSelectorComponent
+                selectedSpeciesIds={this.state.selectedSpeciesIds}
+                onSelectSpecies={this.onSelectSpecies}
+                animalData={this.state.animalData}
+            />
+            <SelectedSpeciesComponent
+                selectedSpeciesIds={this.state.selectedSpeciesIds}
+                onSelectSpecies={this.onSelectSpecies}
+            />
         </>
     }
 }
