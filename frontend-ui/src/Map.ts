@@ -1,7 +1,7 @@
 import config from "./config";
 import loadGoogleMapsApi from "load-google-maps-api";
 
-export class Map {
+export class GoogleMap {
 
     static loadGoogleMapsApi(): Promise<typeof google.maps> {
         return loadGoogleMapsApi({key: config["google_maps_key"]});

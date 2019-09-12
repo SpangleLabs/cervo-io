@@ -8,10 +8,10 @@ import {PageMap} from "../pageMap";
 interface SelectedSpeciesComponentProps extends ViewProps {
     selectedZoos: ZooJson[];
     pageMap: PageMap;
-}
-interface SelectedSpeciesComponentState {
     postcode: string;
     postcodeError: boolean;
+    onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
+    zooDistances: Map<number, number>;
 }
 
 interface SelectedSpeciesResultProps {
@@ -26,6 +26,7 @@ interface PostcodeEntryProps {
 interface SelectedZooResultProps {
     zoo: ZooJson;
     pageMap: PageMap;
+    distance: number|undefined;
 }
 
 export class SelectedSpeciesResult extends React.Component<SelectedSpeciesResultProps, {}> {
@@ -73,33 +74,21 @@ class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
     }
 
     render() {
+        let distance = "";
+        if(this.props.distance) {
+            distance = `(${Math.round(this.props.distance/1000)}km)`;
+        }
         const onClick = this.onClick.bind(this);
         return <li>
             <span className="zoo_name clickable" onClick={onClick}>{this.props.zoo.name}</span>
-            <span className="distance">?</span>
+            <span className="distance">{distance}</span>
         </li>
     }
 }
 
-export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesComponentProps, SelectedSpeciesComponentState> {
+export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesComponentProps, {}> {
     constructor(props: SelectedSpeciesComponentProps) {
         super(props);
-        this.state = {postcode: "", postcodeError: false};
-        this.onPostcodeUpdate = this.onPostcodeUpdate.bind(this);
-    }
-
-    onPostcodeUpdate(e: React.FormEvent<HTMLInputElement>) {
-        e.preventDefault();
-        const postcodeEntry = e.currentTarget.value;
-        this.setState({postcode: postcodeEntry});
-        if(postcodeEntry.length === 0) {
-            this.setState({postcodeError: false});
-            return;
-        }
-        if(postcodeEntry.length <= 3) {
-            this.setState({postcodeError: true});
-            return;
-        }
     }
 
     render() {
@@ -114,13 +103,18 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
                 }
             </ul>
             <PostcodeEntry
-                postcode={this.state.postcode}
-                error={this.state.postcodeError}
-                onUpdate={this.onPostcodeUpdate}
+                postcode={this.props.postcode}
+                error={this.props.postcodeError}
+                onUpdate={this.props.onPostcodeUpdate}
             />
             <h2>Zoos with selected species ({this.props.selectedZoos.length})</h2>
             <ul id="selected-zoos">
-                {this.props.selectedZoos.map((zoo) => <SelectedZooResult zoo={zoo} pageMap={this.props.pageMap} />)}
+                {this.props.selectedZoos.map((zoo) =>
+                    <SelectedZooResult
+                        zoo={zoo}
+                        pageMap={this.props.pageMap}
+                        distance={this.props.zooDistances.get(zoo.zoo_id)}
+                    />)}
             </ul>
         </>
     }

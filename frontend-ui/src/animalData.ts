@@ -7,7 +7,7 @@ import {
     CategoryLevelJson,
     FullCategoryJson,
     FullSpeciesJson,
-    SpeciesJson,
+    SpeciesJson, ZooDistanceCache, ZooDistanceJson,
     ZooJson
 } from "@cervoio/common-lib/src/apiInterfaces";
 
@@ -19,6 +19,7 @@ export class AnimalData {
     baseCategory: Promise<CategoryData[]>;
     validFirstLetters: Promise<string[]>;
     speciesByLetter: Map<string, Promise<SpeciesData[]>>;
+    cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
 
     constructor() {
         this.species = new Map<number, SpeciesData>();
@@ -86,6 +87,42 @@ export class AnimalData {
             this.species.set(speciesId, newSpecies);
             return newSpecies;
         }
+    }
+
+    cacheAddZooDistances(postcode: string, zooDistanceData: ZooDistanceJson[]) {
+        if (!this.cacheZooDistances[postcode]) {
+            this.cacheZooDistances[postcode] = {};
+        }
+        for (const val of zooDistanceData) {
+            this.cacheZooDistances[postcode][val.zoo_id] = val.metres;
+        }
+    }
+
+    async promiseGetZooDistances(postcode: string, zooKeys: string[]): Promise<ZooDistanceCache[]> {
+        let zoosNeedingDistance = zooKeys;
+        let foundDistances: ZooDistanceCache[] = [];
+        if (this.cacheZooDistances[postcode]) {
+            zoosNeedingDistance = [];
+            for (const zooKey of zooKeys) {
+                if (this.cacheZooDistances[postcode][zooKey]) {
+                    foundDistances.push({
+                        zoo_id: Number(zooKey),
+                        metres: this.cacheZooDistances[postcode][zooKey]
+                    });
+                } else {
+                    zoosNeedingDistance.push(zooKey);
+                }
+            }
+        }
+        if (zoosNeedingDistance.length === 0) {
+            return foundDistances;
+        }
+        //create url to request
+        let path = `zoo_distances/${postcode}/`+zoosNeedingDistance.join(",");
+        //get response
+        const newDistances = await promiseGet(path);
+        this.cacheAddZooDistances(postcode, newDistances);
+        return foundDistances.concat(newDistances);
     }
 }
 
