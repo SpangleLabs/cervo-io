@@ -3,7 +3,7 @@ import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
-import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
 
@@ -14,7 +14,7 @@ interface MainState {
     postcode: string;
     postcodeError: boolean;
     zooDistances: Map<number, number>;
-    visibleInfoWindowsZoos: ZooJson[];
+    visibleInfoWindowsZoos: FullZooJson[];
 }
 
 class MainComponent extends React.Component <{}, MainState> {
@@ -24,6 +24,7 @@ class MainComponent extends React.Component <{}, MainState> {
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
         this.onPostcodeUpdate = this.onPostcodeUpdate.bind(this);
         this.onClickZooMarker = this.onClickZooMarker.bind(this);
+        this.onCloseInfoWindow = this.onCloseInfoWindow.bind(this);
     }
 
     async onSelectSpecies(speciesId: number, selected?: boolean) {
@@ -112,14 +113,25 @@ class MainComponent extends React.Component <{}, MainState> {
         await this.updateZooDistances(this.state.postcode, selectedZoos);
     }
 
-    onClickZooMarker(zoo: ZooJson) {
-        const self = this;
+    async onClickZooMarker(zoo: ZooJson) {
+        console.log("Zoo marker: ");
+        console.log(zoo);
+        const fullZoo = await this.state.animalData.promiseFullZoo(zoo.zoo_id);
         this.setState(function(state: MainState) {
-            const zooIds = self.state.visibleInfoWindowsZoos.map(x => x.zoo_id);
+            const zooIds = state.visibleInfoWindowsZoos.map(x => x.zoo_id);
             if(!zooIds.includes(zoo.zoo_id)) {
-                return state.visibleInfoWindowsZoos.concat([zoo])
+                const newList = state.visibleInfoWindowsZoos.concat([fullZoo]);
+                console.log(newList);
+                return {visibleInfoWindowsZoos: newList};
             }
-            return {}
+            return null;
+        });
+    }
+
+    async onCloseInfoWindow(zoo: FullZooJson) {
+        this.setState(function(state: MainState) {
+            const newList = state.visibleInfoWindowsZoos.filter(x => x.zoo_id != zoo.zoo_id);
+            return {visibleInfoWindowsZoos: newList};
         });
     }
 
@@ -151,6 +163,7 @@ class MainComponent extends React.Component <{}, MainState> {
                 selectedSpeciesIds={this.state.selectedSpeciesIds}
                 visibleInfoWindowsZoos={this.state.visibleInfoWindowsZoos}
                 onMarkerClick={this.onClickZooMarker}
+                onInfoWindowClose={this.onCloseInfoWindow}
             />
         </>
     }

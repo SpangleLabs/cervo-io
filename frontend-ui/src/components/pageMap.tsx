@@ -1,14 +1,15 @@
 import * as React from "react";
 import config from "../config";
-import {SpeciesEntryForZooJson, ZooJson} from "../../../common-lib/src/apiInterfaces";
+import {FullZooJson, ZooJson} from "../../../common-lib/src/apiInterfaces";
 import {GoogleMap, InfoWindow, LoadScript, Marker} from "@react-google-maps/api";
 
 interface MapProps {
     google: any;
     selectedZoos: ZooJson[];
     selectedSpeciesIds: number[];
-    visibleInfoWindowsZoos: ZooJson[];
+    visibleInfoWindowsZoos: FullZooJson[];
     onMarkerClick: (zoo: ZooJson) => void;
+    onInfoWindowClose: (zoo: FullZooJson) => void;
 }
 
 export class MapContainer extends React.Component<MapProps, {}> {
@@ -39,19 +40,24 @@ export class MapContainer extends React.Component<MapProps, {}> {
                 />
             ]
         }));
-        const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map((zoo) => {
-                const zooSpecies: SpeciesEntryForZooJson[] = [];
-                return <InfoWindow anchor={this.markers.get(zoo.zoo_id)}>
-                    <h1>{zoo.name}</h1>
-                    <a href={zoo.link}>{zoo.link}</a><br/>
-                    <span>Postcode: </span>{zoo.postcode}<br/>
-                    <h2>Species:</h2>
-                    <ul className="zoo_species">
-                        {zooSpecies.map((x) => <li className="zoo_species">
-                            <span className="common_name">common name</span>
-                            <span className="latin_name">latin name</span>
-                        </li>)}
-                    </ul>
+        const self = this;
+        const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map(function(zoo: FullZooJson) {
+                const onClick = self.props.onInfoWindowClose.bind(null, zoo);
+                return <InfoWindow anchor={self.markers.get(zoo.zoo_id)} onCloseClick={onClick}>
+                    <>
+                        <h1>{zoo.name}</h1>
+                        <a href={zoo.link}>{zoo.link}</a><br/>
+                        <span>Postcode: </span>{zoo.postcode}<br/>
+                        <h2>Species:</h2>
+                        <ul className="zoo_species">
+                            {zoo.species.map((species) =>
+                                <li className={`zoo_species ${self.props.selectedSpeciesIds.includes(species.species_id) ? "selected" : ""}`}>
+                                    <span className="common_name">{species.common_name}</span>
+                                    <span className="latin_name">{species.latin_name}</span>
+                                </li>
+                            )}
+                        </ul>
+                    </>
                 </InfoWindow>
             }
         );
