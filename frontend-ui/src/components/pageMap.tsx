@@ -11,6 +11,31 @@ interface MapProps {
     onMarkerClick: (zoo: ZooJson) => void;
     onInfoWindowClose: (zoo: FullZooJson) => void;
 }
+interface InfoWindowContentProps {
+    zoo: FullZooJson;
+    selectedSpeciesIds: number[];
+}
+
+export class InfoWindowContent extends React.Component<InfoWindowContentProps, {}> {
+    render() {
+        return <>
+            <h1>{this.props.zoo.name}</h1>
+            <a href={this.props.zoo.link}>{this.props.zoo.link}</a><br/>
+            <span>Postcode: </span>{this.props.zoo.postcode}<br/>
+            <h2>Species:</h2>
+            <ul className="zoo_species">
+                {this.props.zoo.species.map((species) =>
+                    <li>
+                        <span className={`zoo_species species ${this.props.selectedSpeciesIds.includes(species.species_id) ? "selected" : ""}`}>
+                            <span className="common_name">{species.common_name}</span>
+                            <span className="latin_name">{species.latin_name}</span>
+                        </span>
+                    </li>
+                )}
+            </ul>
+        </>
+    }
+}
 
 export class MapContainer extends React.Component<MapProps, {}> {
     markers: Map<number, google.maps.Marker>;
@@ -44,20 +69,7 @@ export class MapContainer extends React.Component<MapProps, {}> {
         const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map(function(zoo: FullZooJson) {
                 const onClick = self.props.onInfoWindowClose.bind(null, zoo);
                 return <InfoWindow anchor={self.markers.get(zoo.zoo_id)} onCloseClick={onClick}>
-                    <>
-                        <h1>{zoo.name}</h1>
-                        <a href={zoo.link}>{zoo.link}</a><br/>
-                        <span>Postcode: </span>{zoo.postcode}<br/>
-                        <h2>Species:</h2>
-                        <ul className="zoo_species">
-                            {zoo.species.map((species) =>
-                                <li className={`zoo_species ${self.props.selectedSpeciesIds.includes(species.species_id) ? "selected" : ""}`}>
-                                    <span className="common_name">{species.common_name}</span>
-                                    <span className="latin_name">{species.latin_name}</span>
-                                </li>
-                            )}
-                        </ul>
-                    </>
+                    <InfoWindowContent zoo={zoo} selectedSpeciesIds={self.props.selectedSpeciesIds}/>
                 </InfoWindow>
             }
         );

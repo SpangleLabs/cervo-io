@@ -114,14 +114,11 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async onClickZooMarker(zoo: ZooJson) {
-        console.log("Zoo marker: ");
-        console.log(zoo);
         const fullZoo = await this.state.animalData.promiseFullZoo(zoo.zoo_id);
         this.setState(function(state: MainState) {
             const zooIds = state.visibleInfoWindowsZoos.map(x => x.zoo_id);
             if(!zooIds.includes(zoo.zoo_id)) {
                 const newList = state.visibleInfoWindowsZoos.concat([fullZoo]);
-                console.log(newList);
                 return {visibleInfoWindowsZoos: newList};
             }
             return null;
