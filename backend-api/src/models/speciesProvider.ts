@@ -23,7 +23,7 @@ export class SpeciesProvider extends AbstractProvider {
 
     getAllSpecies(): Promise<SpeciesJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select * from species");
+            const result = conn.query("select * from species order by `latin_name`");
             conn.end();
             return result;
         }).then(processIntoSpeciesJson);
@@ -39,7 +39,7 @@ export class SpeciesProvider extends AbstractProvider {
 
     getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select * from species where category_id=?", [id]);
+            const result = conn.query("select * from species where category_id=? order by `latin_name`", [id]);
             conn.end();
             return result;
         }).then(processIntoSpeciesJson);

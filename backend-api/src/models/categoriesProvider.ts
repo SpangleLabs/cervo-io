@@ -23,7 +23,7 @@ export class CategoriesProvider extends AbstractProvider {
 
     getBaseCategories(): Promise<CategoryJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id is null");
+            const result = conn.query("select * from categories where parent_category_id is null order by `name`");
             conn.end();
             return result;
         }).then(processIntoCategoryJson);
@@ -39,7 +39,7 @@ export class CategoriesProvider extends AbstractProvider {
 
     getCategoriesByParentId(id: number): Promise<CategoryJson[]> {
         return this.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id=?", [id]);
+            const result = conn.query("select * from categories where parent_category_id=? order by `name`", [id]);
             conn.end();
             return result;
         }).then(processIntoCategoryJson);
