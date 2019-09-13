@@ -3,6 +3,7 @@ import {SpeciesData} from "../animalData";
 import {ViewProps} from "./views";
 import {TickBox} from "./tickbox";
 import {ZooJson} from "../../../common-lib/src/apiInterfaces";
+import {Spinner} from "./images";
 
 interface SelectedSpeciesComponentProps extends ViewProps {
     selectedZoos: ZooJson[];
@@ -11,6 +12,8 @@ interface SelectedSpeciesComponentProps extends ViewProps {
     onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
     onSelectZoos: (zoo: ZooJson) => void;
     zooDistances: Map<number, number>;
+    loadingDistances: boolean;
+    loadingZoos: boolean;
 }
 
 interface SelectedSpeciesResultProps {
@@ -21,6 +24,7 @@ interface PostcodeEntryProps {
     postcode: string;
     onUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
     error: boolean;
+    isLoading: boolean;
 }
 interface SelectedZooResultProps {
     zoo: ZooJson;
@@ -58,6 +62,7 @@ class PostcodeEntry extends React.Component<PostcodeEntryProps, {}> {
                 <input id="postcode" type="text" value={this.props.postcode} onChange={this.props.onUpdate} />
             </label>
             <span className={errorClass}>Invalid postcode.</span>
+            {this.props.isLoading ? <Spinner /> : ""}
         </>
     }
 }
@@ -99,8 +104,10 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
                 postcode={this.props.postcode}
                 error={this.props.postcodeError}
                 onUpdate={this.props.onPostcodeUpdate}
+                isLoading={this.props.loadingDistances}
             />
             <h2>Zoos with selected species ({this.props.selectedZoos.length})</h2>
+            {this.props.loadingDistances ? <Spinner /> : ""}
             <ul id="selected-zoos">
                 {this.props.selectedZoos.map((zoo) =>
                 {

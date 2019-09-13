@@ -15,12 +15,24 @@ interface MainState {
     postcodeError: boolean;
     zooDistances: Map<number, number>;
     visibleInfoWindowsZoos: FullZooJson[];
+    loadingDistances: boolean;
+    loadingZoos: boolean;
 }
 
 class MainComponent extends React.Component <{}, MainState> {
     constructor(props: {}) {
         super(props);
-        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZoos: [], postcode: "", postcodeError: false, zooDistances: new Map(), visibleInfoWindowsZoos: []};
+        this.state = {
+            animalData: new AnimalData(),
+            selectedSpeciesIds: [],
+            selectedZoos: [],
+            postcode: "",
+            postcodeError: false,
+            zooDistances: new Map(),
+            visibleInfoWindowsZoos: [],
+            loadingDistances: false,
+            loadingZoos: false
+        };
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
         this.onPostcodeUpdate = this.onPostcodeUpdate.bind(this);
         this.onClickZooMarker = this.onClickZooMarker.bind(this);
@@ -91,6 +103,7 @@ class MainComponent extends React.Component <{}, MainState> {
         if(postcode.length <= 3) {
             return;
         }
+        this.setState({loadingDistances: true});
         try {
             const zooDistances = await this.state.animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo=>String(zoo.zoo_id)));
             const zooDistanceMap = new Map<number, number>(
@@ -101,6 +114,7 @@ class MainComponent extends React.Component <{}, MainState> {
         } catch {
             this.setState({zooDistances: new Map(), postcodeError: postcode.length !== 0});
         }
+        this.setState({loadingDistances: false});
     }
 
     async updateSelectedZoos(selectedSpeciesIds: number[]) {
@@ -160,6 +174,8 @@ class MainComponent extends React.Component <{}, MainState> {
                     postcodeError={this.state.postcodeError}
                     onPostcodeUpdate={this.onPostcodeUpdate}
                     zooDistances={this.state.zooDistances}
+                    loadingDistances={this.state.loadingDistances}
+                    loadingZoos={this.state.loadingZoos}
                 />
             </div>
             <MapContainer
