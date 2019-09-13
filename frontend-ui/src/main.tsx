@@ -88,7 +88,7 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async updateZooDistances(postcode: string, selectedZoos: ZooJson[]) {
-        if(postcode.length < 3) {
+        if(postcode.length <= 3) {
             return;
         }
         try {
