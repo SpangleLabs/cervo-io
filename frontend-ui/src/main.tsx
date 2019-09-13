@@ -6,7 +6,6 @@ import * as ReactDOM from "react-dom";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
-import {GoogleApiWrapper} from "google-maps-react";
 
 interface MainState {
     animalData: AnimalData;
@@ -178,8 +177,3 @@ document.addEventListener("DOMContentLoaded", function () {
     //     //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
     // });
 });
-
-
-export default GoogleApiWrapper({
-    apiKey: (config['google_maps_key'])
-})(MapContainer)
