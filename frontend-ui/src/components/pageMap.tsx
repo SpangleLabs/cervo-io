@@ -50,7 +50,7 @@ export class MapContainer extends React.Component<MapProps, {}> {
                         {zooSpecies.map((x) => <li className="zoo_species">
                             <span className="common_name">common name</span>
                             <span className="latin_name">latin name</span>
-                        </li>}
+                        </li>)}
                     </ul>
                 </InfoWindow>
             }
