@@ -47,17 +47,20 @@ export class MapContainer extends React.Component<MapProps, {}> {
             </InfoWindow>
         );
         return (
-            <LoadScript
-                googleMapsApiKey={config['google_maps_key']}
-            >
-                <GoogleMap
-                    zoom={6}
-                    center={{lat: 55, lng: -3}}
-                >
-                    {currentMarkers.values()}
-                    {visibleInfoWindows}
-                </GoogleMap>
-            </LoadScript>
+            <div id="map-ccontainer">
+                <div id="map-container">
+                    <LoadScript googleMapsApiKey={config['google_maps_key']} >
+                        <GoogleMap
+                            zoom={6}
+                            center={{lat: 55, lng: -3}}
+                            id="map"
+                        >
+                            {currentMarkers.values()}
+                            {visibleInfoWindows}
+                        </GoogleMap>
+                    </LoadScript>
+                </div>
+            </div>
         );
     }
 }

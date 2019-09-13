@@ -146,19 +146,13 @@ class MainComponent extends React.Component <{}, MainState> {
                     zooDistances={this.state.zooDistances}
                 />
             </div>
-            <div id="map-ccontainer">
-                <div id="map-container">
-                    <div id="map">
-                        <MapContainer
-                            selectedZoos={this.state.selectedZoos}
-                            google={{apiKey: (config['google_maps_key'])}}
-                            selectedSpeciesIds={this.state.selectedSpeciesIds}
-                            visibleInfoWindowsZoos={this.state.visibleInfoWindowsZoos}
-                            onMarkerClick={this.onClickZooMarker}
-                        />
-                    </div>
-                </div>
-            </div>
+            <MapContainer
+                selectedZoos={this.state.selectedZoos}
+                google={{apiKey: (config['google_maps_key'])}}
+                selectedSpeciesIds={this.state.selectedSpeciesIds}
+                visibleInfoWindowsZoos={this.state.visibleInfoWindowsZoos}
+                onMarkerClick={this.onClickZooMarker}
+            />
         </>
     }
 }
