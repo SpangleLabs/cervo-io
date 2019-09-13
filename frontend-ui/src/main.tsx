@@ -8,8 +8,6 @@ import {MapContainer} from "./components/pageMap";
 import config from "./config";
 import {GoogleApiWrapper} from "google-maps-react";
 
-interface MainProps {
-}
 interface MainState {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
@@ -17,14 +15,16 @@ interface MainState {
     postcode: string;
     postcodeError: boolean;
     zooDistances: Map<number, number>;
+    visibleInfoWindowsZoos: ZooJson[];
 }
 
-class MainComponent extends React.Component <MainProps, MainState> {
-    constructor(props: MainProps) {
+class MainComponent extends React.Component <{}, MainState> {
+    constructor(props: {}) {
         super(props);
-        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZoos: [], postcode: "", postcodeError: false, zooDistances: new Map()};
+        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZoos: [], postcode: "", postcodeError: false, zooDistances: new Map(), visibleInfoWindowsZoos: []};
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
         this.onPostcodeUpdate = this.onPostcodeUpdate.bind(this);
+        this.onClickZooMarker = this.onClickZooMarker.bind(this);
     }
 
     async onSelectSpecies(speciesId: number, selected?: boolean) {
@@ -107,14 +107,18 @@ class MainComponent extends React.Component <MainProps, MainState> {
             selectedZoos = selectedZoos.concat(zooList);
         }
         this.setState({selectedZoos: selectedZoos});
-        this.updateZooMapMarkers(selectedZoos);
         await this.updateZooDistances(this.state.postcode, selectedZoos);
     }
 
-    updateZooMapMarkers(selectedZoos: ZooJson[]) {
-        // TODO
-        // this.props.pageMap.hideAllMarkers(selectedZoos.map(x => String(x.zoo_id)));
-        // selectedZoos.forEach(x => this.props.pageMap.getZooMarker(x).setVisible(true));
+    onClickZooMarker(zoo: ZooJson) {
+        const self = this;
+        this.setState(function(state: MainState) {
+            const zooIds = self.state.visibleInfoWindowsZoos.map(x => x.zoo_id);
+            if(!zooIds.includes(zoo.zoo_id)) {
+                return state.visibleInfoWindowsZoos.concat([zoo])
+            }
+            return {}
+        });
     }
 
     render() {
@@ -130,9 +134,9 @@ class MainComponent extends React.Component <MainProps, MainState> {
                 <SelectedSpeciesComponent
                     selectedSpeciesIds={this.state.selectedSpeciesIds}
                     onSelectSpecies={this.onSelectSpecies}
+                    onSelectZoos={this.onClickZooMarker}
                     animalData={this.state.animalData}
                     selectedZoos={this.state.selectedZoos}
-                    pageMap={undefined} // TODO
                     postcode={this.state.postcode}
                     postcodeError={this.state.postcodeError}
                     onPostcodeUpdate={this.onPostcodeUpdate}
@@ -142,7 +146,13 @@ class MainComponent extends React.Component <MainProps, MainState> {
             <div id="map-ccontainer">
                 <div id="map-container">
                     <div id="map">
-                        <MapContainer selectedZoos={this.state.selectedZoos} google={{apiKey: (config['google_maps_key'])}}/>
+                        <MapContainer
+                            selectedZoos={this.state.selectedZoos}
+                            google={{apiKey: (config['google_maps_key'])}}
+                            selectedSpeciesIds={this.state.selectedSpeciesIds}
+                            visibleInfoWindowsZoos={this.state.visibleInfoWindowsZoos}
+                            onMarkerClick={this.onClickZooMarker}
+                        />
                     </div>
                 </div>
             </div>

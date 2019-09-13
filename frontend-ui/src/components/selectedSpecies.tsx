@@ -3,14 +3,13 @@ import {SpeciesData} from "../animalData";
 import {ViewProps} from "./views";
 import {TickBox} from "./tickbox";
 import {ZooJson} from "../../../common-lib/src/apiInterfaces";
-import {PageMap} from "../pageMap";
 
 interface SelectedSpeciesComponentProps extends ViewProps {
     selectedZoos: ZooJson[];
-    pageMap: PageMap;
     postcode: string;
     postcodeError: boolean;
     onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
+    onSelectZoos: (zoo: ZooJson) => void;
     zooDistances: Map<number, number>;
 }
 
@@ -25,8 +24,8 @@ interface PostcodeEntryProps {
 }
 interface SelectedZooResultProps {
     zoo: ZooJson;
-    pageMap: PageMap;
     distance: number|undefined;
+    onSelect: () => void;
 }
 
 export class SelectedSpeciesResult extends React.Component<SelectedSpeciesResultProps, {}> {
@@ -66,11 +65,6 @@ class PostcodeEntry extends React.Component<PostcodeEntryProps, {}> {
 class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
     constructor(props: SelectedZooResultProps) {
         super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
-    onClick() {
-        this.props.pageMap.toggleInfoWindow(this.props.zoo.zoo_id);
     }
 
     render() {
@@ -78,9 +72,8 @@ class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
         if(this.props.distance) {
             distance = `(${Math.round(this.props.distance/1000)}km)`;
         }
-        const onClick = this.onClick.bind(this);
         return <li>
-            <span className="zoo_name clickable" onClick={onClick}>{this.props.zoo.name}</span>
+            <span className="zoo_name clickable" onClick={this.props.onSelect}>{this.props.zoo.name}</span>
             <span className="distance">{distance}</span>
         </li>
     }
@@ -110,11 +103,14 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
             <h2>Zoos with selected species ({this.props.selectedZoos.length})</h2>
             <ul id="selected-zoos">
                 {this.props.selectedZoos.map((zoo) =>
-                    <SelectedZooResult
+                {
+                    const onSelect = this.props.onSelectZoos.bind(null, zoo);
+                    return <SelectedZooResult
                         zoo={zoo}
-                        pageMap={this.props.pageMap}
+                        onSelect={onSelect}
                         distance={this.props.zooDistances.get(zoo.zoo_id)}
-                    />)}
+                    />
+                })}
             </ul>
         </>
     }
