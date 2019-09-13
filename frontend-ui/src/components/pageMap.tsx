@@ -58,6 +58,7 @@ export class MapContainer extends React.Component<MapProps, {}> {
             return [
                 zoo.zoo_id,
                 <Marker
+                    key={zoo.zoo_id}
                     position={{lat: zoo.latitude, lng: zoo.longitude}}
                     title={zoo.name}
                     onLoad={onLoad}
@@ -68,7 +69,7 @@ export class MapContainer extends React.Component<MapProps, {}> {
         const self = this;
         const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map(function(zoo: FullZooJson) {
                 const onClick = self.props.onInfoWindowClose.bind(null, zoo);
-                return <InfoWindow anchor={self.markers.get(zoo.zoo_id)} onCloseClick={onClick}>
+                return <InfoWindow key={zoo.zoo_id} anchor={self.markers.get(zoo.zoo_id)} onCloseClick={onClick}>
                     <InfoWindowContent zoo={zoo} selectedSpeciesIds={self.props.selectedSpeciesIds}/>
                 </InfoWindow>
             }
