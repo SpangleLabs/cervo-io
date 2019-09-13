@@ -88,6 +88,9 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async updateZooDistances(postcode: string, selectedZoos: ZooJson[]) {
+        if(postcode.length < 3) {
+            return;
+        }
         try {
             const zooDistances = await this.state.animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo=>String(zoo.zoo_id)));
             const zooDistanceMap = new Map<number, number>(
