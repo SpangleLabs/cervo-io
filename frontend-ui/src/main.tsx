@@ -96,7 +96,8 @@ class MainComponent extends React.Component <{}, MainState> {
             const zooDistanceMap = new Map<number, number>(
                 zooDistances.map(x => [x.zoo_id, x.metres])
             );
-            this.setState({zooDistances: zooDistanceMap, postcodeError: false});
+            selectedZoos.sort(function(a, b) {return zooDistanceMap.get(a.zoo_id) - zooDistanceMap.get(b.zoo_id)});
+            this.setState({zooDistances: zooDistanceMap, postcodeError: false, selectedZoos: selectedZoos});
         } catch {
             this.setState({zooDistances: new Map(), postcodeError: postcode.length !== 0});
         }
@@ -105,10 +106,17 @@ class MainComponent extends React.Component <{}, MainState> {
     async updateSelectedZoos(selectedSpeciesIds: number[]) {
         const selectedSpecies = selectedSpeciesIds.map((speciesId) => this.state.animalData.species.get(speciesId));
         const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
+        // Flatten list of lists
         let selectedZoos: ZooJson[] = [];
         for (const zooList of selectedZooses) {
             selectedZoos = selectedZoos.concat(zooList);
         }
+        // Uniqueify
+        selectedZoos = selectedZoos.filter(function(value, index, arr) {
+            const zooIds = arr.map(x => x.zoo_id);
+            return zooIds.indexOf(value.zoo_id) === index
+        });
+        // Set state
         this.setState({selectedZoos: selectedZoos});
         await this.updateZooDistances(this.state.postcode, selectedZoos);
     }
