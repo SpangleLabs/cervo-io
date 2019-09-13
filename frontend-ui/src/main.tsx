@@ -1,14 +1,14 @@
 import {AnimalData} from "./animalData";
-import {PageMap} from "./pageMap";
-import {GoogleMap} from "./Map";
 import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {MapContainer} from "./components/pageMap";
+import config from "./config";
+import {GoogleApiWrapper} from "google-maps-react";
 
 interface MainProps {
-    pageMap: PageMap;
 }
 interface MainState {
     animalData: AnimalData;
@@ -112,52 +112,67 @@ class MainComponent extends React.Component <MainProps, MainState> {
     }
 
     updateZooMapMarkers(selectedZoos: ZooJson[]) {
-        this.props.pageMap.hideAllMarkers(selectedZoos.map(x => String(x.zoo_id)));
-        selectedZoos.forEach(x => this.props.pageMap.getZooMarker(x).setVisible(true));
+        // TODO
+        // this.props.pageMap.hideAllMarkers(selectedZoos.map(x => String(x.zoo_id)));
+        // selectedZoos.forEach(x => this.props.pageMap.getZooMarker(x).setVisible(true));
     }
 
     render() {
         return <>
-            <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a><br />
-            <h1>Select which species you are interested in</h1>
-            <ViewSelectorComponent
-                selectedSpeciesIds={this.state.selectedSpeciesIds}
-                onSelectSpecies={this.onSelectSpecies}
-                animalData={this.state.animalData}
-            />
-            <SelectedSpeciesComponent
-                selectedSpeciesIds={this.state.selectedSpeciesIds}
-                onSelectSpecies={this.onSelectSpecies}
-                animalData={this.state.animalData}
-                selectedZoos={this.state.selectedZoos}
-                pageMap={this.props.pageMap}
-                postcode={this.state.postcode}
-                postcodeError={this.state.postcodeError}
-                onPostcodeUpdate={this.onPostcodeUpdate}
-                zooDistances={this.state.zooDistances}
-            />
+            <div id="selector">
+                <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a><br />
+                <h1>Select which species you are interested in</h1>
+                <ViewSelectorComponent
+                    selectedSpeciesIds={this.state.selectedSpeciesIds}
+                    onSelectSpecies={this.onSelectSpecies}
+                    animalData={this.state.animalData}
+                />
+                <SelectedSpeciesComponent
+                    selectedSpeciesIds={this.state.selectedSpeciesIds}
+                    onSelectSpecies={this.onSelectSpecies}
+                    animalData={this.state.animalData}
+                    selectedZoos={this.state.selectedZoos}
+                    pageMap={undefined} // TODO
+                    postcode={this.state.postcode}
+                    postcodeError={this.state.postcodeError}
+                    onPostcodeUpdate={this.onPostcodeUpdate}
+                    zooDistances={this.state.zooDistances}
+                />
+            </div>
+            <div id="map-ccontainer">
+                <div id="map-container">
+                    <div id="map">
+                        <MapContainer selectedZoos={this.state.selectedZoos} google={{apiKey: (config['google_maps_key'])}}/>
+                    </div>
+                </div>
+            </div>
         </>
     }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    let mapElement = document.getElementById('map');
-
-    GoogleMap.loadGoogleMapsApi().then(function (googleMaps: any) {
-        const googleMap = GoogleMap.createMap(googleMaps, mapElement);
-        const map = new PageMap(googleMap);
-
-        ReactDOM.render(<MainComponent pageMap={map} />, document.getElementById("selector"));
-
-        // const animalData: AnimalData = new AnimalData();
-        // //const selection = new SelectedSpecies(animalData, map);
-        // const newSelection = new SelectionController();
-        //
-        // new ViewSelector(animalData, newSelection);
-        //
-        // new SelectedSpecies(newSelection);
-
-        //$("input#postcode").on("input", () => selection.updateZooDistances());
-        //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
-    });
+    ReactDOM.render(<MainComponent />, document.getElementById("main"));
+    // let mapElement = document.getElementById('map');
+    //
+    // GoogleMap.loadGoogleMapsApi().then(function (googleMaps: any) {
+    //     const googleMap = GoogleMap.createMap(googleMaps, mapElement);
+    //     const map = new PageMap(googleMap);
+    //
+    //
+    //     // const animalData: AnimalData = new AnimalData();
+    //     // //const selection = new SelectedSpecies(animalData, map);
+    //     // const newSelection = new SelectionController();
+    //     //
+    //     // new ViewSelector(animalData, newSelection);
+    //     //
+    //     // new SelectedSpecies(newSelection);
+    //
+    //     //$("input#postcode").on("input", () => selection.updateZooDistances());
+    //     //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
+    // });
 });
+
+
+export default GoogleApiWrapper({
+    apiKey: (config['google_maps_key'])
+})(MapContainer)
