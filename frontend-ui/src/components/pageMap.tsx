@@ -1,6 +1,6 @@
 import * as React from "react";
 import config from "../config";
-import {ZooJson} from "../../../common-lib/src/apiInterfaces";
+import {SpeciesEntryForZooJson, ZooJson} from "../../../common-lib/src/apiInterfaces";
 import {GoogleMap, InfoWindow, LoadScript, Marker} from "@react-google-maps/api";
 
 interface MapProps {
@@ -39,12 +39,21 @@ export class MapContainer extends React.Component<MapProps, {}> {
                 />
             ]
         }));
-        const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map((x) =>
-            <InfoWindow
-                anchor={this.markers.get(x.zoo_id)}
-            >
-                {x.name}
-            </InfoWindow>
+        const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map((zoo) => {
+                const zooSpecies: SpeciesEntryForZooJson[] = [];
+                return <InfoWindow anchor={this.markers.get(zoo.zoo_id)}>
+                    <h1>{zoo.name}</h1>
+                    <a href={zoo.link}>{zoo.link}</a><br/>
+                    <span>Postcode: </span>{zoo.postcode}<br/>
+                    <h2>Species:</h2>
+                    <ul className="zoo_species">
+                        {zooSpecies.map((x) => <li className="zoo_species">
+                            <span className="common_name">common name</span>
+                            <span className="latin_name">latin name</span>
+                        </li>}
+                    </ul>
+                </InfoWindow>
+            }
         );
         return (
             <div id="map-ccontainer">
