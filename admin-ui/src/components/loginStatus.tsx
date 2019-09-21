@@ -39,7 +39,7 @@ export class LoginStatus extends React.Component<{}, LoginStatusState> {
             if (this.state.session) {
                 return <LoginStatusLoggedin session={this.state.session} />;
             } else {
-                return <div>You are not logged in. <a href="login.html">Go to login</a></div>
+                return <div>You are not logged in. <a href="./login.html">Go to login</a></div>
             }
         } else {
             return <div>Checking login...</div>;
