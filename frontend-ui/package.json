@@ -29,7 +29,6 @@
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
     "google-maps-react": "^2.0.2",
-    "jquery": "^3.4.1",
     "load-google-maps-api": "^2.0.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
@@ -39,7 +38,6 @@
     "@cervoio/common-ui-lib": "../common-ui-lib",
     "@types/google-maps-react": "^2.0.1",
     "@types/googlemaps": "^3.37.0",
-    "@types/jquery": "^3.3.30",
     "@types/load-google-maps-api": "^2.0.0",
     "awesome-typescript-loader": "^5.2.1",
     "parcel": "^1.12.3",
