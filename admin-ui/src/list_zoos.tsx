@@ -97,7 +97,7 @@ class ZooFormRow extends React.Component<ZooFormProps, ZooFormState> {
 class ZooTableRow extends React.Component<ZooRowProps, {}> {
     render() {
         return <tr>
-            <td><a href="view_zoo.html?id={this.props.zoo.zoo_id}">{this.props.zoo.name}</a></td>
+            <td><a href={`view_zoo.html?id=${this.props.zoo.zoo_id}`}>{this.props.zoo.name}</a></td>
             <td>{this.props.zoo.postcode}</td>
             <td>{this.props.zoo.latitude}</td>
             <td>{this.props.zoo.longitude}</td>
