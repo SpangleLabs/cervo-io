@@ -3,13 +3,10 @@ import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
-import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
-import {GoogleApiWrapper} from "google-maps-react";
 
-interface MainProps {
-}
 interface MainState {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
@@ -17,14 +14,29 @@ interface MainState {
     postcode: string;
     postcodeError: boolean;
     zooDistances: Map<number, number>;
+    visibleInfoWindowsZoos: FullZooJson[];
+    loadingDistances: boolean;
+    loadingZoos: boolean;
 }
 
-class MainComponent extends React.Component <MainProps, MainState> {
-    constructor(props: MainProps) {
+class MainComponent extends React.Component <{}, MainState> {
+    constructor(props: {}) {
         super(props);
-        this.state = {animalData: new AnimalData(), selectedSpeciesIds: [], selectedZoos: [], postcode: "", postcodeError: false, zooDistances: new Map()};
+        this.state = {
+            animalData: new AnimalData(),
+            selectedSpeciesIds: [],
+            selectedZoos: [],
+            postcode: "",
+            postcodeError: false,
+            zooDistances: new Map(),
+            visibleInfoWindowsZoos: [],
+            loadingDistances: false,
+            loadingZoos: false
+        };
         this.onSelectSpecies = this.onSelectSpecies.bind(this);
         this.onPostcodeUpdate = this.onPostcodeUpdate.bind(this);
+        this.onClickZooMarker = this.onClickZooMarker.bind(this);
+        this.onCloseInfoWindow = this.onCloseInfoWindow.bind(this);
     }
 
     async onSelectSpecies(speciesId: number, selected?: boolean) {
@@ -88,33 +100,58 @@ class MainComponent extends React.Component <MainProps, MainState> {
     }
 
     async updateZooDistances(postcode: string, selectedZoos: ZooJson[]) {
+        if(postcode.length <= 3) {
+            return;
+        }
+        this.setState({loadingDistances: true});
         try {
             const zooDistances = await this.state.animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo=>String(zoo.zoo_id)));
             const zooDistanceMap = new Map<number, number>(
                 zooDistances.map(x => [x.zoo_id, x.metres])
             );
-            this.setState({zooDistances: zooDistanceMap, postcodeError: false});
+            selectedZoos.sort(function(a, b) {return zooDistanceMap.get(a.zoo_id) - zooDistanceMap.get(b.zoo_id)});
+            this.setState({zooDistances: zooDistanceMap, postcodeError: false, selectedZoos: selectedZoos});
         } catch {
             this.setState({zooDistances: new Map(), postcodeError: postcode.length !== 0});
         }
+        this.setState({loadingDistances: false});
     }
 
     async updateSelectedZoos(selectedSpeciesIds: number[]) {
         const selectedSpecies = selectedSpeciesIds.map((speciesId) => this.state.animalData.species.get(speciesId));
         const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
+        // Flatten list of lists
         let selectedZoos: ZooJson[] = [];
         for (const zooList of selectedZooses) {
             selectedZoos = selectedZoos.concat(zooList);
         }
+        // Uniqueify
+        selectedZoos = selectedZoos.filter(function(value, index, arr) {
+            const zooIds = arr.map(x => x.zoo_id);
+            return zooIds.indexOf(value.zoo_id) === index
+        });
+        // Set state
         this.setState({selectedZoos: selectedZoos});
-        this.updateZooMapMarkers(selectedZoos);
         await this.updateZooDistances(this.state.postcode, selectedZoos);
     }
 
-    updateZooMapMarkers(selectedZoos: ZooJson[]) {
-        // TODO
-        // this.props.pageMap.hideAllMarkers(selectedZoos.map(x => String(x.zoo_id)));
-        // selectedZoos.forEach(x => this.props.pageMap.getZooMarker(x).setVisible(true));
+    async onClickZooMarker(zoo: ZooJson) {
+        const fullZoo = await this.state.animalData.promiseFullZoo(zoo.zoo_id);
+        this.setState(function(state: MainState) {
+            const zooIds = state.visibleInfoWindowsZoos.map(x => x.zoo_id);
+            if(!zooIds.includes(zoo.zoo_id)) {
+                const newList = state.visibleInfoWindowsZoos.concat([fullZoo]);
+                return {visibleInfoWindowsZoos: newList};
+            }
+            return null;
+        });
+    }
+
+    async onCloseInfoWindow(zoo: FullZooJson) {
+        this.setState(function(state: MainState) {
+            const newList = state.visibleInfoWindowsZoos.filter(x => x.zoo_id != zoo.zoo_id);
+            return {visibleInfoWindowsZoos: newList};
+        });
     }
 
     render() {
@@ -130,22 +167,25 @@ class MainComponent extends React.Component <MainProps, MainState> {
                 <SelectedSpeciesComponent
                     selectedSpeciesIds={this.state.selectedSpeciesIds}
                     onSelectSpecies={this.onSelectSpecies}
+                    onSelectZoos={this.onClickZooMarker}
                     animalData={this.state.animalData}
                     selectedZoos={this.state.selectedZoos}
-                    pageMap={undefined} // TODO
                     postcode={this.state.postcode}
                     postcodeError={this.state.postcodeError}
                     onPostcodeUpdate={this.onPostcodeUpdate}
                     zooDistances={this.state.zooDistances}
+                    loadingDistances={this.state.loadingDistances}
+                    loadingZoos={this.state.loadingZoos}
                 />
             </div>
-            <div id="map-ccontainer">
-                <div id="map-container">
-                    <div id="map">
-                        <MapContainer selectedZoos={this.state.selectedZoos} google={{apiKey: (config['google_maps_key'])}}/>
-                    </div>
-                </div>
-            </div>
+            <MapContainer
+                selectedZoos={this.state.selectedZoos}
+                google={{apiKey: (config['google_maps_key'])}}
+                selectedSpeciesIds={this.state.selectedSpeciesIds}
+                visibleInfoWindowsZoos={this.state.visibleInfoWindowsZoos}
+                onMarkerClick={this.onClickZooMarker}
+                onInfoWindowClose={this.onCloseInfoWindow}
+            />
         </>
     }
 }
@@ -171,8 +211,3 @@ document.addEventListener("DOMContentLoaded", function () {
     //     //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
     // });
 });
-
-
-export default GoogleApiWrapper({
-    apiKey: (config['google_maps_key'])
-})(MapContainer)

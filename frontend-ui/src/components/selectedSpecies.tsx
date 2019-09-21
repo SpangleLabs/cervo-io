@@ -1,17 +1,19 @@
 import * as React from "react";
 import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {ViewProps} from "./views";
+import {Spinner} from "./images";
 import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {PageMap} from "../pageMap";
 
 interface SelectedSpeciesComponentProps extends ViewProps {
     selectedZoos: ZooJson[];
-    pageMap: PageMap;
     postcode: string;
     postcodeError: boolean;
     onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
+    onSelectZoos: (zoo: ZooJson) => void;
     zooDistances: Map<number, number>;
+    loadingDistances: boolean;
+    loadingZoos: boolean;
 }
 
 interface SelectedSpeciesResultProps {
@@ -22,11 +24,12 @@ interface PostcodeEntryProps {
     postcode: string;
     onUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
     error: boolean;
+    isLoading: boolean;
 }
 interface SelectedZooResultProps {
     zoo: ZooJson;
-    pageMap: PageMap;
     distance: number|undefined;
+    onSelect: () => void;
 }
 
 export class SelectedSpeciesResult extends React.Component<SelectedSpeciesResultProps, {}> {
@@ -59,6 +62,7 @@ class PostcodeEntry extends React.Component<PostcodeEntryProps, {}> {
                 <input id="postcode" type="text" value={this.props.postcode} onChange={this.props.onUpdate} />
             </label>
             <span className={errorClass}>Invalid postcode.</span>
+            {this.props.isLoading ? <Spinner /> : ""}
         </>
     }
 }
@@ -66,11 +70,6 @@ class PostcodeEntry extends React.Component<PostcodeEntryProps, {}> {
 class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
     constructor(props: SelectedZooResultProps) {
         super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
-    onClick() {
-        this.props.pageMap.toggleInfoWindow(this.props.zoo.zoo_id);
     }
 
     render() {
@@ -78,9 +77,8 @@ class SelectedZooResult extends React.Component<SelectedZooResultProps, {}> {
         if(this.props.distance) {
             distance = `(${Math.round(this.props.distance/1000)}km)`;
         }
-        const onClick = this.onClick.bind(this);
         return <li>
-            <span className="zoo_name clickable" onClick={onClick}>{this.props.zoo.name}</span>
+            <span className="zoo_name clickable" onClick={this.props.onSelect}>{this.props.zoo.name}</span>
             <span className="distance">{distance}</span>
         </li>
     }
@@ -106,15 +104,20 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
                 postcode={this.props.postcode}
                 error={this.props.postcodeError}
                 onUpdate={this.props.onPostcodeUpdate}
+                isLoading={this.props.loadingDistances}
             />
             <h2>Zoos with selected species ({this.props.selectedZoos.length})</h2>
+            {this.props.loadingDistances ? <Spinner /> : ""}
             <ul id="selected-zoos">
                 {this.props.selectedZoos.map((zoo) =>
-                    <SelectedZooResult
+                {
+                    const onSelect = this.props.onSelectZoos.bind(null, zoo);
+                    return <SelectedZooResult
                         zoo={zoo}
-                        pageMap={this.props.pageMap}
+                        onSelect={onSelect}
                         distance={this.props.zooDistances.get(zoo.zoo_id)}
-                    />)}
+                    />
+                })}
             </ul>
         </>
     }

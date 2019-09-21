@@ -6,7 +6,7 @@ import {
     CategoryJson,
     CategoryLevelJson,
     FullCategoryJson,
-    FullSpeciesJson,
+    FullSpeciesJson, FullZooJson,
     SpeciesJson, ZooDistanceCache, ZooDistanceJson,
     ZooJson
 } from "@cervoio/common-lib/src/apiInterfaces";
@@ -20,11 +20,13 @@ export class AnimalData {
     validFirstLetters: Promise<string[]>;
     speciesByLetter: Map<string, Promise<SpeciesData[]>>;
     cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
+    fullZoos: Map<number, FullZooJson>;
 
     constructor() {
         this.species = new Map<number, SpeciesData>();
         this.categories = new Map<number, CategoryData>();
         this.speciesByLetter = new Map<string, Promise<SpeciesData[]>>();
+        this.fullZoos = new Map();
     }
 
     promiseCategoryLevels() : Promise<CategoryLevelJson[]> {
@@ -123,6 +125,15 @@ export class AnimalData {
         const newDistances = await promiseGet(path);
         this.cacheAddZooDistances(postcode, newDistances);
         return foundDistances.concat(newDistances);
+    }
+
+    async promiseFullZoo(zooId: number): Promise<FullZooJson> {
+        if(this.fullZoos.get(zooId)) {
+            return this.fullZoos.get(zooId);
+        }
+        const fullData = await promiseGet(`zoos/${zooId}`);
+        this.fullZoos.set(zooId, fullData[0]);
+        return fullData[0];
     }
 }
 
