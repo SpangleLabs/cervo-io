@@ -2,7 +2,7 @@ import * as React from "react";
 import {SpeciesData} from "../animalData";
 import {ViewProps} from "./views";
 import {TickBox} from "./tickbox";
-import {Spinner} from "./images";
+import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
 
 interface SearchState {
     searchTerm: string;

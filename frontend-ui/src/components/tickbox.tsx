@@ -1,5 +1,5 @@
 import * as React from "react";
-import {BoxChecked, BoxUnchecked} from "./images";
+import {BoxChecked, BoxUnchecked} from "@cervoio/common-ui-lib/src/components/images";
 
 export interface IsSelected {
     selected: boolean
