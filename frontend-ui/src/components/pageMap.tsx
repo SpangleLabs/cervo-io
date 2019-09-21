@@ -1,7 +1,7 @@
 import {Map, Marker} from 'google-maps-react';
 import * as React from "react";
 //import config from "../config";
-import {ZooJson} from "../../../common-lib/src/apiInterfaces";
+import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 interface MapProps {
     google: any;

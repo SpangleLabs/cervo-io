@@ -1,7 +1,7 @@
 import * as React from "react";
 import {ViewProps} from "./views";
 import {CategoryData, SpeciesData} from "../animalData";
-import {TickBox} from "./tickbox";
+import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
 

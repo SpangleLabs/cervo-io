@@ -1,7 +1,7 @@
 import * as React from "react";
 import {ViewProps} from "./views";
 import {SpeciesData} from "../animalData";
-import {TickBox} from "./tickbox";
+import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
 
 interface AlphabetLetterProps {
