@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ViewProps} from "./views";
+import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {CategoryData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
-import {ViewProps} from "./views";
+import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
 

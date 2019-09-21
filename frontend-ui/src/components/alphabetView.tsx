@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ViewProps} from "./views";
+import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
