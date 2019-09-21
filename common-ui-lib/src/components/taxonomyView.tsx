@@ -14,30 +14,19 @@ interface TaxonomyViewState {
     categoryLevels: CategoryLevelJson[];
     isLoading: boolean
 }
-interface CategoryProps extends ViewProps {
-    category: CategoryData;
-    categoryLevels: CategoryLevelJson[];
-    autoExpand: boolean;
-    autoSelect: boolean;
-    odd: boolean;
-}
-interface NonSelectableCategoryProps {
+interface CategoryProps {
     animalData: AnimalData;
     category: CategoryData;
     categoryLevels: CategoryLevelJson[];
     autoExpand: boolean;
     odd: boolean;
+    selectedSpeciesIds?: number[];
+    onSelectSpecies?: (speciesId: number, selected?: boolean) => void;
+    autoSelect?: boolean;
 }
 interface CategoryState {
     expand: boolean,
     selected: boolean,
-    gotFullData: boolean,
-    subCategories: CategoryData[],
-    species: SpeciesData[],
-    isLoading: boolean
-}
-interface NonSelectableCategoryState {
-    expand: boolean,
     gotFullData: boolean,
     subCategories: CategoryData[],
     species: SpeciesData[],
@@ -60,11 +49,12 @@ class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
     render() {
         const liClassName = `species ${this.props.selected ? "selected" : ""}`;
         const spanClassName = this.props.onSelect ? "clickable" : "";
+        const tickbox = this.props.onSelect == null ? null : <TickBox selected={this.props.selected} />;
         return <li className={liClassName}>
             <span className={spanClassName} onClick={this.props.onSelect}>
                 <span className="species_name">{this.props.species.commonName}</span>
                 <span className="latin_name">{this.props.species.latinName}</span>
-                {this.props.children}
+                {tickbox}
             </span>
         </li>
     }
@@ -137,14 +127,18 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
     render() {
         const liClassName = `category ${this.state.expand ? "open" : "closed"} ${this.state.selected ? "selected" : ""}`;
         const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.state.expand ? "" : "hidden"}`;
+        let categoryCheckbox = null;
+        if(this.props.onSelectSpecies != null) {
+            categoryCheckbox = <span className="clickable selector" onClick={this.selectCategory.bind(this, undefined)}>
+                <TickBox selected={this.state.selected} />
+            </span>
+        }
         return <li className={liClassName}>
             <span className="clickable" onClick={this.expand}>
                 <span className="category_name">{this.props.category.name}</span>
                 <span className="category_level">{this.categoryLevelName()}</span>
             </span>
-            <span className="clickable selector" onClick={this.selectCategory.bind(this, undefined)}>
-                <TickBox selected={this.state.selected} />
-            </span>
+            {categoryCheckbox}
             {this.state.isLoading ? <Spinner /> : ""}
             <ul className={ulClassName}>
                 {this.state.subCategories.map(
@@ -166,11 +160,9 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                         <TaxonomySpecies
                             key={"species-"+species.id}
                             species={species}
-                            selected={this.props.selectedSpeciesIds.includes(species.id)}
-                            onSelect={this.props.onSelectSpecies.bind(null, species.id, undefined)}
-                        >
-                            <TickBox selected={this.props.selectedSpeciesIds.includes(species.id)} />
-                        </TaxonomySpecies>
+                            selected={this.props.selectedSpeciesIds == null ? false : this.props.selectedSpeciesIds.includes(species.id)}
+                            onSelect={this.props.onSelectSpecies == null ? null : this.props.onSelectSpecies.bind(null, species.id, undefined)}
+                        />
                 )}
             </ul>
         </li>
@@ -212,77 +204,6 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
     }
 }
 
-
-class NonSelectableTaxonomyCategory extends React.Component<NonSelectableCategoryProps, NonSelectableCategoryState> {
-    constructor(props: NonSelectableCategoryProps) {
-        super(props);
-        this.state = {expand: false, gotFullData: false, subCategories: [], species: [], isLoading: false};
-        this.expand = this.expand.bind(this);
-    }
-
-    async componentDidMount() {
-        if(this.props.autoExpand) {
-            this.expand();
-        }
-    }
-
-    categoryLevelName() {
-        const matching = this.props.categoryLevels.filter((level) => level.category_level_id == this.props.category.categoryLevelId);
-        if(matching.length) {
-            return matching[0].name;
-        } else {
-            return "(unknown rank)";
-        }
-    }
-
-    async populate() {
-        if (!this.state.gotFullData) {
-            this.setState({isLoading: true});
-            const [subCategories, species] = await Promise.all([this.props.category.getSubCategories(), this.props.category.getSpecies()]);
-            this.setState({gotFullData: true, subCategories: subCategories, species: species});
-            this.setState({isLoading: false});
-        }
-    }
-
-    async expand() {
-        await this.populate();
-        this.setState((state) => {return {expand: !state.expand}});
-    }
-
-    render() {
-        const liClassName = `category ${this.state.expand ? "open" : "closed"}`;
-        const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.state.expand ? "" : "hidden"}`;
-        return <li className={liClassName}>
-            <span className="clickable" onClick={this.expand}>
-                <span className="category_name">{this.props.category.name}</span>
-                <span className="category_level">{this.categoryLevelName()}</span>
-            </span>
-            {this.state.isLoading ? <Spinner /> : ""}
-            <ul className={ulClassName}>
-                {this.state.subCategories.map(
-                    (category) =>
-                        <NonSelectableTaxonomyCategory
-                            key={"category-"+category.id}
-                            category={category}
-                            categoryLevels={this.props.categoryLevels}
-                            animalData={this.props.animalData}
-                            odd={!this.props.odd}
-                            autoExpand={this.state.subCategories.length == 1}
-                        />
-                )}
-                {this.state.species.map(
-                    (species) =>
-                        <TaxonomySpecies
-                            key={"species-"+species.id}
-                            species={species}
-                        >
-                        </TaxonomySpecies>
-                )}
-            </ul>
-        </li>
-    }
-}
-
 export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelectableTaxonomyViewProps, TaxonomyViewState> {
     constructor(props: ViewProps) {
         super(props);
@@ -300,7 +221,7 @@ export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelec
     render() {
         const baseCategories = this.state.baseCategories.map(
             (category) =>
-                <NonSelectableTaxonomyCategory
+                <TaxonomyCategory
                     key = {"category-"+category.id}
                     animalData={this.props.animalData}
                     categoryLevels={this.state.categoryLevels}
