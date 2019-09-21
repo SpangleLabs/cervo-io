@@ -28,8 +28,8 @@ interface CategoryState {
 }
 interface SpeciesProps {
     species: SpeciesData;
-    selected: boolean;
-    onSelect: () => void
+    selected?: boolean;
+    onSelect?: () => void
 }
 interface SpeciesState {
 }
@@ -41,9 +41,10 @@ class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
     }
 
     render() {
-        const className = `species ${this.props.selected ? "selected" : ""}`;
-        return <li className={className}>
-            <span className="clickable" onClick={this.props.onSelect}>
+        const liClassName = `species ${this.props.selected ? "selected" : ""}`;
+        const spanClassName = this.props.onSelect ? "clickable" : "";
+        return <li className={liClassName}>
+            <span className={spanClassName} onClick={this.props.onSelect}>
                 <span className="species_name">{this.props.species.commonName}</span>
                 <span className="latin_name">{this.props.species.latinName}</span>
                 {this.props.children}
