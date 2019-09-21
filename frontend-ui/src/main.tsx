@@ -1,4 +1,4 @@
-import {AnimalData} from "./animalData";
+import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import * as React from "react";
 import {ViewSelectorComponent} from "./components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";

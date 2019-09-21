@@ -1,4 +1,4 @@
-import {AnimalData} from "../animalData";
+import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 
 export interface ViewProps {
     animalData: AnimalData;

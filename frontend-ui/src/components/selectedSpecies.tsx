@@ -1,5 +1,5 @@
 import * as React from "react";
-import {SpeciesData} from "../animalData";
+import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {ViewProps} from "./views";
 import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
