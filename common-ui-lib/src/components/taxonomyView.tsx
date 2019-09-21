@@ -46,7 +46,7 @@ class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
             <span className="clickable" onClick={this.props.onSelect}>
                 <span className="species_name">{this.props.species.commonName}</span>
                 <span className="latin_name">{this.props.species.latinName}</span>
-                <TickBox selected={this.props.selected} />
+                {this.props.children}
             </span>
         </li>
     }
@@ -150,7 +150,9 @@ class TaxonomyCategory extends React.Component<CategoryProps, CategoryState> {
                             species={species}
                             selected={this.props.selectedSpeciesIds.includes(species.id)}
                             onSelect={this.props.onSelectSpecies.bind(null, species.id, undefined)}
-                        />
+                        >
+                            <TickBox selected={this.props.selectedSpeciesIds.includes(species.id)} />
+                        </TaxonomySpecies>
                 )}
             </ul>
         </li>
