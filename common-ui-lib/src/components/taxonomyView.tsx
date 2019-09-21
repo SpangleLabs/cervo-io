@@ -1,9 +1,9 @@
 import * as React from "react";
-import {ViewProps} from "@cervoio/common-ui-lib/src/views";
-import {CategoryData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
-import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
+import {ViewProps} from "../views";
+import {CategoryData, SpeciesData} from "../animalData";
+import {TickBox} from "./tickbox";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
+import {Spinner} from "./images";
 
 
 interface TaxonomyViewState {
