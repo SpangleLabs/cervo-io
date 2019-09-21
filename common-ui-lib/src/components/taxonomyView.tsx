@@ -1,11 +1,14 @@
 import * as React from "react";
 import {ViewProps} from "../views";
-import {CategoryData, SpeciesData} from "../animalData";
+import {AnimalData, CategoryData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Spinner} from "./images";
 
 
+interface NonSelectableTaxonomyViewProps {
+    animalData: AnimalData;
+}
 interface TaxonomyViewState {
     baseCategories: CategoryData[];
     categoryLevels: CategoryLevelJson[];
@@ -18,9 +21,23 @@ interface CategoryProps extends ViewProps {
     autoSelect: boolean;
     odd: boolean;
 }
+interface NonSelectableCategoryProps {
+    animalData: AnimalData;
+    category: CategoryData;
+    categoryLevels: CategoryLevelJson[];
+    autoExpand: boolean;
+    odd: boolean;
+}
 interface CategoryState {
     expand: boolean,
     selected: boolean,
+    gotFullData: boolean,
+    subCategories: CategoryData[],
+    species: SpeciesData[],
+    isLoading: boolean
+}
+interface NonSelectableCategoryState {
+    expand: boolean,
     gotFullData: boolean,
     subCategories: CategoryData[],
     species: SpeciesData[],
@@ -194,3 +211,146 @@ export class TaxonomyViewComponent extends React.Component<ViewProps, TaxonomyVi
         </ul>
     }
 }
+
+
+class NonSelectableTaxonomyCategory extends React.Component<NonSelectableCategoryProps, NonSelectableCategoryState> {
+    constructor(props: NonSelectableCategoryProps) {
+        super(props);
+        this.state = {expand: false, gotFullData: false, subCategories: [], species: [], isLoading: false};
+        this.expand = this.expand.bind(this);
+    }
+
+    async componentDidMount() {
+        if(this.props.autoExpand) {
+            this.expand();
+        }
+    }
+
+    categoryLevelName() {
+        const matching = this.props.categoryLevels.filter((level) => level.category_level_id == this.props.category.categoryLevelId);
+        if(matching.length) {
+            return matching[0].name;
+        } else {
+            return "(unknown rank)";
+        }
+    }
+
+    async populate() {
+        if (!this.state.gotFullData) {
+            this.setState({isLoading: true});
+            const [subCategories, species] = await Promise.all([this.props.category.getSubCategories(), this.props.category.getSpecies()]);
+            this.setState({gotFullData: true, subCategories: subCategories, species: species});
+            this.setState({isLoading: false});
+        }
+    }
+
+    async expand() {
+        await this.populate();
+        this.setState((state) => {return {expand: !state.expand}});
+    }
+
+    render() {
+        const liClassName = `category ${this.state.expand ? "open" : "closed"}`;
+        const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.state.expand ? "" : "hidden"}`;
+        return <li className={liClassName}>
+            <span className="clickable" onClick={this.expand}>
+                <span className="category_name">{this.props.category.name}</span>
+                <span className="category_level">{this.categoryLevelName()}</span>
+            </span>
+            {this.state.isLoading ? <Spinner /> : ""}
+            <ul className={ulClassName}>
+                {this.state.subCategories.map(
+                    (category) =>
+                        <NonSelectableTaxonomyCategory
+                            key={"category-"+category.id}
+                            category={category}
+                            categoryLevels={this.props.categoryLevels}
+                            animalData={this.props.animalData}
+                            odd={!this.props.odd}
+                            autoExpand={this.state.subCategories.length == 1}
+                        />
+                )}
+                {this.state.species.map(
+                    (species) =>
+                        <TaxonomySpecies
+                            key={"species-"+species.id}
+                            species={species}
+                        >
+                        </TaxonomySpecies>
+                )}
+            </ul>
+        </li>
+    }
+}
+
+export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelectableTaxonomyViewProps, TaxonomyViewState> {
+    constructor(props: ViewProps) {
+        super(props);
+        this.state = {baseCategories: [], categoryLevels: [], isLoading: false};
+    }
+
+    async componentDidMount(): Promise<void> {
+        const categoryLevelsPromise = this.props.animalData.promiseCategoryLevels();
+        const baseCategoriesPromise = this.props.animalData.promiseBaseCategories();
+        this.setState({isLoading: true});
+        const [categoryLevels, baseCategories] = await Promise.all([categoryLevelsPromise, baseCategoriesPromise]);
+        this.setState({baseCategories: baseCategories, categoryLevels: categoryLevels, isLoading: false});
+    }
+
+    render() {
+        const baseCategories = this.state.baseCategories.map(
+            (category) =>
+                <NonSelectableTaxonomyCategory
+                    key = {"category-"+category.id}
+                    animalData={this.props.animalData}
+                    categoryLevels={this.state.categoryLevels}
+                    category={category}
+                    odd={true}
+                    autoExpand={true}
+                />);
+        return <ul className="odd">
+            {this.state.isLoading ? <Spinner/> : ""}
+            {baseCategories}
+        </ul>
+    }
+}
+
+//
+// class SelectableTaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
+//
+// }
+//
+// class SelectableTaxonomyView extends React.Component<ViewProps, TaxonomyViewState> {
+//     constructor(props: ViewProps) {
+//         super(props);
+//         this.state = {baseCategories: [], categoryLevels: [], isLoading: false};
+//     }
+//
+//     async componentDidMount(): Promise<void> {
+//         const categoryLevelsPromise = this.props.animalData.promiseCategoryLevels();
+//         const baseCategoriesPromise = this.props.animalData.promiseBaseCategories();
+//         this.setState({isLoading: true});
+//         const [categoryLevels, baseCategories] = await Promise.all([categoryLevelsPromise, baseCategoriesPromise]);
+//         this.setState({baseCategories: baseCategories, categoryLevels: categoryLevels, isLoading: false});
+//     }
+//
+//     render() {
+//         const baseCategories = this.state.baseCategories.map(
+//             (category) =>
+//                 <TaxonomyCategory
+//                     key = {"category-"+category.id}
+//                     animalData={this.props.animalData}
+//                     selectedSpeciesIds={this.props.selectedSpeciesIds}
+//                     onSelectSpecies={this.props.onSelectSpecies}
+//                     categoryLevels={this.state.categoryLevels}
+//                     category={category}
+//                     odd={true}
+//                     autoExpand={true}
+//                     autoSelect={false}
+//                 />);
+//         return <ul className="odd">
+//             {this.state.isLoading ? <Spinner/> : ""}
+//             {baseCategories}
+//         </ul>
+//     }
+// }
