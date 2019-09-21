@@ -1,7 +1,7 @@
 /**
  * Store data about known species
  */
-import {promiseGet} from "@cervoio/common-ui-lib/src/utilities";
+import {promiseGet} from "./utilities";
 import {
     CategoryJson,
     CategoryLevelJson,

@@ -1,6 +1,6 @@
 import * as React from "react";
 import config from "../config";
-import {FullZooJson, ZooJson} from "../../../common-lib/src/apiInterfaces";
+import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {GoogleMap, InfoWindow, LoadScript, Marker} from "@react-google-maps/api";
 
 interface MapProps {
