@@ -180,6 +180,16 @@ export class CategoryData {
             return data.species.map(x => self.animalData.getOrCreateSpecies(x));
         });
     }
+
+    async getCategoryName(): Promise<string> {
+        const categoryLevels = await this.animalData.promiseCategoryLevels();
+        const matching = categoryLevels.filter((level) => level.category_level_id == this.categoryLevelId);
+        if(matching.length) {
+            return matching[0].name;
+        } else {
+            return "(unknown rank)";
+        }
+    }
 }
 
 /**

@@ -4,6 +4,13 @@ import {AnimalData, CategoryData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
 import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Spinner} from "./images";
+import {
+    create,
+    TaxonomyCategoryState,
+    TaxonomyTreeState,
+    treeExpandCategory,
+    treeToggleSelectCategory
+} from "../taxonomyState";
 
 
 interface NonSelectableTaxonomyViewProps {
@@ -233,6 +240,113 @@ export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelec
             {this.state.isLoading ? <Spinner/> : ""}
             {baseCategories}
         </ul>
+    }
+}
+
+interface StatedTaxonomyViewProps {
+    animalData: AnimalData
+}
+interface StatedTaxonomyViewState {
+    taxonomy: TaxonomyTreeState
+    isLoading: boolean
+}
+export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps, StatedTaxonomyViewState> {
+    constructor(props: StatedTaxonomyViewProps) {
+        super(props);
+        const taxonomy: TaxonomyTreeState = {categoryLevels: [], rootCategories: []};
+        this.state = {taxonomy: taxonomy, isLoading: true}
+    }
+
+    async componentDidMount(): Promise<void> {
+        const taxonomy = await create(this.props.animalData);
+        this.setState({taxonomy: taxonomy, isLoading: false});
+    }
+
+    async expandCategory(categoryId: number) {
+        console.log("react expandCategory("+categoryId);
+        this.setState({isLoading: true});
+        const newTree = await treeExpandCategory(this.state.taxonomy, categoryId);
+        this.setState({taxonomy: newTree, isLoading: false});
+    }
+
+    async selectCategory(categoryId: number) {
+        console.log("react selectCategory("+categoryId);
+        this.setState({isLoading: true});
+        const newTree = await treeToggleSelectCategory(this.state.taxonomy, categoryId);
+        this.setState({taxonomy: newTree, isLoading: false});
+    }
+
+    async selectSpecies(speciesId: number) {
+        console.log(speciesId);
+    }
+
+    render() {
+        const baseCategories = this.state.taxonomy.rootCategories.map(
+            (category) =>
+                <StatedTaxonomyCategory
+                    key = {"category-"+category.data.id}
+                    category={category}
+                    odd={true}
+                    selectCategory={this.selectCategory.bind(this)}
+                    expandCategory={this.expandCategory.bind(this)}
+                    selectSpecies={this.selectSpecies.bind(this)}
+                />);
+        return <ul className="odd">
+            {this.state.isLoading ? <Spinner/> : ""}
+            {baseCategories}
+        </ul>
+    }
+}
+
+interface StatedTaxonomyCategoryProps {
+    category: TaxonomyCategoryState;
+    odd: boolean;
+    expandCategory: (categoryId: number) => Promise<void>
+    selectCategory: (categoryId: number) => Promise<void>
+    selectSpecies: (speciesId: number) => Promise<void>
+}
+interface StatedTaxonomyCategoryState {
+
+}
+class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps, StatedTaxonomyCategoryState> {
+    render() {
+        const liClassName = `category ${this.props.category.expanded ? "open" : "closed"} ${this.props.category.selected ? "selected" : ""}`;
+        const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.props.category.expanded ? "" : "hidden"}`;
+        let categoryCheckbox = null;
+        if(this.props.selectCategory != null) {
+            categoryCheckbox = <span className="clickable selector" onClick={this.props.selectCategory.bind(null, this.props.category.data.id)}>
+                <TickBox selected={this.props.category.selected} />
+            </span>
+        }
+        return <li className={liClassName}>
+            <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.category.data.id)}>
+                <span className="category_name">{this.props.category.data.name}</span>
+                <span className="category_level">{this.props.category.categoryLevel}</span>
+            </span>
+            {categoryCheckbox}
+            <ul className={ulClassName}>
+                {this.props.category.subCategories.map(
+                    (category) =>
+                        <StatedTaxonomyCategory
+                            key = {"category-"+category.data.id}
+                            category={category}
+                            odd={!this.props.odd}
+                            selectCategory={this.props.selectCategory}
+                            expandCategory={this.props.expandCategory}
+                            selectSpecies={this.props.selectSpecies}
+                        />
+                )}
+                {this.props.category.species.map(
+                    (species) =>
+                        <TaxonomySpecies
+                            key={"species-"+species.data.id}
+                            species={species.data}
+                            selected={species.selected}
+                            onSelect={null}
+                        />
+                )}
+            </ul>
+        </li>
     }
 }
 
