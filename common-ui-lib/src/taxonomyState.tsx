@@ -24,29 +24,32 @@ export async function create(animalData: AnimalData): Promise<TaxonomyTreeState>
     };
 }
 
-export async function treeToggleSelectCategory(state: TaxonomyTreeState, categoryId: number): Promise<TaxonomyTreeState> {
+export async function treeToggleSelectCategory(state: TaxonomyTreeState, categoryIds: number[]): Promise<TaxonomyTreeState> {
     return {
         categoryLevels: state.categoryLevels,
-        rootCategories: await Promise.all(state.rootCategories.map(x => categoryToggleSelectCategory(x, categoryId)))
+        rootCategories: await Promise.all(state.rootCategories.map(x => categoryToggleSelectCategory(x, categoryIds)))
     }
 }
 
-export async function treeExpandCategory(state: TaxonomyTreeState, categoryId: number): Promise<TaxonomyTreeState> {
+export async function treeExpandCategory(state: TaxonomyTreeState, categoryIds: number[]): Promise<TaxonomyTreeState> {
     return {
         categoryLevels: state.categoryLevels,
-        rootCategories: await Promise.all(state.rootCategories.map(x => categoryExpandCategory(x, categoryId)))
+        rootCategories: await Promise.all(state.rootCategories.map(x => categoryExpandCategory(x, categoryIds)))
     }
 }
 
-async function categoryToggleSelectCategory(category: TaxonomyCategoryState, categoryId: number): Promise<TaxonomyCategoryState> {
-    if(category.data.id == categoryId) {
+async function categoryToggleSelectCategory(category: TaxonomyCategoryState, categoryIds: number[]): Promise<TaxonomyCategoryState> {
+    if(category.data.id != categoryIds[0]) {
+        return category;
+    }
+    if(categoryIds.length == 1) {
         return toggleSelectCategory(category);
     }
     category = await populateCategory(category);
     return {
         data: category.data,
         categoryLevel: category.categoryLevel,
-        subCategories: await Promise.all(category.subCategories.map(x => categoryToggleSelectCategory(x, categoryId))),
+        subCategories: await Promise.all(category.subCategories.map(x => categoryToggleSelectCategory(x, categoryIds.slice(1)))),
         species: category.species,
         populated: category.populated,
         expanded: category.expanded,
@@ -54,15 +57,18 @@ async function categoryToggleSelectCategory(category: TaxonomyCategoryState, cat
     }
 }
 
-async function categoryExpandCategory(category: TaxonomyCategoryState, categoryId: number): Promise<TaxonomyCategoryState> {
-    if(category.data.id == categoryId) {
+async function categoryExpandCategory(category: TaxonomyCategoryState, categoryIds: number[]): Promise<TaxonomyCategoryState> {
+    if(category.data.id != categoryIds[0]) {
+        return category;
+    }
+    if(categoryIds.length == 1) {
         return expandCategory(category);
     }
     category = await populateCategory(category);
     return {
         data: category.data,
         categoryLevel: category.categoryLevel,
-        subCategories: await Promise.all(category.subCategories.map(x => categoryExpandCategory(x, categoryId))),
+        subCategories: await Promise.all(category.subCategories.map(x => categoryExpandCategory(x, categoryIds.slice(1)))),
         species: category.species,
         populated: category.populated,
         expanded: category.expanded,
