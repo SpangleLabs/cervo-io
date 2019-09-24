@@ -293,8 +293,8 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     selectSpecies={this.selectSpecies.bind(this)}
                 />);
         return <ul className="odd">
-            {this.state.isLoading ? <Spinner/> : ""}
             {baseCategories}
+            {this.state.isLoading ? <Spinner/> : ""}
         </ul>
     }
 }
