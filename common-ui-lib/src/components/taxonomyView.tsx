@@ -262,17 +262,17 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         this.setState({taxonomy: taxonomy, isLoading: false});
     }
 
-    async expandCategory(...categoryIds: number[]) {
-        console.log("react expandCategory("+categoryIds);
+    async expandCategory(categoryPath: number[]) {
+        console.log("react expandCategory("+categoryPath);
         this.setState({isLoading: true});
-        const newTree = await treeExpandCategory(this.state.taxonomy, categoryIds);
+        const newTree = await treeExpandCategory(this.state.taxonomy, categoryPath);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
-    async selectCategory(...categoryIds: number[]) {
-        console.log("react selectCategory("+categoryIds);
+    async selectCategory(categoryPath: number[]) {
+        console.log("react selectCategory("+categoryPath);
         this.setState({isLoading: true});
-        const newTree = await treeToggleSelectCategory(this.state.taxonomy, categoryIds);
+        const newTree = await treeToggleSelectCategory(this.state.taxonomy, categoryPath);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
@@ -286,9 +286,10 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                 <StatedTaxonomyCategory
                     key = {"category-"+category.data.id}
                     category={category}
+                    path={[category.data.id]}
                     odd={true}
-                    selectCategory={this.selectCategory.bind(this, category.data.id)}
-                    expandCategory={this.expandCategory.bind(this, category.data.id)}
+                    selectCategory={this.selectCategory.bind(this)}
+                    expandCategory={this.expandCategory.bind(this)}
                     selectSpecies={this.selectSpecies.bind(this)}
                 />);
         return <ul className="odd">
@@ -300,9 +301,10 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
 
 interface StatedTaxonomyCategoryProps {
     category: TaxonomyCategoryState;
+    path: number[];
     odd: boolean;
-    expandCategory: (categoryId: number) => Promise<void>
-    selectCategory: (categoryId: number) => Promise<void>
+    expandCategory: (categoryPath: number[]) => Promise<void>
+    selectCategory: (categoryPath: number[]) => Promise<void>
     selectSpecies: (speciesId: number) => Promise<void>
 }
 interface StatedTaxonomyCategoryState {
@@ -314,12 +316,12 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
         const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.props.category.expanded ? "" : "hidden"}`;
         let categoryCheckbox = null;
         if(this.props.selectCategory != null) {
-            categoryCheckbox = <span className="clickable selector" onClick={this.props.selectCategory.bind(null, this.props.category.data.id)}>
+            categoryCheckbox = <span className="clickable selector" onClick={this.props.selectCategory.bind(null, this.props.path)}>
                 <TickBox selected={this.props.category.selected} />
             </span>
         }
         return <li className={liClassName}>
-            <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.category.data.id)}>
+            <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.path)}>
                 <span className="category_name">{this.props.category.data.name}</span>
                 <span className="category_level">{this.props.category.categoryLevel}</span>
             </span>
@@ -330,9 +332,10 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                         <StatedTaxonomyCategory
                             key = {"category-"+category.data.id}
                             category={category}
+                            path={this.props.path.concat([category.data.id])}
                             odd={!this.props.odd}
-                            selectCategory={this.props.selectCategory.bind(null, this.props.category.data.id)}
-                            expandCategory={this.props.expandCategory.bind(null, this.props.category.data.id)}
+                            selectCategory={this.props.selectCategory}
+                            expandCategory={this.props.expandCategory}
                             selectSpecies={this.props.selectSpecies}
                         />
                 )}
