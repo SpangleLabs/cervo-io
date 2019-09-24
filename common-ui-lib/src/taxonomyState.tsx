@@ -2,7 +2,7 @@ import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 
 
-export async function create(animalData: AnimalData): Promise<TaxonomyTreeState> {
+export async function create(animalData: AnimalData, onSelectSpecies: (speciesId: number, selected?: boolean) => void): Promise<TaxonomyTreeState> {
     const categoryLevelsPromise = animalData.promiseCategoryLevels();
     const baseCategoriesPromise = animalData.promiseBaseCategories();
     const [categoryLevels, baseCategories] = await Promise.all([categoryLevelsPromise, baseCategoriesPromise]);
@@ -14,7 +14,8 @@ export async function create(animalData: AnimalData): Promise<TaxonomyTreeState>
             species: [],
             populated: false,
             expanded: false,
-            selected: false
+            selected: false,
+            onSelectSpecies: onSelectSpecies
         }
     }));
     const expandedRootCategories = await Promise.all(rootCategories.map(expandCategory));
@@ -53,7 +54,8 @@ async function categoryToggleSelectCategory(category: TaxonomyCategoryState, cat
         species: category.species,
         populated: category.populated,
         expanded: category.expanded,
-        selected: category.selected
+        selected: category.selected,
+        onSelectSpecies: category.onSelectSpecies
     }
 }
 
@@ -72,27 +74,23 @@ async function categoryExpandCategory(category: TaxonomyCategoryState, categoryI
         species: category.species,
         populated: category.populated,
         expanded: category.expanded,
-        selected: category.selected
-    }
-}
-
-function selectSpecies(species: TaxonomySpeciesState, selected: boolean): TaxonomySpeciesState {
-    return {
-        data: species.data,
-        selected: selected
+        selected: category.selected,
+        onSelectSpecies: category.onSelectSpecies
     }
 }
 
 async function selectCategory(category: TaxonomyCategoryState, selected: boolean): Promise<TaxonomyCategoryState> {
     category = await populateCategory(category);
+    category.species.map(x => category.onSelectSpecies(x.data.id, selected));
     return {
         data: category.data,
         categoryLevel: category.categoryLevel,
         subCategories: await Promise.all(category.subCategories.map(x => selectCategory(x, selected))),
-        species: category.species.map(x => selectSpecies(x, selected)),
+        species: category.species,
         populated: category.populated,
         expanded: category.expanded,
-        selected: selected
+        selected: selected,
+        onSelectSpecies: category.onSelectSpecies
     }
 }
 
@@ -112,7 +110,8 @@ async function expandCategory(category: TaxonomyCategoryState): Promise<Taxonomy
             species: category.species,
             populated: category.populated,
             expanded: !category.expanded,
-            selected: category.selected
+            selected: category.selected,
+            onSelectSpecies: category.onSelectSpecies
         }
     }
     return {
@@ -122,7 +121,8 @@ async function expandCategory(category: TaxonomyCategoryState): Promise<Taxonomy
         species: category.species,
         populated: category.populated,
         expanded: !category.expanded,
-        selected: category.selected
+        selected: category.selected,
+        onSelectSpecies: category.onSelectSpecies
     }
 }
 
@@ -139,7 +139,8 @@ async function populateCategory(category: TaxonomyCategoryState): Promise<Taxono
             species: [],
             populated: false,
             selected: category.selected,
-            expanded: false
+            expanded: false,
+            onSelectSpecies: category.onSelectSpecies
         }
     }));
     const species = speciesData.map(x => {
@@ -154,8 +155,9 @@ async function populateCategory(category: TaxonomyCategoryState): Promise<Taxono
         subCategories: subCategories,
         species: species,
         populated: true,
+        selected: category.selected,
         expanded: category.expanded,
-        selected: category.selected
+        onSelectSpecies: category.onSelectSpecies
     }
 }
 
@@ -173,9 +175,9 @@ export interface TaxonomyCategoryState {
     populated: boolean;
     selected: boolean;
     expanded: boolean;
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
 
 export interface TaxonomySpeciesState {
     data: SpeciesData;
-    selected: boolean;
 }

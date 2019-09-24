@@ -51,6 +51,11 @@ interface SpeciesState {
 class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
     constructor(props: SpeciesProps) {
         super(props);
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick() {
+        this.props.onSelect();
     }
 
     render() {
@@ -58,7 +63,7 @@ class TaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
         const spanClassName = this.props.onSelect ? "clickable" : "";
         const tickbox = this.props.onSelect == null ? null : <TickBox selected={this.props.selected} />;
         return <li className={liClassName}>
-            <span className={spanClassName} onClick={this.props.onSelect}>
+            <span className={spanClassName} onClick={this.onClick}>
                 <span className="species_name">{this.props.species.commonName}</span>
                 <span className="latin_name">{this.props.species.latinName}</span>
                 {tickbox}
@@ -244,7 +249,9 @@ export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelec
 }
 
 interface StatedTaxonomyViewProps {
-    animalData: AnimalData
+    animalData: AnimalData;
+    selectedSpecies: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void
 }
 interface StatedTaxonomyViewState {
     taxonomy: TaxonomyTreeState
@@ -258,7 +265,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 
     async componentDidMount(): Promise<void> {
-        const taxonomy = await create(this.props.animalData);
+        const taxonomy = await create(this.props.animalData, this.props.onSelectSpecies);
         this.setState({taxonomy: taxonomy, isLoading: false});
     }
 
@@ -276,10 +283,6 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
-    async selectSpecies(speciesId: number) {
-        console.log(speciesId);
-    }
-
     render() {
         const baseCategories = this.state.taxonomy.rootCategories.map(
             (category) =>
@@ -288,9 +291,10 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     category={category}
                     path={[category.data.id]}
                     odd={true}
+                    selectedSpecies={this.props.selectedSpecies}
                     selectCategory={this.selectCategory.bind(this)}
                     expandCategory={this.expandCategory.bind(this)}
-                    selectSpecies={this.selectSpecies.bind(this)}
+                    selectSpecies={this.props.onSelectSpecies}
                 />);
         return <ul className="odd">
             {baseCategories}
@@ -303,9 +307,10 @@ interface StatedTaxonomyCategoryProps {
     category: TaxonomyCategoryState;
     path: number[];
     odd: boolean;
-    expandCategory: (categoryPath: number[]) => Promise<void>
-    selectCategory: (categoryPath: number[]) => Promise<void>
-    selectSpecies: (speciesId: number) => Promise<void>
+    selectedSpecies: number[];
+    expandCategory: (categoryPath: number[]) => Promise<void>;
+    selectCategory: (categoryPath: number[]) => Promise<void>;
+    selectSpecies: (speciesId: number) => void;
 }
 interface StatedTaxonomyCategoryState {
 
@@ -334,6 +339,7 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             category={category}
                             path={this.props.path.concat([category.data.id])}
                             odd={!this.props.odd}
+                            selectedSpecies={this.props.selectedSpecies}
                             selectCategory={this.props.selectCategory}
                             expandCategory={this.props.expandCategory}
                             selectSpecies={this.props.selectSpecies}
@@ -344,8 +350,8 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                         <TaxonomySpecies
                             key={"species-"+species.data.id}
                             species={species.data}
-                            selected={species.selected}
-                            onSelect={null}
+                            selected={this.props.selectedSpecies.includes(species.data.id)}
+                            onSelect={this.props.selectSpecies.bind(null, species.data.id)}
                         />
                 )}
             </ul>
