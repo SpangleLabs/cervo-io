@@ -303,6 +303,24 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 }
 
+interface CategorySelectorProps {
+    selectCategory: () => Promise<void>;
+    selected: boolean;
+}
+interface CategorySelectorState {
+
+}
+class CategorySelector extends React.Component<CategorySelectorProps, CategorySelectorState> {
+    render() {
+        if(this.props.selectCategory != null) {
+            return <span className="clickable selector" onClick={this.props.selectCategory}>
+                <TickBox selected={this.props.selected} />
+            </span>
+        }
+        return null;
+    }
+}
+
 interface StatedTaxonomyCategoryProps {
     category: TaxonomyCategoryState;
     path: number[];
@@ -319,18 +337,12 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
     render() {
         const liClassName = `category ${this.props.category.expanded ? "open" : "closed"} ${this.props.category.selected ? "selected" : ""}`;
         const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.props.category.expanded ? "" : "hidden"}`;
-        let categoryCheckbox = null;
-        if(this.props.selectCategory != null) {
-            categoryCheckbox = <span className="clickable selector" onClick={this.props.selectCategory.bind(null, this.props.path)}>
-                <TickBox selected={this.props.category.selected} />
-            </span>
-        }
         return <li className={liClassName}>
             <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.path)}>
                 <span className="category_name">{this.props.category.data.name}</span>
                 <span className="category_level">{this.props.category.categoryLevel}</span>
             </span>
-            {categoryCheckbox}
+            <CategorySelector selectCategory={this.props.selectCategory.bind(null, this.props.path)} selected={this.props.category.selected} />
             <ul className={ulClassName}>
                 {this.props.category.subCategories.map(
                     (category) =>
