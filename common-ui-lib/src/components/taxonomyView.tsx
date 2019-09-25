@@ -2,7 +2,7 @@ import * as React from "react";
 import {ViewProps} from "../views";
 import {AnimalData, CategoryData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
-import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {CategoryLevelJson, NewCategoryJson, NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Spinner} from "./images";
 import {
     create,
@@ -280,6 +280,24 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         console.log("react selectCategory("+categoryPath);
         this.setState({isLoading: true});
         const newTree = await treeToggleSelectCategory(this.state.taxonomy, categoryPath);
+        this.setState({taxonomy: newTree, isLoading: false});
+    }
+
+    async addCategory(categoryParentPath: number[], newCategory: NewCategoryJson) {
+        console.log("Create new category at path: "+categoryParentPath);
+        console.log(newCategory);
+        this.setState({isLoading: true});
+        const category = await this.props.animalData.addCategory(newCategory);
+        const newTree = await treeAddCategory(categoryParentPath, category);
+        this.setState({taxonomy: newTree, isLoading: false});
+    }
+
+    async addSpecies(categoryParentPath: number[], newSpecies: NewSpeciesJson) {
+        console.log("Create new species at path: "+categoryParentPath);
+        console.log(newSpecies);
+        this.setState({isLoading: true});
+        const species = await this.props.animalData.addSpecies(newSpecies);
+        const newTree = await treeAddSpecies(categoryParentPath, species);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
