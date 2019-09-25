@@ -1,6 +1,6 @@
 import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import * as React from "react";
-import {TaxonomyViewComponent} from "@cervoio/common-ui-lib/src/components/taxonomyView";
+import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
 import {AlphabetViewComponent} from "./alphabetView";
 import {SearchViewComponent} from "./searchView";
 
@@ -60,8 +60,8 @@ export class ViewSelectorComponent extends React.Component<ViewProps, ViewSelect
             </div>
             <div id="animals-taxonomic"
                  className={this.state.currentView == ViewsEnum.Taxonomic ? "" : "hidden"}>
-                <TaxonomyViewComponent
-                    selectedSpeciesIds={this.props.selectedSpeciesIds}
+                <StatedTaxonomyView
+                    selectedSpecies={this.props.selectedSpeciesIds}
                     onSelectSpecies={this.props.onSelectSpecies}
                     animalData={this.props.animalData}
                 />

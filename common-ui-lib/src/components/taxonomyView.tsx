@@ -251,7 +251,7 @@ export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelec
 interface StatedTaxonomyViewProps {
     animalData: AnimalData;
     selectedSpecies: number[];
-    onSelectSpecies: (speciesId: number, selected?: boolean) => void
+    onSelectSpecies?: (speciesId: number, selected?: boolean) => void
 }
 interface StatedTaxonomyViewState {
     taxonomy: TaxonomyTreeState
@@ -284,6 +284,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 
     render() {
+        const selectCategory = this.props.onSelectSpecies == null ? null : this.selectCategory.bind(this);
         const baseCategories = this.state.taxonomy.rootCategories.map(
             (category) =>
                 <StatedTaxonomyCategory
@@ -292,7 +293,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     path={[category.data.id]}
                     odd={true}
                     selectedSpecies={this.props.selectedSpecies}
-                    selectCategory={this.selectCategory.bind(this)}
+                    selectCategory={selectCategory}
                     expandCategory={this.expandCategory.bind(this)}
                     selectSpecies={this.props.onSelectSpecies}
                 />);
@@ -327,8 +328,8 @@ interface StatedTaxonomyCategoryProps {
     odd: boolean;
     selectedSpecies: number[];
     expandCategory: (categoryPath: number[]) => Promise<void>;
-    selectCategory: (categoryPath: number[]) => Promise<void>;
-    selectSpecies: (speciesId: number) => void;
+    selectCategory?: (categoryPath: number[]) => Promise<void>;
+    selectSpecies?: (speciesId: number) => void;
 }
 interface StatedTaxonomyCategoryState {
 
@@ -337,12 +338,13 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
     render() {
         const liClassName = `category ${this.props.category.expanded ? "open" : "closed"} ${this.props.category.selected ? "selected" : ""}`;
         const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.props.category.expanded ? "" : "hidden"}`;
+        const selectCategory = this.props.selectCategory == null ? null : this.props.selectCategory.bind(null, this.props.path);
         return <li className={liClassName}>
             <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.path)}>
                 <span className="category_name">{this.props.category.data.name}</span>
                 <span className="category_level">{this.props.category.categoryLevel}</span>
             </span>
-            <CategorySelector selectCategory={this.props.selectCategory.bind(null, this.props.path)} selected={this.props.category.selected} />
+            <CategorySelector selectCategory={selectCategory} selected={this.props.category.selected} />
             <ul className={ulClassName}>
                 {this.props.category.subCategories.map(
                     (category) =>
@@ -363,7 +365,7 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             key={"species-"+species.data.id}
                             species={species.data}
                             selected={this.props.selectedSpecies.includes(species.data.id)}
-                            onSelect={this.props.selectSpecies.bind(null, species.data.id)}
+                            onSelect={this.props.selectSpecies == null ? null : this.props.selectSpecies.bind(null, species.data.id)}
                         />
                 )}
             </ul>
