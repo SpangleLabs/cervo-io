@@ -7,7 +7,7 @@ import {Spinner} from "./images";
 import {
     create,
     TaxonomyCategoryState,
-    TaxonomyTreeState,
+    TaxonomyTreeState, treeAddCategory, treeAddSpecies,
     treeExpandCategory,
     treeToggleSelectCategory
 } from "../taxonomyState";
@@ -288,7 +288,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         console.log(newCategory);
         this.setState({isLoading: true});
         const category = await this.props.animalData.addCategory(newCategory);
-        const newTree = await treeAddCategory(categoryParentPath, category);
+        const newTree = await treeAddCategory(this.state.taxonomy, categoryParentPath, category);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
@@ -297,7 +297,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         console.log(newSpecies);
         this.setState({isLoading: true});
         const species = await this.props.animalData.addSpecies(newSpecies);
-        const newTree = await treeAddSpecies(categoryParentPath, species);
+        const newTree = await treeAddSpecies(this.state.taxonomy, categoryParentPath, species);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 

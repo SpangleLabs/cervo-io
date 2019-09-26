@@ -39,6 +39,20 @@ export async function treeExpandCategory(state: TaxonomyTreeState, categoryIds: 
     }
 }
 
+export async function treeAddCategory(state: TaxonomyTreeState, categoryParentPath: number[], newCategory: CategoryData): Promise<TaxonomyTreeState> {
+    return {
+        categoryLevels: state.categoryLevels,
+        rootCategories: await Promise.all(state.rootCategories.map(x => categoryAddCategory(x, categoryParentPath, newCategory)))
+    }
+}
+
+export async function treeAddSpecies(state: TaxonomyTreeState, categoryParentPath: number[], newSpecies: SpeciesData): Promise<TaxonomyTreeState> {
+    return {
+        categoryLevels: state.categoryLevels,
+        rootCategories: await Promise.all(state.rootCategories.map(x => categoryAddSpecies(x, categoryParentPath, newSpecies)))
+    }
+}
+
 async function categoryToggleSelectCategory(category: TaxonomyCategoryState, categoryIds: number[]): Promise<TaxonomyCategoryState> {
     if(category.data.id != categoryIds[0]) {
         return category;
@@ -71,6 +85,46 @@ async function categoryExpandCategory(category: TaxonomyCategoryState, categoryI
         data: category.data,
         categoryLevel: category.categoryLevel,
         subCategories: await Promise.all(category.subCategories.map(x => categoryExpandCategory(x, categoryIds.slice(1)))),
+        species: category.species,
+        populated: category.populated,
+        expanded: category.expanded,
+        selected: category.selected,
+        onSelectSpecies: category.onSelectSpecies
+    }
+}
+
+async function categoryAddCategory(category: TaxonomyCategoryState, parentCategoryPath: number[], newCategory: CategoryData): Promise<TaxonomyCategoryState> {
+    if(category.data.id != parentCategoryPath[0]) {
+        return category;
+    }
+    if(parentCategoryPath.length == 1) {
+        return addCategory(category, newCategory);
+    }
+    category = await populateCategory(category);
+    return {
+        data: category.data,
+        categoryLevel: category.categoryLevel,
+        subCategories: await Promise.all(category.subCategories.map(x => categoryAddCategory(x, parentCategoryPath.slice(1), newCategory))),
+        species: category.species,
+        populated: category.populated,
+        expanded: category.expanded,
+        selected: category.selected,
+        onSelectSpecies: category.onSelectSpecies
+    }
+}
+
+async function categoryAddSpecies(category: TaxonomyCategoryState, parentCategoryPath: number[], newSpecies: SpeciesData): Promise<TaxonomyCategoryState> {
+    if(category.data.id != parentCategoryPath[0]) {
+        return category;
+    }
+    if(parentCategoryPath.length == 1) {
+        return addSpecies(category, newSpecies);
+    }
+    category = await populateCategory(category);
+    return {
+        data: category.data,
+        categoryLevel: category.categoryLevel,
+        subCategories: await Promise.all(category.subCategories.map(x => categoryAddSpecies(x, parentCategoryPath.slice(1), newSpecies))),
         species: category.species,
         populated: category.populated,
         expanded: category.expanded,
@@ -126,6 +180,48 @@ async function expandCategory(category: TaxonomyCategoryState): Promise<Taxonomy
     }
 }
 
+async function addCategory(parentCategory: TaxonomyCategoryState, newCategory: CategoryData): Promise<TaxonomyCategoryState> {
+    parentCategory = await populateCategory(parentCategory);
+    const subCategories = parentCategory.subCategories.concat([{
+        data: newCategory,
+        categoryLevel: await newCategory.getCategoryName(),
+        subCategories: [],
+        species: [],
+        populated: false,
+        selected: parentCategory.selected,
+        expanded: false,
+        onSelectSpecies: parentCategory.onSelectSpecies
+    }]);
+    return {
+        data: parentCategory.data,
+        categoryLevel: parentCategory.categoryLevel,
+        subCategories: subCategories,
+        species: parentCategory.species,
+        populated: parentCategory.populated,
+        expanded: parentCategory.expanded,
+        selected: parentCategory.selected,
+        onSelectSpecies: parentCategory.onSelectSpecies
+    }
+}
+
+async function addSpecies(parentCategory: TaxonomyCategoryState, newSpecies: SpeciesData): Promise<TaxonomyCategoryState> {
+    parentCategory = await populateCategory(parentCategory);
+    const species = parentCategory.species.concat([{
+        data: newSpecies
+    }]);
+    return {
+        data: parentCategory.data,
+        categoryLevel: parentCategory.categoryLevel,
+        subCategories: parentCategory.subCategories,
+        species: species,
+        populated: parentCategory.populated,
+        expanded: parentCategory.expanded,
+        selected: parentCategory.selected,
+        onSelectSpecies: parentCategory.onSelectSpecies
+    }
+}
+
+
 async function populateCategory(category: TaxonomyCategoryState): Promise<TaxonomyCategoryState> {
     if (category.populated) {
         return category;
@@ -145,8 +241,7 @@ async function populateCategory(category: TaxonomyCategoryState): Promise<Taxono
     }));
     const species = speciesData.map(x => {
         return {
-            data: x,
-            selected: category.selected
+            data: x
         }
     });
     return {
