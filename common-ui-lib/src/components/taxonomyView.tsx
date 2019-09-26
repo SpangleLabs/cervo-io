@@ -44,6 +44,7 @@ class TaxonomySpecies extends React.Component<TaxonomySpeciesProps, TaxonomySpec
     }
 }
 
+
 interface StatedTaxonomyViewProps {
     animalData: AnimalData;
     selectedSpecies: number[];
@@ -122,6 +123,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 }
 
+
 interface CategorySelectorProps {
     selectCategory: () => Promise<void> | null;
     selected: boolean;
@@ -139,6 +141,7 @@ class CategorySelector extends React.Component<CategorySelectorProps, CategorySe
         return null;
     }
 }
+
 
 interface StatedTaxonomyCategoryProps {
     category: TaxonomyCategoryState;
@@ -202,6 +205,7 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
         </li>
     }
 }
+
 
 interface EditTaxonomyFormProps {
     parentCategory: TaxonomyCategoryState;
@@ -286,6 +290,7 @@ class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryF
         </li>
     }
 }
+
 
 interface AddSpeciesFormProps {
     parentCategory: TaxonomyCategoryState;
