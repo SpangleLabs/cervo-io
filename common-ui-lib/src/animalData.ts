@@ -181,6 +181,7 @@ export class CategoryData {
     name: string;
     categoryLevelId: number;
     parentCategoryId: number | null;
+    hidden: boolean;
     _fullDataPromise: Promise<FullCategoryJson> | null;
     subCategories: Promise<CategoryData> | null;
     species: Promise<SpeciesData> | null;
@@ -191,6 +192,7 @@ export class CategoryData {
         this.name = categoryData.name;
         this.categoryLevelId = categoryData.category_level_id;
         this.parentCategoryId = categoryData.parent_category_id;
+        this.hidden = categoryData.hidden;
         this._fullDataPromise = null;
         this.subCategories = null;
         this.species = null;
@@ -239,6 +241,7 @@ export class SpeciesData {
     commonName: string;
     latinName: string;
     parentCategoryId: number;
+    hidden: boolean;
     zooList: Promise<ZooJson[]> | null;
 
     constructor(speciesData: SpeciesJson, animalData: AnimalData) {
@@ -247,6 +250,7 @@ export class SpeciesData {
         this.commonName = speciesData.common_name;
         this.latinName = speciesData.latin_name;
         this.parentCategoryId = speciesData.category_id;
+        this.hidden = speciesData.hidden;
         this.zooList = null;
     }
 

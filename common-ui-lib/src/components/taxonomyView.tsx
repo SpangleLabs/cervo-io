@@ -16,7 +16,8 @@ import {ChangeEvent, FormEvent} from "react";
 interface TaxonomySpeciesProps {
     species: SpeciesData;
     selected?: boolean;
-    onSelect?: () => void
+    onSelect?: () => void;
+    editableTaxonomy: boolean;
 }
 interface TaxonomySpeciesState {
 }
@@ -33,12 +34,13 @@ class TaxonomySpecies extends React.Component<TaxonomySpeciesProps, TaxonomySpec
     render() {
         const liClassName = `species ${this.props.selected ? "selected" : ""}`;
         const spanClassName = this.props.onSelect ? "clickable" : "";
-        const tickbox = this.props.onSelect == null ? null : <TickBox selected={this.props.selected} />;
+        const selectableTaxonomy = this.props.onSelect != null;
         return <li className={liClassName}>
             <span className={spanClassName} onClick={this.onClick}>
                 <span className="species_name">{this.props.species.commonName}</span>
                 <span className="latin_name">{this.props.species.latinName}</span>
-                {tickbox}
+                {this.props.editableTaxonomy && <HiddenStatus hidden={this.props.species.hidden}/>}
+                {selectableTaxonomy && <TickBox selected={this.props.selected} />}
             </span>
         </li>
     }
@@ -168,6 +170,7 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
             <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.path)}>
                 <span className="category_name">{this.props.category.data.name}</span>
                 <span className="category_level">{this.props.category.categoryLevel}</span>
+                {this.props.editableTaxonomy && <HiddenStatus hidden={this.props.category.data.hidden}/>}
             </span>
             <CategorySelector selectCategory={selectCategory} selected={this.props.category.selected} />
             <ul className={ulClassName}>
@@ -199,6 +202,7 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             species={species.data}
                             selected={this.props.selectedSpecies.includes(species.data.id)}
                             onSelect={this.props.selectSpecies == null ? null : this.props.selectSpecies.bind(null, species.data.id)}
+                            editableTaxonomy={this.props.editableTaxonomy}
                         />
                 )}
             </ul>
@@ -342,5 +346,18 @@ class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesForm
                 <input type='submit'/>
             </form>
         </li>
+    }
+}
+
+
+interface HiddenStatusProps {
+    hidden: boolean
+}
+interface HiddenStatusState {
+
+}
+class HiddenStatus extends React.Component<HiddenStatusProps, HiddenStatusState> {
+    render() {
+        return <>{this.props.hidden ? "⛔" : "👁️"}</>
     }
 }
