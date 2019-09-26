@@ -179,11 +179,12 @@ import {AnimalData} from "../../common-ui-lib/src/animalData";
 // }
 
 document.addEventListener("DOMContentLoaded", async function() {
-    const animalData = new AnimalData();
+    const animalData = new AnimalData(getAuthCookie());
     ReactDOM.render(<StatedTaxonomyView
         selectedSpecies={[]}
         onSelectSpecies={null}
         animalData={animalData}
+        editableTaxonomy={true}
     />, document.getElementById('animals-taxonomic'));
 
     // await updateLoginStatus();
