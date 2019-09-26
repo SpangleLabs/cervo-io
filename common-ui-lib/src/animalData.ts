@@ -1,12 +1,12 @@
 /**
  * Store data about known species
  */
-import {promiseGet} from "./utilities";
+import {promiseGet, promisePost} from "./utilities";
 import {
     CategoryJson,
     CategoryLevelJson,
     FullCategoryJson,
-    FullSpeciesJson, FullZooJson,
+    FullSpeciesJson, FullZooJson, NewCategoryJson, NewSpeciesJson,
     SpeciesJson, ZooDistanceCache, ZooDistanceJson,
     ZooJson
 } from "@cervoio/common-lib/src/apiInterfaces";
@@ -38,6 +38,14 @@ export class AnimalData {
             authHeaders = new Map([["authorization", getAuthCookie()]]);
         }
         return promiseGet(path, authHeaders);
+    }
+
+    postPath(path: string, data: any): Promise<any> {
+        let authHeaders = undefined;
+        if(this.token) {
+            authHeaders = new Map([["authorization", getAuthCookie()]]);
+        }
+        return promisePost(path, data, authHeaders);
     }
 
     promiseCategoryLevels() : Promise<CategoryLevelJson[]> {
@@ -145,6 +153,26 @@ export class AnimalData {
         const fullData = await this.getPath(`zoos/${zooId}`);
         this.fullZoos.set(zooId, fullData[0]);
         return fullData[0];
+    }
+
+    async addCategory(newCategory: NewCategoryJson): Promise<CategoryData> {
+        const category: CategoryJson = await this.postPath("categories/", newCategory);
+        const categoryId = category.category_id;
+        if (!this.categories.has(categoryId)) {
+            const categoryData = new CategoryData(category, this);
+            this.categories.set(categoryId, categoryData);
+        }
+        return this.categories.get(categoryId);
+    }
+
+    async addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesData> {
+        const species: SpeciesJson = await this.postPath("species/", newSpecies);
+        const speciesId = species.species_id;
+        if (!this.species.has(speciesId)) {
+            const speciesData = new SpeciesData(species, this);
+            this.species.set(speciesId, speciesData);
+        }
+        return this.species.get(speciesId);
     }
 }
 
