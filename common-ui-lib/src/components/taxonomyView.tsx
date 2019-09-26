@@ -11,6 +11,7 @@ import {
     treeExpandCategory,
     treeToggleSelectCategory
 } from "../taxonomyState";
+import {ChangeEvent, FormEvent} from "react";
 
 
 interface NonSelectableTaxonomyViewProps {
@@ -251,7 +252,8 @@ export class NonSelectableTaxonomyViewComponent extends React.Component<NonSelec
 interface StatedTaxonomyViewProps {
     animalData: AnimalData;
     selectedSpecies: number[];
-    onSelectSpecies?: (speciesId: number, selected?: boolean) => void
+    onSelectSpecies?: (speciesId: number, selected?: boolean) => void;
+    editableTaxonomy?: boolean
 }
 interface StatedTaxonomyViewState {
     taxonomy: TaxonomyTreeState
@@ -283,7 +285,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
-    async addCategory(categoryParentPath: number[], newCategory: NewCategoryJson) {
+    async addCategory(categoryParentPath: number[], newCategory: NewCategoryJson): Promise<void> {
         console.log("Create new category at path: "+categoryParentPath);
         console.log(newCategory);
         this.setState({isLoading: true});
@@ -292,7 +294,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
-    async addSpecies(categoryParentPath: number[], newSpecies: NewSpeciesJson) {
+    async addSpecies(categoryParentPath: number[], newSpecies: NewSpeciesJson): Promise<void> {
         console.log("Create new species at path: "+categoryParentPath);
         console.log(newSpecies);
         this.setState({isLoading: true});
@@ -302,7 +304,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 
     render() {
-        const selectCategory = this.props.onSelectSpecies == null ? null : this.selectCategory.bind(this);
+        const selectableTaxonomy = this.props.onSelectSpecies != null;
         const baseCategories = this.state.taxonomy.rootCategories.map(
             (category) =>
                 <StatedTaxonomyCategory
@@ -311,9 +313,12 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     path={[category.data.id]}
                     odd={true}
                     selectedSpecies={this.props.selectedSpecies}
-                    selectCategory={selectCategory}
                     expandCategory={this.expandCategory.bind(this)}
-                    selectSpecies={this.props.onSelectSpecies}
+                    selectCategory={selectableTaxonomy && this.selectCategory.bind(this)}
+                    selectSpecies={selectableTaxonomy && this.props.onSelectSpecies}
+                    editableTaxonomy={this.props.editableTaxonomy}
+                    addCategory={this.props.editableTaxonomy && this.addCategory.bind(this)}
+                    addSpecies={this.props.editableTaxonomy && this.addSpecies.bind(this)}
                 />);
         return <ul className="odd">
             {baseCategories}
@@ -346,8 +351,11 @@ interface StatedTaxonomyCategoryProps {
     odd: boolean;
     selectedSpecies: number[];
     expandCategory: (categoryPath: number[]) => Promise<void>;
-    selectCategory?: (categoryPath: number[]) => Promise<void>;
-    selectSpecies?: (speciesId: number) => void;
+    selectCategory: (categoryPath: number[]) => Promise<void> | null;
+    selectSpecies: (speciesId: number) => void | null;
+    editableTaxonomy: boolean;
+    addCategory: (categoryParentPath: number[], newCategory: NewCategoryJson) => Promise<void> | null;
+    addSpecies: (categoryParentPath: number[], newSpecies: NewSpeciesJson) => Promise<void> | null;
 }
 interface StatedTaxonomyCategoryState {
 
@@ -372,9 +380,12 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             path={this.props.path.concat([category.data.id])}
                             odd={!this.props.odd}
                             selectedSpecies={this.props.selectedSpecies}
-                            selectCategory={this.props.selectCategory}
                             expandCategory={this.props.expandCategory}
+                            selectCategory={this.props.selectCategory}
                             selectSpecies={this.props.selectSpecies}
+                            editableTaxonomy={this.props.editableTaxonomy}
+                            addCategory={this.props.addCategory}
+                            addSpecies={this.props.addSpecies}
                         />
                 )}
                 {this.props.category.species.map(
@@ -386,10 +397,149 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             onSelect={this.props.selectSpecies == null ? null : this.props.selectSpecies.bind(null, species.data.id)}
                         />
                 )}
+                {this.props.editableTaxonomy && <EditTaxonomyForm
+                    parentCategory={this.props.category}
+                    addCategory={this.props.addCategory.bind(null, this.props.path)}
+                    addSpecies={this.props.addSpecies.bind(null, this.props.path)}
+                />}
             </ul>
         </li>
     }
 }
+
+interface EditTaxonomyFormProps {
+    parentCategory: TaxonomyCategoryState;
+    addCategory: (newCategory: NewCategoryJson) => Promise<void>;
+    addSpecies: (newSpecies: NewSpeciesJson) => Promise<void>;
+}
+interface EditTaxonomyFormState {
+
+}
+class EditTaxonomyForm extends React.Component<EditTaxonomyFormProps, EditTaxonomyFormState> {
+    render() {
+        if(this.props.parentCategory.data.categoryLevelId == 1) {
+            return <AddSpeciesForm
+                parentCategory={this.props.parentCategory}
+                addSpecies={this.props.addSpecies}
+            />
+        } else {
+            return <AddCategoryForm
+                parentCategory={this.props.parentCategory}
+                addCategory={this.props.addCategory}
+            />
+        }
+    }
+}
+
+interface AddCategoryFormProps {
+    parentCategory: TaxonomyCategoryState;
+    addCategory: (newCategory: NewCategoryJson) => Promise<void>;
+}
+interface AddCategoryFormState {
+    name: string;
+    categoryLevel: number;
+    hidden: boolean;
+}
+class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryFormState> {
+    constructor(props: AddCategoryFormProps) {
+        super(props);
+        this.state = {name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false}
+    }
+
+    onChangeName(event: ChangeEvent<HTMLInputElement>) {
+        this.setState({name: event.target.value});
+    }
+
+    onChangeCategoryLevel(event: ChangeEvent<HTMLSelectElement>) {
+        this.setState({categoryLevel: Number(event.target.value)});
+    }
+
+    onChangeHidden(event: ChangeEvent<HTMLInputElement>) {
+        this.setState({hidden: event.target.checked})
+    }
+
+    async onSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const newCategory: NewCategoryJson = {
+            name: this.state.name,
+            category_level_id: this.state.categoryLevel,
+            parent_category_id: this.props.parentCategory.data.id,
+            hidden: this.state.hidden
+        };
+        await this.props.addCategory(newCategory);
+        this.setState({name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false});
+    }
+
+    async render() {
+        const categoryLevels = await this.props.parentCategory.data.animalData.promiseCategoryLevels();
+        return <li className='category add'>
+            <span>Add category </span>
+            <form onSubmit={this.onSubmit.bind(this)}>
+                <input type='text' placeholder="name" value={this.state.name} onChange={this.onChangeName.bind(this)}/>
+                <select value={this.state.categoryLevel} onChange={this.onChangeCategoryLevel.bind(this)}>
+                    {categoryLevels.map(x => <option value={x.category_level_id}>{x.name}</option>)}
+                </select>
+                <input type='submit'/>
+                <label>Hidden?<input type='checkbox' checked={this.state.hidden} onChange={this.onChangeHidden.bind(this)} /></label>
+            </form>
+        </li>
+    }
+}
+
+interface AddSpeciesFormProps {
+    parentCategory: TaxonomyCategoryState;
+    addSpecies: (newSpecies: NewSpeciesJson) => Promise<void>;
+}
+interface AddSpeciesFormState {
+    commonName: string;
+    latinName: string;
+    hidden: boolean;
+}
+class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesFormState> {
+    constructor(props: AddSpeciesFormProps) {
+        super(props);
+        this.state = {commonName: "", latinName: "", hidden: false}
+    }
+
+    onChangeCommonName(event: ChangeEvent<HTMLInputElement>) {
+        this.setState({commonName: event.target.value});
+    }
+
+    onChangeLatinName(event: ChangeEvent<HTMLInputElement>) {
+        this.setState({latinName: event.target.value});
+    }
+
+    onChangeHidden(event: ChangeEvent<HTMLInputElement>) {
+        this.setState({hidden: event.target.checked});
+    }
+
+    async onSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const newSpecies: NewSpeciesJson = {
+            common_name: this.state.commonName,
+            latin_name: this.state.latinName,
+            category_id: this.props.parentCategory.data.id,
+            hidden: this.state.hidden
+        };
+        const self = this;
+        await this.props.addSpecies(newSpecies);
+        self.setState({commonName: "", latinName: "", hidden: false});
+    }
+
+    render() {
+        return <li className='species add'>
+            <span>Add species </span>
+            <form onSubmit={this.onSubmit.bind(this)}>
+                <input type='text' placeholder='Common name' value={this.state.commonName} onChange={this.onChangeCommonName.bind(this)} />
+                <input type='text' placeholder='latin name' value={this.state.latinName} onChange={this.onChangeLatinName.bind(this)} />
+                <label>Hidden?<input type='checkbox' checked={this.state.hidden} onChange={this.onChangeHidden.bind(this)} /></label>
+                <input type='submit'/>
+            </form>
+        </li>
+    }
+}
+
+
 
 //
 // class SelectableTaxonomySpecies extends React.Component<SpeciesProps, SpeciesState> {
