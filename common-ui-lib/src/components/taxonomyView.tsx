@@ -314,11 +314,11 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     odd={true}
                     selectedSpecies={this.props.selectedSpecies}
                     expandCategory={this.expandCategory.bind(this)}
-                    selectCategory={selectableTaxonomy && this.selectCategory.bind(this)}
-                    selectSpecies={selectableTaxonomy && this.props.onSelectSpecies}
+                    selectCategory={selectableTaxonomy ? this.selectCategory.bind(this) : null}
+                    selectSpecies={selectableTaxonomy ? this.props.onSelectSpecies : null}
                     editableTaxonomy={this.props.editableTaxonomy}
-                    addCategory={this.props.editableTaxonomy && this.addCategory.bind(this)}
-                    addSpecies={this.props.editableTaxonomy && this.addSpecies.bind(this)}
+                    addCategory={this.props.editableTaxonomy ? this.addCategory.bind(this) : null}
+                    addSpecies={this.props.editableTaxonomy ? this.addSpecies.bind(this) : null}
                 />);
         return <ul className="odd">
             {baseCategories}
@@ -328,7 +328,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
 }
 
 interface CategorySelectorProps {
-    selectCategory: () => Promise<void>;
+    selectCategory: () => Promise<void> | null;
     selected: boolean;
 }
 interface CategorySelectorState {
@@ -364,7 +364,8 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
     render() {
         const liClassName = `category ${this.props.category.expanded ? "open" : "closed"} ${this.props.category.selected ? "selected" : ""}`;
         const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.props.category.expanded ? "" : "hidden"}`;
-        const selectCategory = this.props.selectCategory == null ? null : this.props.selectCategory.bind(null, this.props.path);
+        const selectableTaxonomy = !!this.props.selectSpecies;
+        const selectCategory = selectableTaxonomy ? this.props.selectCategory.bind(null, this.props.path) : null;
         return <li className={liClassName}>
             <span className="clickable" onClick={this.props.expandCategory.bind(null, this.props.path)}>
                 <span className="category_name">{this.props.category.data.name}</span>
@@ -381,11 +382,11 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             odd={!this.props.odd}
                             selectedSpecies={this.props.selectedSpecies}
                             expandCategory={this.props.expandCategory}
-                            selectCategory={this.props.selectCategory}
-                            selectSpecies={this.props.selectSpecies}
+                            selectCategory={selectableTaxonomy ? this.props.selectCategory : null}
+                            selectSpecies={selectableTaxonomy ? this.props.selectSpecies : null}
                             editableTaxonomy={this.props.editableTaxonomy}
-                            addCategory={this.props.addCategory}
-                            addSpecies={this.props.addSpecies}
+                            addCategory={this.props.editableTaxonomy ? this.props.addCategory : null}
+                            addSpecies={this.props.editableTaxonomy ? this.props.addSpecies : null}
                         />
                 )}
                 {this.props.category.species.map(
@@ -439,11 +440,17 @@ interface AddCategoryFormState {
     name: string;
     categoryLevel: number;
     hidden: boolean;
+    categoryLevels: CategoryLevelJson[];
 }
 class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryFormState> {
     constructor(props: AddCategoryFormProps) {
         super(props);
-        this.state = {name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false}
+        this.state = {name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false, categoryLevels: []}
+    }
+
+    async componentDidMount() {
+        const categoryLevels = await this.props.parentCategory.data.animalData.promiseCategoryLevels();
+        this.setState({categoryLevels: categoryLevels});
     }
 
     onChangeName(event: ChangeEvent<HTMLInputElement>) {
@@ -470,14 +477,13 @@ class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryF
         this.setState({name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false});
     }
 
-    async render() {
-        const categoryLevels = await this.props.parentCategory.data.animalData.promiseCategoryLevels();
+    render() {
         return <li className='category add'>
             <span>Add category </span>
             <form onSubmit={this.onSubmit.bind(this)}>
                 <input type='text' placeholder="name" value={this.state.name} onChange={this.onChangeName.bind(this)}/>
                 <select value={this.state.categoryLevel} onChange={this.onChangeCategoryLevel.bind(this)}>
-                    {categoryLevels.map(x => <option value={x.category_level_id}>{x.name}</option>)}
+                    {this.state.categoryLevels.map(x => <option value={x.category_level_id}>{x.name}</option>)}
                 </select>
                 <input type='submit'/>
                 <label>Hidden?<input type='checkbox' checked={this.state.hidden} onChange={this.onChangeHidden.bind(this)} /></label>
