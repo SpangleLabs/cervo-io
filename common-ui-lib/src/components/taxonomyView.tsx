@@ -373,6 +373,11 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
             </span>
             <CategorySelector selectCategory={selectCategory} selected={this.props.category.selected} />
             <ul className={ulClassName}>
+                {this.props.editableTaxonomy && <EditTaxonomyForm
+                    parentCategory={this.props.category}
+                    addCategory={this.props.addCategory.bind(null, this.props.path)}
+                    addSpecies={this.props.addSpecies.bind(null, this.props.path)}
+                />}
                 {this.props.category.subCategories.map(
                     (category) =>
                         <StatedTaxonomyCategory
@@ -398,11 +403,6 @@ class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps
                             onSelect={this.props.selectSpecies == null ? null : this.props.selectSpecies.bind(null, species.data.id)}
                         />
                 )}
-                {this.props.editableTaxonomy && <EditTaxonomyForm
-                    parentCategory={this.props.category}
-                    addCategory={this.props.addCategory.bind(null, this.props.path)}
-                    addSpecies={this.props.addSpecies.bind(null, this.props.path)}
-                />}
             </ul>
         </li>
     }
