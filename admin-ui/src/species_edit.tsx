@@ -1,17 +1,8 @@
-import $ from "jquery";
-import {promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
-import {
-    CategoryJson,
-    CategoryLevelJson, FullCategoryJson,
-    NewCategoryJson,
-    NewSpeciesJson,
-    SpeciesJson
-} from "@cervoio/common-lib/src/apiInterfaces";
-import {getAuthCookie, updateLoginStatus} from "./lib/authCheck";
+import {getAuthCookie} from "./lib/authCheck";
 import * as ReactDOM from "react-dom";
 import * as React from "react";
-import {StatedTaxonomyView, TaxonomyViewComponent} from "@cervoio/common-ui-lib/src/components/taxonomyView";
-import {AnimalData} from "../../common-ui-lib/src/animalData";
+import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
+import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 
 // let categoryLevelCache: CategoryLevelJson[] = [];
 // function getCategoryLevels() {
