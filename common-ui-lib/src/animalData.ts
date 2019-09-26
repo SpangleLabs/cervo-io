@@ -10,7 +10,6 @@ import {
     SpeciesJson, ZooDistanceCache, ZooDistanceJson,
     ZooJson
 } from "@cervoio/common-lib/src/apiInterfaces";
-import {getAuthCookie} from "../../admin-ui/src/lib/authCheck";
 
 
 export class AnimalData {
@@ -35,7 +34,7 @@ export class AnimalData {
     getPath(path: string): Promise<any> {
         let authHeaders = undefined;
         if(this.token) {
-            authHeaders = new Map([["authorization", getAuthCookie()]]);
+            authHeaders = new Map([["authorization", this.token]]);
         }
         return promiseGet(path, authHeaders);
     }
@@ -43,7 +42,7 @@ export class AnimalData {
     postPath(path: string, data: any): Promise<any> {
         let authHeaders = undefined;
         if(this.token) {
-            authHeaders = new Map([["authorization", getAuthCookie()]]);
+            authHeaders = new Map([["authorization", this.token]]);
         }
         return promisePost(path, data, authHeaders);
     }
