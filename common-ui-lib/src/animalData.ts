@@ -23,6 +23,7 @@ export class AnimalData {
     cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
     fullZoos: Map<number, FullZooJson>;
     private _listZoos: ZooJson[] = null;
+    private _listedSpecies: boolean = false;
 
     constructor(token?: string) {
         this.token = token;
@@ -170,6 +171,20 @@ export class AnimalData {
         const listZoos = await this.getPath("zoos/");
         this._listZoos = listZoos;
         return listZoos;
+    }
+
+    async listSpecies(): Promise<SpeciesData[]> {
+        if(!this._listedSpecies) {
+            const listSpecies: SpeciesJson[] = await this.getPath("species/");
+            const self = this;
+            listSpecies.forEach(function(species: SpeciesJson) {
+                if(!self.species.has(species.species_id)) {
+                    const newSpecies = new SpeciesData(species, self);
+                    self.species.set(species.species_id, newSpecies);
+                }
+            });
+        }
+        return Array.from(this.species.values());
     }
 
     async addCategory(newCategory: NewCategoryJson): Promise<CategoryData> {

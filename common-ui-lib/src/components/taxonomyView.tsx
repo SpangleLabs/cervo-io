@@ -356,7 +356,7 @@ interface HiddenStatusProps {
 interface HiddenStatusState {
 
 }
-class HiddenStatus extends React.Component<HiddenStatusProps, HiddenStatusState> {
+export class HiddenStatus extends React.Component<HiddenStatusProps, HiddenStatusState> {
     render() {
         return <>{this.props.hidden ? "⛔" : "👁️"}</>
     }
