@@ -192,6 +192,7 @@ async function addCategory(parentCategory: TaxonomyCategoryState, newCategory: C
         expanded: false,
         onSelectSpecies: parentCategory.onSelectSpecies
     }]);
+    subCategories.sort((a, b) => a.data.name.localeCompare(b.data.name));
     return {
         data: parentCategory.data,
         categoryLevel: parentCategory.categoryLevel,
@@ -209,6 +210,7 @@ async function addSpecies(parentCategory: TaxonomyCategoryState, newSpecies: Spe
     const species = parentCategory.species.concat([{
         data: newSpecies
     }]);
+    species.sort((a, b) => a.data.commonName.localeCompare(b.data.commonName));
     return {
         data: parentCategory.data,
         categoryLevel: parentCategory.categoryLevel,
