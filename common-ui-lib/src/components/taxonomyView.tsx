@@ -322,7 +322,9 @@ class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesForm
 
     onChangeCommonName(event: ChangeEvent<HTMLInputElement>) {
         let commonName = event.target.value;
-        commonName = commonName[0].toUpperCase() + commonName.substr(1).toLowerCase();
+        if (commonName.length > 0) {
+            commonName = commonName[0].toUpperCase() + commonName.substr(1).toLowerCase();
+        }
         this.setState({commonName: commonName});
     }
 
@@ -345,7 +347,7 @@ class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesForm
         const self = this;
         await this.props.addSpecies(newSpecies);
         const starterLatinName = this.props.parentCategory.data.name + " ";
-        self.setState({commonName: "", latinName: starterLatinName, hidden: false});
+        self.setState({commonName: "", latinName: starterLatinName, hidden: true});
     }
 
     render() {
