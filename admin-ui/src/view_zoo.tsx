@@ -42,25 +42,25 @@ class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
             category_id: species.parentCategoryId,
             hidden: species.hidden
         };
-        this.setState((state) => {return {zooSpecies: state.zooSpecies.concat([newEntry])}});
+        this.setState((state) => {return {zooSpecies: [newEntry].concat(state.zooSpecies)}});
     }
 
     render() {
         return <>
-                <LoginStatus />
-                Name: {this.props.zoo.name}}<br />
-                Postcode: {this.props.zoo.postcode}<br />
-                Link: <a href={this.props.zoo.link}>{this.props.zoo.link}</a><br />
-                Species list:<br />
-                <ul id="species_list">
-                    {this.state.zooSpecies.map(species => <SpeciesEntry key={species.zoo_species_id} species={species} />)}
-                </ul>
-                <AddZooSpeciesForm
-                    animalData={this.props.animalData}
-                    speciesList={this.state.speciesList}
-                    addSpecies={this.addSpecies.bind(this)}
-                />
-            </>
+            <LoginStatus />
+            Name: {this.props.zoo.name}}<br />
+            Postcode: {this.props.zoo.postcode}<br />
+            Link: <a href={this.props.zoo.link}>{this.props.zoo.link}</a><br />
+            Species list:<br />
+            <AddZooSpeciesForm
+                animalData={this.props.animalData}
+                speciesList={this.state.speciesList}
+                addSpecies={this.addSpecies.bind(this)}
+            />
+            <ul id="species_list">
+                {this.state.zooSpecies.map(species => <SpeciesEntry key={species.zoo_species_id} species={species} />)}
+            </ul>
+        </>
     }
 }
 
@@ -123,15 +123,4 @@ document.addEventListener("DOMContentLoaded", async function() {
     const zooId = Number(searchParams.get("id"));
     const zoo = await animalData.promiseFullZoo(zooId);
     ReactDOM.render(<ZooInfo animalData={animalData} zoo={zoo} />, document.getElementById('zoo-info'));
-
-    //
-    // await updateLoginStatus();
-    // const searchParams = new URLSearchParams(window.location.search);
-    // const zooId = Number(searchParams.get("id"));
-    // await loadZooData(zooId);
-    // await addSpeciesButton(zooId);
-    // $("form#addSpecies").on("submit", function(e) {
-    //     e.preventDefault();
-    //     sendAddSpecies(zooId);
-    // })
 });
