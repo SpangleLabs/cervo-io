@@ -1,8 +1,6 @@
 import {config} from "./config";
 import $ from "jquery";
 
-const spinner: string = `<img class="spinner" src="images/spinner.svg" alt="⏳"/>`;
-
 export function promiseGet(path: string, headers?: Map<string, string>): Promise<any> {
     return promiseRequest("GET", path, null, headers);
 }
@@ -65,22 +63,6 @@ export function arrayEquals<T>(array1: T[], array2: T[]): boolean {
         if (array1[idx] !== array2[idx]) return false;
     }
     return true;
-}
-
-function addSpinner(element: JQuery<Element>): void {
-    element.append(spinner);
-}
-
-function removeSpinner(element: JQuery<Element>): void {
-    element.find("img.spinner").remove();
-}
-
-export function promiseSpinner<T>(element: JQuery<Element>, promise: Promise<T>): Promise<T> {
-    addSpinner(element);
-    return promise.then(function(data: T) {
-        removeSpinner(element);
-        return data;
-    });
 }
 
 export function tickboxImageElem(selected: boolean): JQuery<HTMLElement> {
