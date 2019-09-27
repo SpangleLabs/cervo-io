@@ -248,7 +248,15 @@ interface AddCategoryFormState {
 class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryFormState> {
     constructor(props: AddCategoryFormProps) {
         super(props);
-        this.state = {name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false, categoryLevels: []}
+        this.state = {name: "", categoryLevel: this.defaultCategoryLevel(), hidden: false, categoryLevels: []}
+    }
+
+    defaultCategoryLevel() {
+        let defaultCategoryLevel = this.props.parentCategory.data.categoryLevelId;
+        if (this.props.parentCategory.subCategories.length != 0) {
+            defaultCategoryLevel = this.props.parentCategory.subCategories[0].data.categoryLevelId;
+        }
+        return defaultCategoryLevel;
     }
 
     async componentDidMount() {
@@ -257,7 +265,7 @@ class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryF
     }
 
     onChangeName(event: ChangeEvent<HTMLInputElement>) {
-        this.setState({name: event.target.value});
+        this.setState({name: event.target.value.toLowerCase(), categoryLevel: this.defaultCategoryLevel()});
     }
 
     onChangeCategoryLevel(event: ChangeEvent<HTMLSelectElement>) {
@@ -277,7 +285,7 @@ class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCategoryF
             hidden: this.state.hidden
         };
         await this.props.addCategory(newCategory);
-        this.setState({name: "", categoryLevel: this.props.parentCategory.data.categoryLevelId, hidden: false});
+        this.setState({name: "", categoryLevel: this.defaultCategoryLevel(), hidden: false});
     }
 
     render() {
@@ -308,15 +316,18 @@ interface AddSpeciesFormState {
 class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesFormState> {
     constructor(props: AddSpeciesFormProps) {
         super(props);
-        this.state = {commonName: "", latinName: "", hidden: false}
+        const starterLatinName = this.props.parentCategory.data.name + " ";
+        this.state = {commonName: "", latinName: starterLatinName, hidden: true}
     }
 
     onChangeCommonName(event: ChangeEvent<HTMLInputElement>) {
-        this.setState({commonName: event.target.value});
+        let commonName = event.target.value;
+        commonName = commonName[0].toUpperCase() + commonName.substr(1).toLowerCase();
+        this.setState({commonName: commonName});
     }
 
     onChangeLatinName(event: ChangeEvent<HTMLInputElement>) {
-        this.setState({latinName: event.target.value});
+        this.setState({latinName: event.target.value.toLowerCase()});
     }
 
     onChangeHidden(event: ChangeEvent<HTMLInputElement>) {
@@ -333,7 +344,8 @@ class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesForm
         };
         const self = this;
         await this.props.addSpecies(newSpecies);
-        self.setState({commonName: "", latinName: "", hidden: false});
+        const starterLatinName = this.props.parentCategory.data.name + " ";
+        self.setState({commonName: "", latinName: starterLatinName, hidden: false});
     }
 
     render() {
