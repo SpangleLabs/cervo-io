@@ -48,7 +48,7 @@ class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
     render() {
         return <>
             <LoginStatus />
-            Name: {this.props.zoo.name}}<br />
+            Name: {this.props.zoo.name}<br />
             Postcode: {this.props.zoo.postcode}<br />
             Link: <a href={this.props.zoo.link}>{this.props.zoo.link}</a><br />
             Species list:<br />
