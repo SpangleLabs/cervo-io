@@ -86,3 +86,26 @@ export function promiseSpinner<T>(element: JQuery<Element>, promise: Promise<T>)
 export function tickboxImageElem(selected: boolean): JQuery<HTMLElement> {
     return $(`<img src='images/${selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${selected ? "✔" : "➕"}'/>`);
 }
+
+export function toggleSelectionMembership<T>(selection: T[], element: T, selected?: boolean): T[] {
+    if(selected == null) {
+        // Toggle species
+        if(selection.includes(element)) {
+            return selection.filter((id) => element != id)
+        } else {
+            return selection.concat(element)
+        }
+    } else if(selected) {
+        // Add species
+        if(!selection.includes(element)) {
+            return selection.concat(element)
+        }
+        return selection;
+    } else {
+        // Remove species
+        if(selection.includes(element)) {
+            return selection.filter((id) => element != id)
+        }
+        return selection;
+    }
+}

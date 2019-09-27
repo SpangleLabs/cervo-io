@@ -6,6 +6,7 @@ import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
+import {toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 
 interface MainState {
     animalData: AnimalData;
@@ -40,48 +41,11 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async onSelectSpecies(speciesId: number, selected?: boolean) {
-        if(selected == undefined) {
-            // Toggle species
-            if(this.containsSpecies(speciesId)) {
-                this.setState(
-                    (state) => {
-                        const selectedSpeciesIds = state.selectedSpeciesIds.filter((id) => speciesId != id);
-                        this.updateSelectedZoos(selectedSpeciesIds);
-                        return {selectedSpeciesIds: selectedSpeciesIds}
-                    });
-            } else {
-                this.setState(
-                    (state) => {
-                        const selectedSpeciesIds = state.selectedSpeciesIds.concat(speciesId);
-                        this.updateSelectedZoos(selectedSpeciesIds);
-                        return {selectedSpeciesIds: selectedSpeciesIds}
-                    });
-            }
-        } else if(selected) {
-            // Add species
-            if(!this.containsSpecies(speciesId)) {
-                this.setState(
-                    (state) => {
-                        const selectedSpeciesIds = state.selectedSpeciesIds.concat(speciesId);
-                        this.updateSelectedZoos(selectedSpeciesIds);
-                        return {selectedSpeciesIds: selectedSpeciesIds}
-                    });
-            }
-        } else {
-            // Remove species
-            if(this.containsSpecies(speciesId)) {
-                this.setState(
-                    (state) => {
-                        const selectedSpeciesIds = state.selectedSpeciesIds.filter((id) => speciesId != id);
-                        this.updateSelectedZoos(selectedSpeciesIds);
-                        return {selectedSpeciesIds: selectedSpeciesIds}
-                    });
-            }
-        }
-    }
-
-    containsSpecies(speciesId: number): boolean {
-        return this.state.selectedSpeciesIds.includes(speciesId);
+        this.setState((state) => {
+            const newSelection = toggleSelectionMembership(state.selectedSpeciesIds, speciesId, selected);
+            this.updateSelectedZoos(newSelection);
+            return {selectedSpeciesIds: newSelection}
+        });
     }
 
     async onPostcodeUpdate(e: React.FormEvent<HTMLInputElement>) {
