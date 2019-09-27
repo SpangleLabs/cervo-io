@@ -1,14 +1,14 @@
 /**
  * Store data about known species
  */
-import {promiseGet, promisePost} from "./utilities";
+import {promiseDelete, promiseGet, promisePost} from "./utilities";
 import {
     CategoryJson,
     CategoryLevelJson,
     FullCategoryJson,
-    FullSpeciesJson, FullZooJson, NewCategoryJson, NewSpeciesJson,
+    FullSpeciesJson, FullZooJson, NewCategoryJson, NewSpeciesJson, NewZooSpeciesLinkJson,
     SpeciesJson, ZooDistanceCache, ZooDistanceJson,
-    ZooJson
+    ZooJson, ZooSpeciesLinkJson
 } from "@cervoio/common-lib/src/apiInterfaces";
 
 
@@ -22,6 +22,7 @@ export class AnimalData {
     speciesByLetter: Map<string, Promise<SpeciesData[]>>;
     cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
     fullZoos: Map<number, FullZooJson>;
+    private _listZoos: ZooJson[] = null;
 
     constructor(token?: string) {
         this.token = token;
@@ -45,6 +46,14 @@ export class AnimalData {
             authHeaders = new Map([["authorization", this.token]]);
         }
         return promisePost(path, data, authHeaders);
+    }
+
+    deletePath(path: string, data: any): Promise<any> {
+        let authHeaders = undefined;
+        if(this.token) {
+            authHeaders = new Map([["authorization", this.token]]);
+        }
+        return promiseDelete(path, data, authHeaders);
     }
 
     promiseCategoryLevels() : Promise<CategoryLevelJson[]> {
@@ -154,6 +163,15 @@ export class AnimalData {
         return fullData[0];
     }
 
+    async listZoos(): Promise<ZooJson[]> {
+        if(this._listZoos) {
+            return this._listZoos;
+        }
+        const listZoos = await this.getPath("zoos/");
+        this._listZoos = listZoos;
+        return listZoos;
+    }
+
     async addCategory(newCategory: NewCategoryJson): Promise<CategoryData> {
         const category: CategoryJson = await this.postPath("categories/", newCategory);
         const categoryId = category.category_id;
@@ -172,6 +190,22 @@ export class AnimalData {
             this.species.set(speciesId, speciesData);
         }
         return this.species.get(speciesId);
+    }
+
+    async addZooSpeciesLink(zooId: number, speciesId: number): Promise<ZooSpeciesLinkJson> {
+        const zooSpecies: NewZooSpeciesLinkJson = {
+            zoo_id: zooId,
+            species_id: speciesId
+        };
+        return await this.postPath("zoo_species/", zooSpecies);
+    }
+
+    async deleteZooSpeciesLink(zooId: number, speciesId: number): Promise<void> {
+        const zooSpecies: NewZooSpeciesLinkJson = {
+            zoo_id: zooId,
+            species_id: speciesId
+        };
+        await this.deletePath("zoo_species/", zooSpecies);
     }
 }
 
