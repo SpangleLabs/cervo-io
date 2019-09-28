@@ -52,6 +52,7 @@ interface StatedTaxonomyViewProps {
     selectedSpecies: number[];
     onSelectSpecies?: (speciesId: number, selected?: boolean) => void;
     editableTaxonomy?: boolean
+    newSpeciesCreated?: (speciesId: number) => Promise<void>;
 }
 interface StatedTaxonomyViewState {
     taxonomy: TaxonomyTreeState
@@ -70,22 +71,18 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 
     async expandCategory(categoryPath: number[]) {
-        console.log("react expandCategory("+categoryPath);
         this.setState({isLoading: true});
         const newTree = await treeExpandCategory(this.state.taxonomy, categoryPath);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
     async selectCategory(categoryPath: number[]) {
-        console.log("react selectCategory("+categoryPath);
         this.setState({isLoading: true});
         const newTree = await treeToggleSelectCategory(this.state.taxonomy, categoryPath);
         this.setState({taxonomy: newTree, isLoading: false});
     }
 
     async addCategory(categoryParentPath: number[], newCategory: NewCategoryJson): Promise<void> {
-        console.log("Create new category at path: "+categoryParentPath);
-        console.log(newCategory);
         this.setState({isLoading: true});
         const category = await this.props.animalData.addCategory(newCategory);
         const newTree = await treeAddCategory(this.state.taxonomy, categoryParentPath, category);
@@ -93,10 +90,9 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 
     async addSpecies(categoryParentPath: number[], newSpecies: NewSpeciesJson): Promise<void> {
-        console.log("Create new species at path: "+categoryParentPath);
-        console.log(newSpecies);
         this.setState({isLoading: true});
         const species = await this.props.animalData.addSpecies(newSpecies);
+        await this.props.newSpeciesCreated(species.id);
         const newTree = await treeAddSpecies(this.state.taxonomy, categoryParentPath, species);
         this.setState({taxonomy: newTree, isLoading: false});
     }
