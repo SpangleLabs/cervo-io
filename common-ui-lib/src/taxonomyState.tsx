@@ -187,9 +187,9 @@ async function addCategory(parentCategory: TaxonomyCategoryState, newCategory: C
         categoryLevel: await newCategory.getCategoryName(),
         subCategories: [],
         species: [],
-        populated: false,
+        populated: true,
         selected: parentCategory.selected,
-        expanded: false,
+        expanded: true,
         onSelectSpecies: parentCategory.onSelectSpecies
     }]);
     subCategories.sort((a, b) => a.data.name.localeCompare(b.data.name));
