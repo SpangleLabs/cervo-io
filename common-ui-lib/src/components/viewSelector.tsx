@@ -1,6 +1,6 @@
-import {ViewProps} from "@cervoio/common-ui-lib/src/views";
+import {ViewProps} from "../views";
 import * as React from "react";
-import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
+import {StatedTaxonomyView} from "./taxonomyView";
 import {AlphabetViewComponent} from "./alphabetView";
 import {SearchViewComponent} from "./searchView";
 
