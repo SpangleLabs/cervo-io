@@ -3,7 +3,16 @@ import * as React from "react";
 import {StatedTaxonomyView} from "./taxonomyView";
 import {AlphabetViewComponent} from "./alphabetView";
 import {SearchViewComponent} from "./searchView";
+import {AnimalData} from "../animalData";
 
+
+interface ViewSelectorProps {
+    animalData: AnimalData;
+    selectedSpeciesIds: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
+    editableTaxonomy?: boolean;
+    newSpeciesCreated?: (speciesId: number) => Promise<void>;
+}
 enum ViewsEnum {
     Taxonomic,
     Alphabetical,
@@ -12,8 +21,7 @@ enum ViewsEnum {
 interface ViewSelectorState {
     currentView: ViewsEnum
 }
-
-export class ViewSelectorComponent extends React.Component<ViewProps, ViewSelectorState> {
+export class ViewSelectorComponent extends React.Component<ViewSelectorProps, ViewSelectorState> {
     constructor(props: ViewProps) {
         super(props);
         this.state = {currentView: ViewsEnum.Taxonomic};
@@ -64,6 +72,8 @@ export class ViewSelectorComponent extends React.Component<ViewProps, ViewSelect
                     selectedSpecies={this.props.selectedSpeciesIds}
                     onSelectSpecies={this.props.onSelectSpecies}
                     animalData={this.props.animalData}
+                    editableTaxonomy={this.props.editableTaxonomy}
+                    newSpeciesCreated={this.props.newSpeciesCreated}
                 />
             </div>
             <div id="animals-alphabetic"

@@ -9,6 +9,8 @@ import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {HiddenStatus} from "@cervoio/common-ui-lib/src/components/taxonomyView";
 import * as ReactDOM from "react-dom";
 import {ChangeEvent, FormEvent} from "react";
+import {ViewSelectorComponent} from "../../common-ui-lib/src/components/viewSelector";
+import {toggleSelectionMembership} from "../../common-ui-lib/src/utilities";
 
 
 interface ZooInfoProps {
@@ -17,12 +19,12 @@ interface ZooInfoProps {
 }
 interface ZooInfoState {
     speciesList: SpeciesData[];
-    zooSpecies: SpeciesEntryForZooJson[];
+    zooSpecies: number[];
 }
 class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
     constructor(props: ZooInfoProps) {
         super(props);
-        this.state = {speciesList: [], zooSpecies: this.props.zoo.species};
+        this.state = {speciesList: [], zooSpecies: this.props.zoo.species.map(x => x.species_id)};
     }
 
     async componentDidMount() {
@@ -32,17 +34,28 @@ class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
 
     async addSpecies(speciesId: number): Promise<void> {
         const newLink = await this.props.animalData.addZooSpeciesLink(this.props.zoo.zoo_id, speciesId);
-        const species = this.state.speciesList.filter(x => x.id == speciesId)[0];
-        const newEntry: SpeciesEntryForZooJson = {
-            zoo_species_id: newLink.zoo_species_id,
-            zoo_id: newLink.zoo_id,
-            species_id: newLink.species_id,
-            common_name: species.commonName,
-            latin_name: species.latinName,
-            category_id: species.parentCategoryId,
-            hidden: species.hidden
-        };
-        this.setState((state) => {return {zooSpecies: [newEntry].concat(state.zooSpecies)}});
+        this.setState((state) => {return {zooSpecies: [newLink.species_id].concat(state.zooSpecies)}});
+    }
+
+    toggleSpecies(speciesId: number, selected?: boolean): void {
+        console.log("Toggle " + speciesId + " " + selected);
+        const self = this;
+        this.setState(function(state) {
+            const newSelection = toggleSelectionMembership(state.zooSpecies, speciesId, selected);
+            if(newSelection.includes(speciesId)) {
+                self.props.animalData.addZooSpeciesLink(self.props.zoo.zoo_id, speciesId).then(function() {
+                    self.setState({zooSpecies: newSelection});
+                });
+            } else {
+                self.props.animalData.deleteZooSpeciesLink(self.props.zoo.zoo_id, speciesId).then(function() {
+                    self.setState({zooSpecies: newSelection});
+                });
+            }
+        });
+    }
+
+    async newSpeciesCreated(speciesId: number): Promise<void> {
+        this.toggleSpecies(speciesId, true);
     }
 
     render() {
@@ -52,14 +65,13 @@ class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
             Postcode: {this.props.zoo.postcode}<br />
             Link: <a href={this.props.zoo.link}>{this.props.zoo.link}</a><br />
             Species list:<br />
-            <AddZooSpeciesForm
+            <ViewSelectorComponent
                 animalData={this.props.animalData}
-                speciesList={this.state.speciesList}
-                addSpecies={this.addSpecies.bind(this)}
+                selectedSpeciesIds={this.state.zooSpecies}
+                onSelectSpecies={this.toggleSpecies.bind(this)}
+                editableTaxonomy={true}
+                newSpeciesCreated={this.newSpeciesCreated.bind(this)}
             />
-            <ul id="species_list">
-                {this.state.zooSpecies.map(species => <SpeciesEntry key={species.zoo_species_id} species={species} />)}
-            </ul>
         </>
     }
 }
