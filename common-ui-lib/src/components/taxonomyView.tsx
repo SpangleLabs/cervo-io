@@ -319,7 +319,7 @@ class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpeciesForm
     onChangeCommonName(event: ChangeEvent<HTMLInputElement>) {
         let commonName = event.target.value;
         if (commonName.length > 0) {
-            commonName = commonName[0].toUpperCase() + commonName.substr(1).toLowerCase();
+            commonName = commonName[0].toUpperCase() + commonName.substr(1);
         }
         this.setState({commonName: commonName});
     }
