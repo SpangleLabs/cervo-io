@@ -7,7 +7,6 @@ import * as React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {HiddenStatus} from "@cervoio/common-ui-lib/src/components/taxonomyView";
 import * as ReactDOM from "react-dom";
-import {ChangeEvent, FormEvent} from "react";
 import {ViewSelectorComponent} from "../../common-ui-lib/src/components/viewSelector";
 import {toggleSelectionMembership} from "../../common-ui-lib/src/utilities";
 
@@ -74,7 +73,7 @@ class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
                 editableTaxonomy={true}
                 newSpeciesCreated={this.newSpeciesCreated.bind(this)}
             />
-            <h2>Full species list</h2>
+            <h2>Full species list ({this.state.zooSpecies.length})</h2>
             <ul>
                 {this.state.zooSpecies.map(x => <SpeciesEntry species={x} key={x.id}/>)}
             </ul>
