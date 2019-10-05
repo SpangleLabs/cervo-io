@@ -49,7 +49,7 @@ class SpeciesEditorPage extends React.Component<SpeciesEditorPageProps, SpeciesE
                     onSelectSpecies={null}
                     animalData={this.props.animalData}
                     editableTaxonomy={true}
-                    newSpeciesCreated={this.newSpeciesCreated.bind(this)}
+                    onNewSpeciesCreated={this.newSpeciesCreated.bind(this)}
                 />
             </div>
         </>

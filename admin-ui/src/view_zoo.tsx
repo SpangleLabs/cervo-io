@@ -69,9 +69,11 @@ class ZooInfo extends React.Component<ZooInfoProps, ZooInfoState> {
             <ViewSelectorComponent
                 animalData={this.props.animalData}
                 selectedSpeciesIds={this.state.zooSpecies.map(x => x.id)}
+                selectableSpecies={true}
+                selectableCategories={false}
                 onSelectSpecies={this.toggleSpecies.bind(this)}
                 editableTaxonomy={true}
-                newSpeciesCreated={this.newSpeciesCreated.bind(this)}
+                onNewSpeciesCreated={this.newSpeciesCreated.bind(this)}
             />
             <h2>Full species list ({this.state.zooSpecies.length})</h2>
             <ul>

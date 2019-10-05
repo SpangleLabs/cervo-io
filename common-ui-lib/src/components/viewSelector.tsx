@@ -1,4 +1,3 @@
-import {ViewProps} from "../views";
 import * as React from "react";
 import {StatedTaxonomyView} from "./taxonomyView";
 import {AlphabetViewComponent} from "./alphabetView";
@@ -9,9 +8,11 @@ import {AnimalData} from "../animalData";
 interface ViewSelectorProps {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
+    selectableCategories: boolean;
+    selectableSpecies: boolean;
+    editableTaxonomy: boolean;
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
-    editableTaxonomy?: boolean;
-    newSpeciesCreated?: (speciesId: number) => Promise<void>;
+    onNewSpeciesCreated?: (speciesId: number) => Promise<void>;
 }
 enum ViewsEnum {
     Taxonomic,
@@ -22,7 +23,7 @@ interface ViewSelectorState {
     currentView: ViewsEnum
 }
 export class ViewSelectorComponent extends React.Component<ViewSelectorProps, ViewSelectorState> {
-    constructor(props: ViewProps) {
+    constructor(props: ViewSelectorProps) {
         super(props);
         this.state = {currentView: ViewsEnum.Taxonomic};
     }
@@ -69,11 +70,13 @@ export class ViewSelectorComponent extends React.Component<ViewSelectorProps, Vi
             <div id="animals-taxonomic"
                  className={this.state.currentView == ViewsEnum.Taxonomic ? "" : "hidden"}>
                 <StatedTaxonomyView
-                    selectedSpecies={this.props.selectedSpeciesIds}
-                    onSelectSpecies={this.props.onSelectSpecies}
                     animalData={this.props.animalData}
+                    selectedSpecies={this.props.selectedSpeciesIds}
+                    selectableCategories={this.props.selectableCategories}
+                    selectableSpecies={this.props.selectableSpecies}
+                    onSelectSpecies={this.props.onSelectSpecies}
                     editableTaxonomy={this.props.editableTaxonomy}
-                    newSpeciesCreated={this.props.newSpeciesCreated}
+                    onNewSpeciesCreated={this.props.onNewSpeciesCreated}
                 />
             </div>
             <div id="animals-alphabetic"

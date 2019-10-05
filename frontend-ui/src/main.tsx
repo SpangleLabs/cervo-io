@@ -124,9 +124,12 @@ class MainComponent extends React.Component <{}, MainState> {
                 <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a><br />
                 <h1>Select which species you are interested in</h1>
                 <ViewSelectorComponent
-                    selectedSpeciesIds={this.state.selectedSpeciesIds}
-                    onSelectSpecies={this.onSelectSpecies}
                     animalData={this.state.animalData}
+                    selectedSpeciesIds={this.state.selectedSpeciesIds}
+                    selectableSpecies={true}
+                    selectableCategories={true}
+                    onSelectSpecies={this.onSelectSpecies}
+                    editableTaxonomy={false}
                 />
                 <SelectedSpeciesComponent
                     selectedSpeciesIds={this.state.selectedSpeciesIds}
