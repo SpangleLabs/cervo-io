@@ -98,43 +98,6 @@ class SpeciesEntry extends React.Component<SpeciesEntryProps, SpeciesEntryState>
     }
 }
 
-interface AddZooSpeciesFormProps {
-    animalData: AnimalData;
-    speciesList: SpeciesData[];
-    addSpecies: (speciesId: number) => Promise<void>
-}
-interface AddZooSpeciesFormState {
-    value: number;
-}
-class AddZooSpeciesForm extends React.Component<AddZooSpeciesFormProps, AddZooSpeciesFormState> {
-    constructor(props: AddZooSpeciesFormProps) {
-        super(props);
-        this.state = {value: 0}
-    }
-
-    async onSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        if(this.state.value != 0) {
-            await this.props.addSpecies(this.state.value);
-            this.setState({value: 0});
-        }
-    }
-
-    handleChange(event: ChangeEvent<HTMLSelectElement>) {
-        this.setState({value: Number(event.target.value)});
-    }
-
-    render() {
-        return <form onSubmit={this.onSubmit.bind(this)}>
-            <select onChange={this.handleChange.bind(this)} value={this.state.value}>
-                <option value={0} disabled={true}>Select species</option>
-                {this.props.speciesList.map(x => <option value={x.id}>{x.commonName}</option>)}
-            </select>
-            <input type="submit" disabled={this.state.value == 0} value="Add species to zoo"/>
-        </form>
-    }
-}
-
 document.addEventListener("DOMContentLoaded", async function() {
     const animalData = new AnimalData(getAuthCookie());
     const searchParams = new URLSearchParams(window.location.search);
