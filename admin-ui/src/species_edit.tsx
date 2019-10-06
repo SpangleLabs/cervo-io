@@ -1,11 +1,11 @@
-import {getAuthCookie} from "./lib/authCheck";
 import * as ReactDOM from "react-dom";
 import * as React from "react";
 import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import {LoginStatus} from "./components/loginStatus";
-import {ZooJson} from "../../common-lib/src/apiInterfaces";
+import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {ChangeEvent} from "react";
+import {getAuthCookie} from "@cervoio/common-ui-lib/src/utilities";
 
 interface SpeciesEditorPageProps {
     animalData: AnimalData;

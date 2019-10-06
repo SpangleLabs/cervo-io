@@ -1,5 +1,4 @@
-import {getAuthCookie} from "./lib/authCheck";
-import {toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
+import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
 import * as ReactDOM from "react-dom";
 import * as React from "react";

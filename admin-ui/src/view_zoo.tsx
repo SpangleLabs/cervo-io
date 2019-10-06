@@ -1,14 +1,13 @@
 import {
     FullZooJson
 } from "@cervoio/common-lib/src/apiInterfaces";
-import {getAuthCookie} from "./lib/authCheck";
 import {LoginStatus} from "./components/loginStatus";
 import * as React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {HiddenStatus} from "@cervoio/common-ui-lib/src/components/taxonomyView";
 import * as ReactDOM from "react-dom";
-import {ViewSelectorComponent} from "../../common-ui-lib/src/components/viewSelector";
-import {toggleSelectionMembership} from "../../common-ui-lib/src/utilities";
+import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/viewSelector";
+import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 
 
 interface ZooInfoProps {

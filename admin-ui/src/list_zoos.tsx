@@ -1,6 +1,5 @@
-import {promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
+import {getAuthCookie, promiseGet, promisePost} from "@cervoio/common-ui-lib/src/utilities";
 import {NewZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {getAuthCookie} from "./lib/authCheck";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {LoginStatus} from "./components/loginStatus";

@@ -91,3 +91,7 @@ export function toggleSelectionMembership<T>(selection: T[], element: T, selecte
         return selection;
     }
 }
+
+export function getAuthCookie(): string {
+    return document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+}

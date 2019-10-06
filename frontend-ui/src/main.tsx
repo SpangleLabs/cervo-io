@@ -6,7 +6,7 @@ import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
-import {toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
+import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 
 interface MainState {
     animalData: AnimalData;
@@ -24,7 +24,7 @@ class MainComponent extends React.Component <{}, MainState> {
     constructor(props: {}) {
         super(props);
         this.state = {
-            animalData: new AnimalData(),
+            animalData: new AnimalData(getAuthCookie()),
             selectedSpeciesIds: [],
             selectedZoos: [],
             postcode: "",
