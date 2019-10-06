@@ -159,22 +159,4 @@ class MainComponent extends React.Component <{}, MainState> {
 
 document.addEventListener("DOMContentLoaded", function () {
     ReactDOM.render(<MainComponent />, document.getElementById("main"));
-    // let mapElement = document.getElementById('map');
-    //
-    // GoogleMap.loadGoogleMapsApi().then(function (googleMaps: any) {
-    //     const googleMap = GoogleMap.createMap(googleMaps, mapElement);
-    //     const map = new PageMap(googleMap);
-    //
-    //
-    //     // const animalData: AnimalData = new AnimalData();
-    //     // //const selection = new SelectedSpecies(animalData, map);
-    //     // const newSelection = new SelectionController();
-    //     //
-    //     // new ViewSelector(animalData, newSelection);
-    //     //
-    //     // new SelectedSpecies(newSelection);
-    //
-    //     //$("input#postcode").on("input", () => selection.updateZooDistances());
-    //     //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
-    // });
 });
