@@ -1,9 +1,19 @@
-import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import * as React from "react";
-import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
+import {StatedTaxonomyView} from "./taxonomyView";
 import {AlphabetViewComponent} from "./alphabetView";
 import {SearchViewComponent} from "./searchView";
+import {AnimalData} from "../animalData";
 
+
+interface ViewSelectorProps {
+    animalData: AnimalData;
+    selectedSpeciesIds: number[];
+    selectableCategories: boolean;
+    selectableSpecies: boolean;
+    editableTaxonomy: boolean;
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
+    onNewSpeciesCreated?: (speciesId: number) => Promise<void>;
+}
 enum ViewsEnum {
     Taxonomic,
     Alphabetical,
@@ -12,9 +22,8 @@ enum ViewsEnum {
 interface ViewSelectorState {
     currentView: ViewsEnum
 }
-
-export class ViewSelectorComponent extends React.Component<ViewProps, ViewSelectorState> {
-    constructor(props: ViewProps) {
+export class ViewSelectorComponent extends React.Component<ViewSelectorProps, ViewSelectorState> {
+    constructor(props: ViewSelectorProps) {
         super(props);
         this.state = {currentView: ViewsEnum.Taxonomic};
     }
@@ -61,9 +70,13 @@ export class ViewSelectorComponent extends React.Component<ViewProps, ViewSelect
             <div id="animals-taxonomic"
                  className={this.state.currentView == ViewsEnum.Taxonomic ? "" : "hidden"}>
                 <StatedTaxonomyView
-                    selectedSpecies={this.props.selectedSpeciesIds}
-                    onSelectSpecies={this.props.onSelectSpecies}
                     animalData={this.props.animalData}
+                    selectedSpecies={this.props.selectedSpeciesIds}
+                    selectableCategories={this.props.selectableCategories}
+                    selectableSpecies={this.props.selectableSpecies}
+                    onSelectSpecies={this.props.onSelectSpecies}
+                    editableTaxonomy={this.props.editableTaxonomy}
+                    onNewSpeciesCreated={this.props.onNewSpeciesCreated}
                 />
             </div>
             <div id="animals-alphabetic"

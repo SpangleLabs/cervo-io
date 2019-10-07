@@ -1,12 +1,12 @@
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import * as React from "react";
-import {ViewSelectorComponent} from "./components/viewSelector";
+import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/viewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
-import {toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
+import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 
 interface MainState {
     animalData: AnimalData;
@@ -24,7 +24,7 @@ class MainComponent extends React.Component <{}, MainState> {
     constructor(props: {}) {
         super(props);
         this.state = {
-            animalData: new AnimalData(),
+            animalData: new AnimalData(getAuthCookie()),
             selectedSpeciesIds: [],
             selectedZoos: [],
             postcode: "",
@@ -124,9 +124,12 @@ class MainComponent extends React.Component <{}, MainState> {
                 <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a><br />
                 <h1>Select which species you are interested in</h1>
                 <ViewSelectorComponent
-                    selectedSpeciesIds={this.state.selectedSpeciesIds}
-                    onSelectSpecies={this.onSelectSpecies}
                     animalData={this.state.animalData}
+                    selectedSpeciesIds={this.state.selectedSpeciesIds}
+                    selectableSpecies={true}
+                    selectableCategories={true}
+                    onSelectSpecies={this.onSelectSpecies}
+                    editableTaxonomy={false}
                 />
                 <SelectedSpeciesComponent
                     selectedSpeciesIds={this.state.selectedSpeciesIds}
@@ -156,22 +159,4 @@ class MainComponent extends React.Component <{}, MainState> {
 
 document.addEventListener("DOMContentLoaded", function () {
     ReactDOM.render(<MainComponent />, document.getElementById("main"));
-    // let mapElement = document.getElementById('map');
-    //
-    // GoogleMap.loadGoogleMapsApi().then(function (googleMaps: any) {
-    //     const googleMap = GoogleMap.createMap(googleMaps, mapElement);
-    //     const map = new PageMap(googleMap);
-    //
-    //
-    //     // const animalData: AnimalData = new AnimalData();
-    //     // //const selection = new SelectedSpecies(animalData, map);
-    //     // const newSelection = new SelectionController();
-    //     //
-    //     // new ViewSelector(animalData, newSelection);
-    //     //
-    //     // new SelectedSpecies(newSelection);
-    //
-    //     //$("input#postcode").on("input", () => selection.updateZooDistances());
-    //     //$("#animals-search form").on("submit", () => {selector.getSearchView().updateSearchResults(); return false;})
-    // });
 });

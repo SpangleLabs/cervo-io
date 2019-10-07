@@ -1,6 +1,7 @@
 import {SessionTokenJson} from "../../../common-lib/src/apiInterfaces";
 import * as React from "react";
-import {checkLogin, getAuthCookie} from "../lib/authCheck";
+import {checkLogin} from "../lib/authCheck";
+import {getAuthCookie} from "../../../common-ui-lib/src/utilities";
 
 interface SessionProps {
     session: SessionTokenJson

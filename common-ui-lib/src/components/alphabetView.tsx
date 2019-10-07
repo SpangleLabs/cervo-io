@@ -1,30 +1,13 @@
 import * as React from "react";
-import {ViewProps} from "@cervoio/common-ui-lib/src/views";
-import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
-import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
-import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
-
-interface AlphabetLetterProps {
-    letter: string,
-    odd: boolean,
-    valid: boolean,
-    selected: boolean,
-    onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
-}
-
-interface AlphabetViewState {
-    validLetters: string[];
-    selectedLetter: string;
-    speciesList: SpeciesData[];
-    isLoading: boolean;
-}
+import {AnimalData, SpeciesData} from "../animalData";
+import {TickBox} from "./tickbox";
+import {Spinner} from "./images";
 
 interface AlphabetLetterResultProps {
     species: SpeciesData;
     selectedSpeciesIds: number[];
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
-
 class AlphabetLetterResult extends React.Component<AlphabetLetterResultProps, {}> {
     constructor(props: AlphabetLetterResultProps) {
         super(props);
@@ -47,6 +30,14 @@ class AlphabetLetterResult extends React.Component<AlphabetLetterResultProps, {}
     }
 }
 
+
+interface AlphabetLetterProps {
+    letter: string,
+    odd: boolean,
+    valid: boolean,
+    selected: boolean,
+    onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
+}
 class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
     constructor(props: AlphabetLetterProps) {
         super(props);
@@ -58,8 +49,19 @@ class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
     }
 }
 
-export class AlphabetViewComponent extends React.Component<ViewProps, AlphabetViewState> {
-    constructor(props: ViewProps) {
+interface AlphabetViewProps {
+    animalData: AnimalData;
+    selectedSpeciesIds: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
+}
+interface AlphabetViewState {
+    validLetters: string[];
+    selectedLetter: string;
+    speciesList: SpeciesData[];
+    isLoading: boolean;
+}
+export class AlphabetViewComponent extends React.Component<AlphabetViewProps, AlphabetViewState> {
+    constructor(props: AlphabetViewProps) {
         super(props);
         this.state = {validLetters: [], selectedLetter: "", speciesList: [], isLoading: false};
     }
