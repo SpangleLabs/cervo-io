@@ -91,7 +91,7 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
 
     render() {
         const selectedSpecies = this.props.selectedSpeciesIds.map((speciesId) => {return this.props.animalData.species.get(speciesId)});
-        selectedSpecies.sort(function(a, b) {return a.commonName.localeCompare(b.commonName)});
+        selectedSpecies.sort((a, b) => a.commonName.localeCompare(b.commonName));
         return <><h2>Selected species ({this.props.selectedSpeciesIds.length})</h2>
             <ul>
                 {selectedSpecies.map((species) =>
