@@ -1,7 +1,7 @@
 import $ from "jquery";
 import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {promisePost} from "@cervoio/common-ui-lib/src/utilities";
-import {checkLogin, getAuthCookie} from "./lib/authCheck";
+import {getAuthCookie, promisePost} from "@cervoio/common-ui-lib/src/utilities";
+import {checkLogin} from "./lib/authCheck";
 
 function setAuthCookie(token: string) {
     let d = new Date();
