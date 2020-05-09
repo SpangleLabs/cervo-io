@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "build": "parcel build src/index.html src/faq.html --public-url ./",
+    "serve": "parcel serve src/index.html src/faq.html --public-url ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,18 +27,18 @@
   },
   "homepage": "https://github.com/joshcoales/zoosite#readme",
   "dependencies": {
+    "@cervoio/common-ui-lib": "../common-ui-lib",
     "@react-google-maps/api": "^1.6.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
   },
   "devDependencies": {
     "@cervoio/common-lib": "../common-lib",
-    "@cervoio/common-ui-lib": "../common-ui-lib",
     "@types/googlemaps": "^3.37.6",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
     "awesome-typescript-loader": "^5.2.1",
-    "parcel": "^1.12.3",
+    "parcel": "^1.12.4",
     "source-map-loader": "^0.2.4",
     "tslint": "^5.18.0",
     "tslint-loader": "^3.5.4",
