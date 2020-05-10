@@ -1,5 +1,5 @@
 import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
-import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView";
+import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView/StatedTaxonomyView";
 import * as ReactDOM from "react-dom";
 import * as React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";

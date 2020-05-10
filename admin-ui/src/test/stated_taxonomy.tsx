@@ -1,7 +1,7 @@
 import * as ReactDOM from "react-dom";
 import {
     StatedTaxonomyView
-} from "@cervoio/common-ui-lib/src/components/taxonomyView";
+} from "../common-ui-lib/src/components/taxonomyView/taxonomyView";
 import * as React from "react";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 
