@@ -58,7 +58,7 @@ export class AddCategoryForm extends React.Component<AddCategoryFormProps, AddCa
     }
 
     render() {
-        return <li className='category add'>
+        return <li>
             <span>Add category </span>
             <form onSubmit={this.onSubmit.bind(this)}>
                 <input type='text' placeholder="name" value={this.state.name} onChange={this.onChangeName.bind(this)}/>

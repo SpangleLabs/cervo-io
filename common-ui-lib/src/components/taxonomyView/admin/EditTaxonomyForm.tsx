@@ -1,5 +1,5 @@
 import {TaxonomyCategoryState} from "../../../taxonomyState";
-import {NewCategoryJson, NewSpeciesJson} from "../../../../../common-lib/src/apiInterfaces";
+import {NewCategoryJson, NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 import * as React from "react";
 import {AddCategoryForm} from "./AddCategoryForm";
 import {AddSpeciesForm} from "./AddSpeciesForm";
@@ -9,21 +9,17 @@ interface EditTaxonomyFormProps {
     addCategory: (newCategory: NewCategoryJson) => Promise<void>;
     addSpecies: (newSpecies: NewSpeciesJson) => Promise<void>;
 }
-interface EditTaxonomyFormState {
 
-}
-export class EditTaxonomyForm extends React.Component<EditTaxonomyFormProps, EditTaxonomyFormState> {
-    render() {
-        if(this.props.parentCategory.data.categoryLevelId == 1) {
-            return <AddSpeciesForm
-                parentCategory={this.props.parentCategory}
-                addSpecies={this.props.addSpecies}
-            />
-        } else {
-            return <AddCategoryForm
-                parentCategory={this.props.parentCategory}
-                addCategory={this.props.addCategory}
-            />
-        }
+export const EditTaxonomyForm: React.FunctionComponent<EditTaxonomyFormProps> = (props) => {
+    if(props.parentCategory.data.categoryLevelId == 1) {
+        return <AddSpeciesForm
+            parentCategory={props.parentCategory}
+            addSpecies={props.addSpecies}
+        />
+    } else {
+        return <AddCategoryForm
+            parentCategory={props.parentCategory}
+            addCategory={props.addCategory}
+        />
     }
 }

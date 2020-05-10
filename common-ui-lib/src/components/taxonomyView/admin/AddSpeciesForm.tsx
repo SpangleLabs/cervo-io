@@ -50,7 +50,7 @@ export class AddSpeciesForm extends React.Component<AddSpeciesFormProps, AddSpec
     }
 
     render() {
-        return <li className='species add'>
+        return <li>
             <span>Add species </span>
             <form onSubmit={this.onSubmit.bind(this)}>
                 <input type='text' placeholder='Common name' value={this.state.commonName} onChange={this.onChangeCommonName.bind(this)} />
