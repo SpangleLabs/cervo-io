@@ -76,11 +76,6 @@ ul.zoo_species > li {
     font-style: normal;
 }
 
-/* Styling search term in search results */
-.search_term {
-    font-weight: bold;
-}
-
 /* Postcode entry form styling */
 form {
     display: inline;
