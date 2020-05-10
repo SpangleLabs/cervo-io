@@ -1,0 +1,19 @@
+span.species.selected {
+    background-color: powderblue;
+}
+.clickable {
+    cursor: pointer;
+}
+.latinName {
+    font-style: italic;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+.latinName::before {
+    content: "(";
+    font-style: normal;
+}
+.latinName::after {
+    content: ")";
+    font-style: normal;
+}

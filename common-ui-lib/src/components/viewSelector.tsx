@@ -1,8 +1,8 @@
 import * as React from "react";
-import {StatedTaxonomyView} from "./taxonomyView";
 import {AlphabetViewComponent} from "./alphabetView/AlphabetView";
 import {SearchViewComponent} from "./searchView/SearchView";
 import {AnimalData} from "../animalData";
+import {StatedTaxonomyView} from "./taxonomyView/StatedTaxonomyView";
 
 const coreStyle = require("./style.css")
 
