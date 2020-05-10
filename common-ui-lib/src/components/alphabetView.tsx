@@ -2,6 +2,9 @@ import * as React from "react";
 import {AnimalData, SpeciesData} from "../animalData";
 import {TickBox} from "./tickbox";
 import {Spinner} from "./images";
+import classNames from "classnames";
+
+const style = require("./style.css")
 
 interface AlphabetLetterResultProps {
     species: SpeciesData;
@@ -20,10 +23,10 @@ class AlphabetLetterResult extends React.Component<AlphabetLetterResultProps, {}
 
     render() {
         const selected = this.props.selectedSpeciesIds.includes(this.props.species.id);
-        const className = `species clickable ${selected ? "selected" : ""}`;
+        const className = classNames("species", "clickable", {"selected": selected})
         return <li>
             <span className={className} onClick={this.onClick}>
-                <span className="common_name">{this.props.species.commonName}</span>
+                <span className={style.common_name}>{this.props.species.commonName}</span>
                 <TickBox selected={selected} />
             </span>
         </li>
@@ -44,7 +47,16 @@ class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
     }
 
     render() {
-        const classes = `letter-list ${this.props.odd ? "odd" : "even"} ${this.props.valid? "clickable" : "disabled"} ${this.props.selected ? "selected" : ""}`;
+        const classes = classNames(
+            "letterList",
+            {
+                "odd": this.props.odd,
+                "even": !this.props.odd,
+                "clickable": this.props.valid,
+                "disable": !this.props.valid,
+                "selected": this.props.selected
+            }
+        )
         return <span className={classes} onClick={this.props.onClick}>{this.props.letter}</span>
     }
 }
@@ -102,9 +114,9 @@ export class AlphabetViewComponent extends React.Component<AlphabetViewProps, Al
                     onSelectSpecies={this.props.onSelectSpecies}
                 />);
         return <>
-                <div id="letter-list">{letters}</div>
+                <div id={style.letterList}>{letters}</div>
                 {this.state.isLoading ? <Spinner /> : ""}
-                <ul id="letter-results">{speciesList}</ul>
+                <ul id={style.letterResults}>{speciesList}</ul>
             </>
     }
 }
