@@ -4,6 +4,7 @@ import {AlphabetViewComponent} from "./alphabetView";
 import {SearchViewComponent} from "./searchView";
 import {AnimalData} from "../animalData";
 
+const coreStyle = require("./style.css")
 
 interface ViewSelectorProps {
     animalData: AnimalData;

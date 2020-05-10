@@ -4,7 +4,7 @@ import {TickBox} from "./tickbox";
 import {Spinner} from "./images";
 import classNames from "classnames";
 
-const style = require("./style.css")
+const style = require("./alphabetView.css")
 
 interface AlphabetLetterResultProps {
     species: SpeciesData;
