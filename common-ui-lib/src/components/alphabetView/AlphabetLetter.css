@@ -1,20 +1,22 @@
-
 .letterList {
     font-size: 130%;
     padding: 0 5px;
 }
-.letterList.odd {
+.odd {
     background-color: lightgrey;
 }
-.letterList.even {
+.even {
     background-color: darkgray;
 }
-.letterList.odd.selected {
+.odd.selected {
     background-color: palevioletred;
 }
-.letterList.even.selected {
+.even.selected {
     background-color: indianred;
 }
-.letterList.disabled {
+.disabled {
     color: gray;
+}
+.clickable {
+    cursor: pointer;
 }

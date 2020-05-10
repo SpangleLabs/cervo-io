@@ -1,0 +1,7 @@
+
+.clickable {
+    cursor: pointer;
+}
+span.species.selected {
+    background-color: powderblue;
+}

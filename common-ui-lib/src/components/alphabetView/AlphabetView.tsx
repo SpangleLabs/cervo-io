@@ -1,65 +1,11 @@
 import * as React from "react";
-import {AnimalData, SpeciesData} from "../animalData";
-import {TickBox} from "./tickbox";
-import {Spinner} from "./images";
-import classNames from "classnames";
+import {AnimalData, SpeciesData} from "../../animalData";
+import {Spinner} from "../images";
+import {AlphabetLetterResult} from "./AlphabetLetterResult";
+import {AlphabetLetter} from "./AlphabetLetter";
 
-const style = require("./alphabetView.css")
+const style = require("./AlphabetView.css")
 
-interface AlphabetLetterResultProps {
-    species: SpeciesData;
-    selectedSpeciesIds: number[];
-    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
-}
-class AlphabetLetterResult extends React.Component<AlphabetLetterResultProps, {}> {
-    constructor(props: AlphabetLetterResultProps) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
-    onClick() {
-        this.props.onSelectSpecies(this.props.species.id);
-    }
-
-    render() {
-        const selected = this.props.selectedSpeciesIds.includes(this.props.species.id);
-        const className = classNames("species", "clickable", {"selected": selected})
-        return <li>
-            <span className={className} onClick={this.onClick}>
-                <span className={style.common_name}>{this.props.species.commonName}</span>
-                <TickBox selected={selected} />
-            </span>
-        </li>
-    }
-}
-
-
-interface AlphabetLetterProps {
-    letter: string,
-    odd: boolean,
-    valid: boolean,
-    selected: boolean,
-    onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
-}
-class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
-    constructor(props: AlphabetLetterProps) {
-        super(props);
-    }
-
-    render() {
-        const classes = classNames(
-            "letterList",
-            {
-                "odd": this.props.odd,
-                "even": !this.props.odd,
-                "clickable": this.props.valid,
-                "disable": !this.props.valid,
-                "selected": this.props.selected
-            }
-        )
-        return <span className={classes} onClick={this.props.onClick}>{this.props.letter}</span>
-    }
-}
 
 interface AlphabetViewProps {
     animalData: AnimalData;

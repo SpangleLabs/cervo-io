@@ -1,10 +1,10 @@
 import * as React from "react";
 import {StatedTaxonomyView} from "./taxonomyView";
-import {AlphabetViewComponent} from "./alphabetView";
+import {AlphabetViewComponent} from "./alphabetView/AlphabetView";
 import {SearchViewComponent} from "./searchView";
 import {AnimalData} from "../animalData";
 
-const coreStyle = require("./style.css")
+require("./style.css")
 
 interface ViewSelectorProps {
     animalData: AnimalData;
