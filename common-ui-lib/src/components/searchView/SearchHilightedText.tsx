@@ -9,8 +9,6 @@ interface HilightedTextProps {
 
 export const SearchHilightedText: React.FunctionComponent<HilightedTextProps> = (props) => {
     const searchRegex = new RegExp(props.searchTerm, "gi");
-    props.text.split(searchRegex);
-
     let split = props.text.split(searchRegex);
     let replacements = props.text.match(searchRegex);
     let result = [];
