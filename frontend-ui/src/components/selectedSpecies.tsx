@@ -2,7 +2,7 @@ import * as React from "react";
 import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
-import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
+import {TickBox} from "@cervoio/common-ui-lib/src/components/TickBox";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 interface SelectedSpeciesComponentProps extends ViewProps {

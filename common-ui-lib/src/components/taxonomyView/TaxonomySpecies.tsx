@@ -1,6 +1,6 @@
 import {SpeciesData} from "../../animalData";
 import * as React from "react";
-import {TickBox} from "../tickbox";
+import {TickBox} from "../TickBox";
 import {HiddenStatus} from "./admin/HiddenStatus";
 import classNames from "classnames";
 

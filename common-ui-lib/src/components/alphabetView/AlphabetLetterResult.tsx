@@ -1,7 +1,7 @@
 import {SpeciesData} from "../../animalData";
 import * as React from "react";
 import classNames from "classnames";
-import {TickBox} from "../tickbox";
+import {TickBox} from "../TickBox";
 
 const style = require("./AlphabetLetterResult.css")
 

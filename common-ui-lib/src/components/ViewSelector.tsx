@@ -4,7 +4,7 @@ import {SearchViewComponent} from "./searchView/SearchView";
 import {AnimalData} from "../animalData";
 import {StatedTaxonomyView} from "./taxonomyView/StatedTaxonomyView";
 
-const coreStyle = require("./style.css")
+const styles = require("./ViewSelector.css")
 
 interface ViewSelectorProps {
     animalData: AnimalData;
@@ -69,7 +69,7 @@ export class ViewSelectorComponent extends React.Component<ViewSelectorProps, Vi
                 </label>
             </div>
             <div id="animals-taxonomic"
-                 className={this.state.currentView == ViewsEnum.Taxonomic ? "" : coreStyle.hidden}>
+                 className={this.state.currentView == ViewsEnum.Taxonomic ? "" : styles.hidden}>
                 <StatedTaxonomyView
                     animalData={this.props.animalData}
                     selectedSpecies={this.props.selectedSpeciesIds}
@@ -81,7 +81,7 @@ export class ViewSelectorComponent extends React.Component<ViewSelectorProps, Vi
                 />
             </div>
             <div id="animals-alphabetic"
-                 className={this.state.currentView == ViewsEnum.Alphabetical ? "" : coreStyle.hidden}>
+                 className={this.state.currentView == ViewsEnum.Alphabetical ? "" : styles.hidden}>
                 <AlphabetViewComponent
                     selectedSpeciesIds={this.props.selectedSpeciesIds}
                     onSelectSpecies={this.props.onSelectSpecies}
@@ -89,7 +89,7 @@ export class ViewSelectorComponent extends React.Component<ViewSelectorProps, Vi
                 />
             </div>
             <div id="animals-search"
-                 className={this.state.currentView == ViewsEnum.Search ? "" : coreStyle.hidden}>
+                 className={this.state.currentView == ViewsEnum.Search ? "" : styles.hidden}>
                 <SearchViewComponent
                     selectedSpeciesIds={this.props.selectedSpeciesIds}
                     onSelectSpecies={this.props.onSelectSpecies}

@@ -5,7 +5,7 @@ import * as React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {LoginStatus} from "./components/loginStatus";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {TickBox} from "@cervoio/common-ui-lib/src/components/tickbox";
+import {TickBox} from "@cervoio/common-ui-lib/src/components/TickBox";
 
 
 interface BulkUpdatePageProps {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {TickBox} from "../tickbox";
+import {TickBox} from "../TickBox";
 
 interface CategorySelectorProps {
     selectCategory: () => Promise<void> | null;

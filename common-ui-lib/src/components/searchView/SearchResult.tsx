@@ -1,6 +1,6 @@
 import * as React from "react";
 import {SearchHilightedText} from "./SearchHilightedText";
-import {TickBox} from "../tickbox";
+import {TickBox} from "../TickBox";
 import {SpeciesData} from "../../animalData";
 import classNames from "classnames";
 
