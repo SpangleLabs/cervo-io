@@ -1,6 +1,6 @@
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import * as React from "react";
-import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/viewSelector";
+import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/ViewSelector";
 import {SelectedSpeciesComponent} from "./components/selectedSpecies";
 import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";

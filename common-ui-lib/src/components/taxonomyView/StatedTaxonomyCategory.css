@@ -1,0 +1,29 @@
+.closed:before {
+    content: "📁";
+}
+.open:before {
+    content: "📂";
+}
+.hidden {
+    display:none;
+}
+.clickable {
+    cursor: pointer;
+}
+.categoryLevel {
+    font-style: italic;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+ul.odd > li.selected {
+    background-color: palevioletred;
+}
+ul.even > li.selected {
+    background-color: indianred;
+}
+ul.odd {
+    background-color: lightgrey;
+}
+ul.even {
+    background-color: darkgray;
+}

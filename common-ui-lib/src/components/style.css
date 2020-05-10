@@ -18,40 +18,6 @@ li {
     max-height: 1000000px;
 }
 
-/* Icons for taxonomy category listing */
-#animals-taxonomic li.closed:before {
-    content: "📁";
-}
-#animals-taxonomic li.open:before {
-    content: "📂";
-}
-#animals-taxonomic li.species:before {
-    content: "🦌";
-}
-
-/* Colours for taxonomy category listing */
-#animals-taxonomic ul.odd {
-    background-color: lightgrey;
-}
-#animals-taxonomic ul.even {
-    background-color: darkgray;
-}
-#animals-taxonomic ul.odd > li.selected {
-    background-color: palevioletred;
-}
-#animals-taxonomic ul.even > li.selected {
-    background-color: indianred;
-}
-#animals-taxonomic ul.odd > li.species.selected {
-    background-color: cornflowerblue;
-}
-#animals-taxonomic ul.even > li.species.selected {
-    background-color: royalblue;
-}
-#animals-taxonomic ul.hidden {
-    display: none;
-}
-
 /* Styling zoo species list in zoo map info window */
 ul.zoo_species {
     border-left: none;

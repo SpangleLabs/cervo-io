@@ -12,6 +12,8 @@ import {Spinner} from "../images";
 import {AnimalData} from "../../animalData";
 import {StatedTaxonomyCategory} from "./StatedTaxonomyCategory";
 
+const styles = require("./StatedTaxonomyCategory.css")
+
 interface StatedTaxonomyViewProps {
     animalData: AnimalData;
     selectedSpecies: number[];
@@ -80,7 +82,7 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     onAddCategory={this.props.editableTaxonomy ? this.addCategory.bind(this) : null}
                     onAddSpecies={this.props.editableTaxonomy ? this.addSpecies.bind(this) : null}
                 />);
-        return <ul className="odd">
+        return <ul className={styles.odd}>
             {baseCategories}
             {this.state.isLoading ? <Spinner/> : ""}
         </ul>

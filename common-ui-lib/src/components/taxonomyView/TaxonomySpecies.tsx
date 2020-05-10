@@ -11,6 +11,7 @@ interface TaxonomySpeciesProps {
     selected?: boolean;
     onSelect?: () => void;
     editableTaxonomy: boolean;
+    odd: boolean;
 }
 interface TaxonomySpeciesState {
 }
@@ -28,7 +29,9 @@ export class TaxonomySpecies extends React.Component<TaxonomySpeciesProps, Taxon
         const liClassName = classNames(
             styles.species,
             {
-                [styles.selected]: this.props.selected
+                [styles.selected]: this.props.selected,
+                [styles.odd]: this.props.odd,
+                [styles.even]: !this.props.odd
             }
         )
         const spanClassName = classNames({[styles.clickable]: this.props.onSelect})

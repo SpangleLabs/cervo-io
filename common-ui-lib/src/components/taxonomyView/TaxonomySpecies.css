@@ -17,3 +17,15 @@ span.species.selected {
     content: ")";
     font-style: normal;
 }
+li.species:before {
+    content: "🦌";
+}
+li.species.selected.odd {
+    background-color: cornflowerblue;
+}
+li.species.selected.even {
+    background-color: royalblue;
+}
+ul.hidden {
+    display: none;
+}

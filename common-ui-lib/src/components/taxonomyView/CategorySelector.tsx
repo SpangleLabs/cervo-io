@@ -5,16 +5,12 @@ interface CategorySelectorProps {
     selectCategory: () => Promise<void> | null;
     selected: boolean;
 }
-interface CategorySelectorState {
 
-}
-export class CategorySelector extends React.Component<CategorySelectorProps, CategorySelectorState> {
-    render() {
-        if(this.props.selectCategory != null) {
-            return <span className="clickable selector" onClick={this.props.selectCategory}>
-                <TickBox selected={this.props.selected} />
+export const CategorySelector: React.FunctionComponent<CategorySelectorProps> = (props) => {
+    if (props.selectCategory != null) {
+        return <span className="clickable selector" onClick={props.selectCategory}>
+                <TickBox selected={props.selected}/>
             </span>
-        }
-        return null;
     }
+    return null;
 }

@@ -5,7 +5,9 @@ import {TaxonomyCategoryState} from "../../taxonomyState";
 import {NewCategoryJson, NewSpeciesJson} from "../../../../common-lib/src/apiInterfaces";
 import {CategorySelector} from "./CategorySelector";
 import {EditTaxonomyForm} from "./admin/EditTaxonomyForm";
+import classNames from "classnames";
 
+const styles = require("./StatedTaxonomyCategory.css")
 
 interface StatedTaxonomyCategoryProps {
     category: TaxonomyCategoryState;
@@ -24,15 +26,28 @@ interface StatedTaxonomyCategoryState {
 }
 export class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps, StatedTaxonomyCategoryState> {
     render() {
-        const liClassName = `category ${this.props.category.expanded ? "open" : "closed"} ${this.props.category.selected ? "selected" : ""}`;
-        const ulClassName = `${this.props.odd ? "even" : "odd"} ${this.props.category.expanded ? "" : "hidden"}`;
+        const liClassName = classNames(
+            styles.category,
+            {
+                [styles.open]: this.props.category.expanded,
+                [styles.closed]: !this.props.category.expanded,
+                [styles.selected]: this.props.category.selected
+            }
+        )
+        const ulClassName = classNames(
+            {
+                [styles.even]: this.props.odd,
+                [styles.odd]: !this.props.odd,
+                [styles.hidden]: !this.props.category.expanded
+            }
+        )
         const selectableSpecies = !!this.props.onSelectSpecies;
         const selectableCategories = !!this.props.onSelectCategory;
         const selectCategory = selectableCategories ? this.props.onSelectCategory.bind(null, this.props.path) : null;
         return <li className={liClassName}>
-            <span className="clickable" onClick={this.props.onExpandCategory.bind(null, this.props.path)}>
-                <span className="category_name">{this.props.category.data.name}</span>
-                <span className="category_level">{this.props.category.categoryLevel}</span>
+            <span className={styles.clickable} onClick={this.props.onExpandCategory.bind(null, this.props.path)}>
+                <span className={styles.categoryName}>{this.props.category.data.name}</span>
+                <span className={styles.categoryLevel}>{this.props.category.categoryLevel}</span>
                 {this.props.editableTaxonomy && <HiddenStatus hidden={this.props.category.data.hidden}/>}
             </span>
             <CategorySelector selectCategory={selectCategory} selected={this.props.category.selected}/>
@@ -66,6 +81,7 @@ export class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCatego
                             selected={this.props.selectedSpecies.includes(species.data.id)}
                             onSelect={this.props.onSelectSpecies == null ? null : this.props.onSelectSpecies.bind(null, species.data.id)}
                             editableTaxonomy={this.props.editableTaxonomy}
+                            odd={!this.props.odd}
                         />
                 )}
             </ul>
