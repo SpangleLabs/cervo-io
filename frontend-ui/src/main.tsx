@@ -7,6 +7,7 @@ import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/pageMap";
 import config from "./config";
 import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
+import {NavTopBar} from "./NavTopBar";
 
 interface MainState {
     animalData: AnimalData;
@@ -52,11 +53,11 @@ class MainComponent extends React.Component <{}, MainState> {
         e.preventDefault();
         const postcodeEntry = e.currentTarget.value;
         this.setState({postcode: postcodeEntry});
-        if(postcodeEntry.length === 0) {
+        if (postcodeEntry.length === 0) {
             this.setState({postcodeError: false});
             return;
         }
-        if(postcodeEntry.length <= 3) {
+        if (postcodeEntry.length <= 3) {
             this.setState({postcodeError: true});
             return;
         }
@@ -64,16 +65,18 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async updateZooDistances(postcode: string, selectedZoos: ZooJson[]) {
-        if(postcode.length <= 3) {
+        if (postcode.length <= 3) {
             return;
         }
         this.setState({loadingDistances: true});
         try {
-            const zooDistances = await this.state.animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo=>String(zoo.zoo_id)));
+            const zooDistances = await this.state.animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo => String(zoo.zoo_id)));
             const zooDistanceMap = new Map<number, number>(
                 zooDistances.map(x => [x.zoo_id, x.metres])
             );
-            selectedZoos.sort(function(a, b) {return zooDistanceMap.get(a.zoo_id) - zooDistanceMap.get(b.zoo_id)});
+            selectedZoos.sort(function (a, b) {
+                return zooDistanceMap.get(a.zoo_id) - zooDistanceMap.get(b.zoo_id)
+            });
             this.setState({zooDistances: zooDistanceMap, postcodeError: false, selectedZoos: selectedZoos});
         } catch {
             this.setState({zooDistances: new Map(), postcodeError: postcode.length !== 0});
@@ -90,7 +93,7 @@ class MainComponent extends React.Component <{}, MainState> {
             selectedZoos = selectedZoos.concat(zooList);
         }
         // Uniqueify
-        selectedZoos = selectedZoos.filter(function(value, index, arr) {
+        selectedZoos = selectedZoos.filter(function (value, index, arr) {
             const zooIds = arr.map(x => x.zoo_id);
             return zooIds.indexOf(value.zoo_id) === index
         });
@@ -101,9 +104,9 @@ class MainComponent extends React.Component <{}, MainState> {
 
     async onClickZooMarker(zoo: ZooJson) {
         const fullZoo = await this.state.animalData.promiseFullZoo(zoo.zoo_id);
-        this.setState(function(state: MainState) {
+        this.setState(function (state: MainState) {
             const zooIds = state.visibleInfoWindowsZoos.map(x => x.zoo_id);
-            if(!zooIds.includes(zoo.zoo_id)) {
+            if (!zooIds.includes(zoo.zoo_id)) {
                 const newList = state.visibleInfoWindowsZoos.concat([fullZoo]);
                 return {visibleInfoWindowsZoos: newList};
             }
@@ -112,7 +115,7 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async onCloseInfoWindow(zoo: FullZooJson) {
-        this.setState(function(state: MainState) {
+        this.setState(function (state: MainState) {
             const newList = state.visibleInfoWindowsZoos.filter(x => x.zoo_id != zoo.zoo_id);
             return {visibleInfoWindowsZoos: newList};
         });
@@ -121,7 +124,7 @@ class MainComponent extends React.Component <{}, MainState> {
     render() {
         return <>
             <div id="selector">
-                <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a><br />
+                <NavTopBar/>
                 <h1>Select which species you are interested in</h1>
                 <ViewSelectorComponent
                     animalData={this.state.animalData}
@@ -157,6 +160,7 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 }
 
+
 document.addEventListener("DOMContentLoaded", function () {
-    ReactDOM.render(<MainComponent />, document.getElementById("main"));
+    ReactDOM.render(<MainComponent/>, document.getElementById("main"));
 });
