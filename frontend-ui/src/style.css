@@ -112,9 +112,6 @@ form {
 }
 
 /* Styling selected zoos list */
-#selected-zoos .distance {
-    padding-left: 3px;
-}
 
 /* Styling clickable list items and spans */
 span[onclick], li[onclick], .letter-list:not(.disabled), .clickable {
