@@ -1,7 +1,10 @@
 import * as React from "react";
-import config from "../config";
+import config from "../../config";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {GoogleMap, InfoWindow, LoadScript, Marker} from "@react-google-maps/api";
+import {InfoWindowContent} from "./InfoWindowContent";
+
+const styles = require("./MapContainer.css")
 
 interface MapProps {
     google: any;
@@ -10,31 +13,6 @@ interface MapProps {
     visibleInfoWindowsZoos: FullZooJson[];
     onMarkerClick: (zoo: ZooJson) => void;
     onInfoWindowClose: (zoo: FullZooJson) => void;
-}
-interface InfoWindowContentProps {
-    zoo: FullZooJson;
-    selectedSpeciesIds: number[];
-}
-
-export class InfoWindowContent extends React.Component<InfoWindowContentProps, {}> {
-    render() {
-        return <>
-            <h1>{this.props.zoo.name}</h1>
-            <a href={this.props.zoo.link}>{this.props.zoo.link}</a><br/>
-            <span>Postcode: </span>{this.props.zoo.postcode}<br/>
-            <h2>Species:</h2>
-            <ul className="zoo_species">
-                {this.props.zoo.species.map((species) =>
-                    <li>
-                        <span className={`zoo_species species ${this.props.selectedSpeciesIds.includes(species.species_id) ? "selected" : ""}`}>
-                            <span className="common_name">{species.common_name}</span>
-                            <span className="latin_name">{species.latin_name}</span>
-                        </span>
-                    </li>
-                )}
-            </ul>
-        </>
-    }
 }
 
 export class MapContainer extends React.Component<MapProps, {}> {
@@ -75,13 +53,13 @@ export class MapContainer extends React.Component<MapProps, {}> {
             }
         );
         return (
-            <div id="map-ccontainer">
-                <div id="map-container">
+            <div id={styles.mapCContainer}>
+                <div id={styles.mapContainer}>
                     <LoadScript googleMapsApiKey={config['google_maps_key']} >
                         <GoogleMap
                             zoom={6}
                             center={{lat: 55, lng: -3}}
-                            id="map"
+                            id={styles.map}
                         >
                             {currentMarkers.values()}
                             {visibleInfoWindows}

@@ -4,10 +4,12 @@ import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/ViewS
 import {SelectedSpeciesComponent} from "./components/SelectedSpecies";
 import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {MapContainer} from "./components/pageMap";
+import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";
 import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 import {NavTopBar} from "./NavTopBar";
+
+const styles = require("./style.css")
 
 interface MainState {
     animalData: AnimalData;
@@ -123,7 +125,7 @@ class MainComponent extends React.Component <{}, MainState> {
 
     render() {
         return <>
-            <div id="selector">
+            <div id={styles.selector}>
                 <NavTopBar/>
                 <h1>Select which species you are interested in</h1>
                 <ViewSelectorComponent
