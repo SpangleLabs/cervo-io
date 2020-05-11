@@ -48,6 +48,7 @@ export class SelectedSpeciesComponent extends React.Component<SelectedSpeciesCom
                 {
                     const onSelect = this.props.onSelectZoos.bind(null, zoo);
                     return <SelectedZooResult
+                        key={zoo.zoo_id}
                         zoo={zoo}
                         onSelect={onSelect}
                         distance={this.props.zooDistances.get(zoo.zoo_id)}
