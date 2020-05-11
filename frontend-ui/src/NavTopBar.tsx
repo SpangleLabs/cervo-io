@@ -1,9 +1,28 @@
 import * as React from "react";
+import classNames from "classnames";
 
 const styles = require("./NavTopBar.css")
 
-export const NavTopBar: React.FunctionComponent = () => {
-    return <div className={styles.navBar}>
-        <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a>
+interface NavTopBarProps {
+    selected: NavTopBarOptions
+}
+
+export enum NavTopBarOptions {
+    bySpecies,
+    byZoos,
+    faq
+}
+
+export const NavTopBar: React.FunctionComponent<NavTopBarProps> = (props) => {
+    return <div className={styles.navBar}>|
+        <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.bySpecies})}>
+            Select by species
+        </div>
+        <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.byZoos})}>
+            List zoos
+        </div>
+        <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.faq})}>
+            <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a>
+        </div>
     </div>
 }

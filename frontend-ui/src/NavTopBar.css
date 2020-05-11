@@ -1,5 +1,14 @@
 .navBar {
-    background-color: forestgreen;
+    background-color: #d5cc87;
     width: 100%;
-    height: 2em;
+}
+.navButton {
+    box-sizing: border-box;
+    padding: 10px;
+    margin-right: 5px;
+    background-color: #c9ee7f;
+    display: inline-block;
+}
+.navButton.selected {
+    background-color: #a5c632;
 }

@@ -7,7 +7,7 @@ import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";
 import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
-import {NavTopBar} from "./NavTopBar";
+import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
 
 const styles = require("./style.css")
 
@@ -126,7 +126,7 @@ class MainComponent extends React.Component <{}, MainState> {
     render() {
         return <>
             <div id={styles.selector}>
-                <NavTopBar/>
+                <NavTopBar selected={NavTopBarOptions.bySpecies}/>
                 <h1>Select which species you are interested in</h1>
                 <ViewSelectorComponent
                     animalData={this.state.animalData}
