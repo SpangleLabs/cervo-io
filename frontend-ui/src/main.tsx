@@ -1,13 +1,12 @@
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import * as React from "react";
-import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/ViewSelector";
-import {SelectedSpeciesComponent} from "./components/SelectedSpecies";
 import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";
 import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
+import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
 
 const styles = require("./style.css")
 
@@ -127,20 +126,11 @@ class MainComponent extends React.Component <{}, MainState> {
         return <>
             <div id={styles.selector}>
                 <NavTopBar selected={NavTopBarOptions.bySpecies}/>
-                <h1>Select which species you are interested in</h1>
-                <ViewSelectorComponent
+                <SpeciesSelectorPage
                     animalData={this.state.animalData}
                     selectedSpeciesIds={this.state.selectedSpeciesIds}
-                    selectableSpecies={true}
-                    selectableCategories={true}
                     onSelectSpecies={this.onSelectSpecies}
-                    editableTaxonomy={false}
-                />
-                <SelectedSpeciesComponent
-                    selectedSpeciesIds={this.state.selectedSpeciesIds}
-                    onSelectSpecies={this.onSelectSpecies}
-                    onSelectZoos={this.onClickZooMarker}
-                    animalData={this.state.animalData}
+                    onClickZooMarker={this.onClickZooMarker}
                     selectedZoos={this.state.selectedZoos}
                     postcode={this.state.postcode}
                     postcodeError={this.state.postcodeError}
