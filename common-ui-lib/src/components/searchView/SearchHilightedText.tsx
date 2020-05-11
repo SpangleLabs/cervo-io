@@ -17,5 +17,5 @@ export const SearchHilightedText: React.FunctionComponent<HilightedTextProps> = 
         result.push(<span className={style.searchTerm}>{replacements[i]}</span>);
     }
     result.push(split[split.length - 1]);
-    return <>result</>;
+    return <>{result}</>;
 }
