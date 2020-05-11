@@ -3,6 +3,7 @@ import {SearchHilightedText} from "./SearchHilightedText";
 import {TickBox} from "../TickBox";
 import {SpeciesData} from "../../animalData";
 import classNames from "classnames";
+import {LatinName} from "../LatinName";
 
 const styles = require("./SearchResult.css")
 
@@ -34,6 +35,7 @@ export class SearchResult extends React.Component<SearchResultProps, {}> {
         )
         const searchTerm = this.props.searchTerm;
         const species = this.props.species;
+        console.log(species.latinName);
         return (<li>
             <span className={className} onClick={this.onClick}>
                 <span className={styles.common_name}>
@@ -42,12 +44,12 @@ export class SearchResult extends React.Component<SearchResultProps, {}> {
                         searchTerm={searchTerm}
                     />
                 </span>
-                <span className={styles.latin_name}>
+                <LatinName>
                     <SearchHilightedText
                         text={species.latinName}
                         searchTerm={searchTerm}
                     />
-                </span>
+                </LatinName>
                 <TickBox selected={selected}/>
             </span>
         </li>);

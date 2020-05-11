@@ -3,6 +3,7 @@ import * as React from "react";
 import {TickBox} from "../TickBox";
 import {HiddenStatus} from "./admin/HiddenStatus";
 import classNames from "classnames";
+import {LatinName} from "../LatinName";
 
 const styles = require("./TaxonomySpecies.css")
 
@@ -39,7 +40,7 @@ export class TaxonomySpecies extends React.Component<TaxonomySpeciesProps, Taxon
         return <li className={liClassName}>
             <span className={spanClassName} onClick={this.onClick}>
                 <span className={styles.commonName}>{this.props.species.commonName}</span>
-                <span className={styles.latinName}>{this.props.species.latinName}</span>
+                <LatinName>{this.props.species.latinName}</LatinName>
                 {this.props.editableTaxonomy && <HiddenStatus hidden={this.props.species.hidden}/>}
                 {selectableTaxonomy && <TickBox selected={this.props.selected} />}
             </span>

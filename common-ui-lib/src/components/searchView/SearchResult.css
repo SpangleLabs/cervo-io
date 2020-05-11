@@ -1,16 +1,3 @@
-.latin_name, .category_level {
-    font-style: italic;
-    padding-left: 3px;
-    padding-right: 3px;
-}
-.latin_name::before {
-    content: "(";
-    font-style: normal;
-}
-.latin_name::after {
-    content: ")";
-    font-style: normal;
-}
-span.species.selected {
+.species.selected {
     background-color: powderblue;
 }
