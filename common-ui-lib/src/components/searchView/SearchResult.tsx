@@ -35,7 +35,6 @@ export class SearchResult extends React.Component<SearchResultProps, {}> {
         )
         const searchTerm = this.props.searchTerm;
         const species = this.props.species;
-        console.log(species.latinName);
         return (<li>
             <span className={className} onClick={this.onClick}>
                 <span className={styles.common_name}>
