@@ -1,15 +1,15 @@
 import * as React from "react";
 import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {SelectedSpeciesResult} from "./SelectedSpeciesResult";
 import {PostcodeEntry} from "./PostcodeEntry";
-import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {SelectedZoosList} from "./SelectedZoosList";
+import {SelectedSpeciesList} from "./SelectedSpeciesList";
 
-interface SelectedSpeciesComponentProps extends ViewProps {
+interface SelectionsProps extends ViewProps {
     selectedZoos: ZooJson[];
     postcode: string;
     postcodeError: boolean;
+    onSelectSpecies: (speciesId: number, selected?: boolean) => Promise<void>;
     onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
     onSelectZoos: (zoo: ZooJson) => void;
     zooDistances: Map<number, number>;
@@ -17,23 +17,13 @@ interface SelectedSpeciesComponentProps extends ViewProps {
     loadingZoos: boolean;
 }
 
-export const SelectedSpeciesComponent: React.FunctionComponent<SelectedSpeciesComponentProps> = (props) => {
-    const selectedSpecies = props.selectedSpeciesIds.map((speciesId) => {
-        return props.animalData.species.get(speciesId)
-    }).filter((x): x is SpeciesData => x !== undefined);
-    selectedSpecies.sort(
-        (a, b) => a.commonName.localeCompare(b.commonName)
-    );
-    return <><h2>Selected species ({props.selectedSpeciesIds.length})</h2>
-        <ul>
-            {selectedSpecies.map((species) =>
-                <SelectedSpeciesResult
-                    key={species.id}
-                    species={species}
-                    onSelectSpecies={props.onSelectSpecies}
-                />)
-            }
-        </ul>
+export const Selections: React.FunctionComponent<SelectionsProps> = (props) => {
+    return <>
+        <SelectedSpeciesList
+            animalData={props.animalData}
+            selectedSpeciesIds={props.selectedSpeciesIds}
+            onSelectSpecies={props.onSelectSpecies}
+        />
         <PostcodeEntry
             postcode={props.postcode}
             error={props.postcodeError}

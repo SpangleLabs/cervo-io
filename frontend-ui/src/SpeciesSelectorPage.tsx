@@ -1,6 +1,6 @@
 import React from "react";
 import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/ViewSelector";
-import {SelectedSpeciesComponent} from "./components/SelectedSpecies";
+import {Selections} from "./components/Selections";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
@@ -29,7 +29,7 @@ export const SpeciesSelectorPage: React.FunctionComponent<SpeciesSelectorPagePro
             onSelectSpecies={props.onSelectSpecies}
             editableTaxonomy={false}
         />
-        <SelectedSpeciesComponent
+        <Selections
             selectedSpeciesIds={props.selectedSpeciesIds}
             onSelectSpecies={props.onSelectSpecies}
             onSelectZoos={props.onClickZooMarker}
