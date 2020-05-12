@@ -1,11 +1,10 @@
 import * as React from "react";
 import {ViewProps} from "@cervoio/common-ui-lib/src/views";
-import {Spinner} from "@cervoio/common-ui-lib/src/components/images";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {SelectedSpeciesResult} from "./SelectedSpeciesResult";
 import {PostcodeEntry} from "./PostcodeEntry";
-import {SelectedZooResult} from "./SelectedZooResult";
 import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
+import {SelectedZoosList} from "./SelectedZoosList";
 
 interface SelectedSpeciesComponentProps extends ViewProps {
     selectedZoos: ZooJson[];
@@ -41,18 +40,11 @@ export const SelectedSpeciesComponent: React.FunctionComponent<SelectedSpeciesCo
             onUpdate={props.onPostcodeUpdate}
             isLoading={props.loadingDistances}
         />
-        <h2>Zoos with selected species ({props.selectedZoos.length})</h2>
-        {props.loadingDistances ? <Spinner/> : ""}
-        <ul id="selected-zoos">
-            {props.selectedZoos.map((zoo) => {
-                const onSelect = props.onSelectZoos.bind(null, zoo);
-                return <SelectedZooResult
-                    key={zoo.zoo_id}
-                    zoo={zoo}
-                    onSelect={onSelect}
-                    distance={props.zooDistances.get(zoo.zoo_id)}
-                />
-            })}
-        </ul>
+        <SelectedZoosList
+            selectedZoos={props.selectedZoos}
+            onSelectZoos={props.onSelectZoos}
+            zooDistances={props.zooDistances}
+            loadingDistances={props.loadingDistances}
+        />
     </>
 }
