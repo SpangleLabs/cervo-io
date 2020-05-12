@@ -16,42 +16,46 @@ interface MapProps {
 }
 
 export class MapContainer extends React.Component<MapProps, {}> {
-    markers: Map<number, google.maps.Marker>;
 
     constructor(props: MapProps) {
         super(props);
-        this.markers = new Map();
-        this.addMarker = this.addMarker.bind(this);
-    }
-
-    addMarker(zooId: number, marker: google.maps.Marker) {
-        this.markers.set(zooId, marker);
     }
 
     render() {
-        const currentMarkers: Map<number, JSX.Element> = new Map(this.props.selectedZoos.map((zoo) =>
-        {
-            const onClick = this.props.onMarkerClick.bind(null, zoo);
-            const onLoad = this.addMarker.bind(null, zoo.zoo_id);
+        const infoWindowMap = this.props.visibleInfoWindowsZoos.reduce(function (map, obj) {
+            map.set(obj.zoo_id, obj);
+            return map;
+        }, new Map<number, FullZooJson>());
+        const currentMarkers: Map<number, JSX.Element> = new Map(this.props.selectedZoos.map((zoo) => {
+            const onClick = () => {
+                this.props.onMarkerClick(zoo);
+            }
+            let child: JSX.Element | null = null;
+            const infoWindowZoo = infoWindowMap.get(zoo.zoo_id);
+            if (infoWindowZoo !== undefined) {
+                const onClickInfo = this.props.onInfoWindowClose.bind(null, infoWindowZoo);
+                child = <InfoWindow
+                    onCloseClick={onClickInfo}
+                    position={{lat: zoo.latitude, lng: zoo.longitude}}
+                    >
+                    <InfoWindowContent
+                        zoo={infoWindowZoo}
+                        selectedSpeciesIds={this.props.selectedSpeciesIds}
+                    />
+                </InfoWindow>;
+            }
             return [
                 zoo.zoo_id,
                 <Marker
                     key={zoo.zoo_id}
                     position={{lat: zoo.latitude, lng: zoo.longitude}}
                     title={zoo.name}
-                    onLoad={onLoad}
                     onClick={onClick}
-                />
+                >
+                    {child}
+                </Marker>
             ]
         }));
-        const self = this;
-        const visibleInfoWindows = this.props.visibleInfoWindowsZoos.map(function(zoo: FullZooJson) {
-                const onClick = self.props.onInfoWindowClose.bind(null, zoo);
-                return <InfoWindow key={zoo.zoo_id} anchor={self.markers.get(zoo.zoo_id)} onCloseClick={onClick}>
-                    <InfoWindowContent zoo={zoo} selectedSpeciesIds={self.props.selectedSpeciesIds}/>
-                </InfoWindow>
-            }
-        );
         return (
             <div id={styles.mapCContainer}>
                 <div id={styles.mapContainer}>
@@ -61,8 +65,7 @@ export class MapContainer extends React.Component<MapProps, {}> {
                             center={{lat: 55, lng: -3}}
                             id={styles.map}
                         >
-                            {currentMarkers.values()}
-                            {visibleInfoWindows}
+                            {Array.from(currentMarkers.values())}
                         </GoogleMap>
                     </LoadScript>
                 </div>

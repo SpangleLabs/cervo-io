@@ -15,7 +15,7 @@ export class InfoWindowContent extends React.Component<InfoWindowContentProps, {
             <h2>Species:</h2>
             <ul className="zoo_species">
                 {this.props.zoo.species.map((species) =>
-                    <li>
+                    <li key={species.species_id}>
                         <span className={`zoo_species species ${this.props.selectedSpeciesIds.includes(species.species_id) ? "selected" : ""}`}>
                             <span className="common_name">{species.common_name}</span>
                             <LatinName>{species.latin_name}</LatinName>
