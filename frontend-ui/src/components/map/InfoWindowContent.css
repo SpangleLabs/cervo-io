@@ -1,0 +1,10 @@
+ul.zoo_species {
+    border-left: none;
+    padding-left: 20px;
+}
+ul.zoo_species > li {
+    list-style-type: disc;
+}
+span.species.selected {
+    background-color: powderblue;
+}

@@ -52,14 +52,6 @@ li {
     display: none;
 }
 
-/* Styling zoo species list in zoo map info window */
-ul.zoo_species {
-    border-left: none;
-    padding-left: 20px;
-}
-ul.zoo_species > li {
-    list-style-type: disc;
-}
 
 /* Styling letter list letters */
 .letter-list {
