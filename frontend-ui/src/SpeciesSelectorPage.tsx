@@ -24,22 +24,25 @@ export const SpeciesSelectorPage: React.FunctionComponent<SpeciesSelectorPagePro
         <ViewSelectorComponent
             animalData={props.animalData}
             selectedSpeciesIds={props.selectedSpeciesIds}
+            onSelectSpecies={props.onSelectSpecies}
             selectableSpecies={true}
             selectableCategories={true}
-            onSelectSpecies={props.onSelectSpecies}
             editableTaxonomy={false}
         />
         <Selections
+            animalData={props.animalData}
             selectedSpeciesIds={props.selectedSpeciesIds}
             onSelectSpecies={props.onSelectSpecies}
-            onSelectZoos={props.onClickZooMarker}
-            animalData={props.animalData}
-            selectedZoos={props.selectedZoos}
+
             postcode={props.postcode}
             postcodeError={props.postcodeError}
             onPostcodeUpdate={props.onPostcodeUpdate}
-            zooDistances={props.zooDistances}
             loadingDistances={props.loadingDistances}
+
+            selectedZoos={props.selectedZoos}
+            onSelectZoos={props.onClickZooMarker}
+            zooDistances={props.zooDistances}
+
             loadingZoos={props.loadingZoos}
         />
     </div>

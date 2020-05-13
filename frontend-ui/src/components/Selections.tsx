@@ -4,16 +4,24 @@ import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {PostcodeEntry} from "./PostcodeEntry";
 import {SelectedZoosList} from "./SelectedZoosList";
 import {SelectedSpeciesList} from "./SelectedSpeciesList";
+import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 
 interface SelectionsProps extends ViewProps {
-    selectedZoos: ZooJson[];
+    // selected species list
+    animalData: AnimalData;
+    selectedSpeciesIds: number[];
+    onSelectSpecies: (speciesId: number, selected?: boolean) => Promise<void>;
+    // postcode entry
     postcode: string;
     postcodeError: boolean;
-    onSelectSpecies: (speciesId: number, selected?: boolean) => Promise<void>;
     onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
+    loadingDistances: boolean;
+    // selected zoos list
+    selectedZoos: ZooJson[];
     onSelectZoos: (zoo: ZooJson) => void;
     zooDistances: Map<number, number>;
-    loadingDistances: boolean;
+
+    // TODO: Not sure
     loadingZoos: boolean;
 }
 

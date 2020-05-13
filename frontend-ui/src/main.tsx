@@ -1,4 +1,4 @@
-import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
+import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
@@ -72,12 +72,10 @@ class MainComponent extends React.Component <{}, MainState> {
         this.setState({loadingDistances: true});
         try {
             const zooDistances = await this.state.animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo => String(zoo.zoo_id)));
-            const zooDistanceMap = new Map<number, number>(
-                zooDistances.map(x => [x.zoo_id, x.metres])
-            );
-            selectedZoos.sort(function (a, b) {
-                return zooDistanceMap.get(a.zoo_id) - zooDistanceMap.get(b.zoo_id)
-            });
+            const zooDistanceMap = zooDistances.reduce((map, obj) => {
+                map.set(obj.zoo_id, obj.metres);
+                return map
+            }, new Map<number, number>());
             this.setState({zooDistances: zooDistanceMap, postcodeError: false, selectedZoos: selectedZoos});
         } catch {
             this.setState({zooDistances: new Map(), postcodeError: postcode.length !== 0});
@@ -86,7 +84,7 @@ class MainComponent extends React.Component <{}, MainState> {
     }
 
     async updateSelectedZoos(selectedSpeciesIds: number[]) {
-        const selectedSpecies = selectedSpeciesIds.map((speciesId) => this.state.animalData.species.get(speciesId));
+        const selectedSpecies = selectedSpeciesIds.map((speciesId) => this.state.animalData.species.get(speciesId)).filter((x): x is SpeciesData => x !== undefined);
         const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
         // Flatten list of lists
         let selectedZoos: ZooJson[] = [];
@@ -130,13 +128,16 @@ class MainComponent extends React.Component <{}, MainState> {
                     animalData={this.state.animalData}
                     selectedSpeciesIds={this.state.selectedSpeciesIds}
                     onSelectSpecies={this.onSelectSpecies}
-                    onClickZooMarker={this.onClickZooMarker}
-                    selectedZoos={this.state.selectedZoos}
+
                     postcode={this.state.postcode}
                     postcodeError={this.state.postcodeError}
                     onPostcodeUpdate={this.onPostcodeUpdate}
-                    zooDistances={this.state.zooDistances}
                     loadingDistances={this.state.loadingDistances}
+
+                    selectedZoos={this.state.selectedZoos}
+                    onClickZooMarker={this.onClickZooMarker}
+                    zooDistances={this.state.zooDistances}
+
                     loadingZoos={this.state.loadingZoos}
                 />
             </div>
