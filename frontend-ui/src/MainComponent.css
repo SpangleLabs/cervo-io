@@ -1,0 +1,12 @@
+
+#selector {
+    position: relative;
+    float: right;
+    width: 100%;
+}
+@media screen and (min-width:1152px) {
+    #selector {
+        order: 2;
+        width: 50%;
+    }
+}

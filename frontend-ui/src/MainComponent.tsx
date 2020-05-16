@@ -8,7 +8,7 @@ import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/s
 import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
 import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
 
-const styles = require("./style.css")
+const styles = require("./MainComponent.css")
 
 interface MainState {
     animalData: AnimalData;
