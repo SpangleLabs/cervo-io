@@ -8,24 +8,19 @@ interface AlphabetLetterProps {
     odd: boolean,
     valid: boolean,
     selected: boolean,
-    onClick: (event: React.MouseEvent<HTMLSpanElement>) => void
+    onClick: ((e: React.MouseEvent<HTMLSpanElement>) => void) | null
 }
-export class AlphabetLetter extends React.Component<AlphabetLetterProps, {}> {
-    constructor(props: AlphabetLetterProps) {
-        super(props);
-    }
 
-    render() {
-        const classes = classNames(
-            styles.letterList,
-            {
-                [styles.odd]: this.props.odd,
-                [styles.even]: !this.props.odd,
-                [styles.clickable]: this.props.valid,
-                [styles.disabled]: !this.props.valid,
-                [styles.selected]: this.props.selected
-            }
-        )
-        return <span className={classes} onClick={this.props.onClick}>{this.props.letter}</span>
-    }
+export const AlphabetLetter: React.FunctionComponent<AlphabetLetterProps> = (props) => {
+    const classes = classNames(
+        styles.letterList,
+        {
+            [styles.odd]: props.odd,
+            [styles.even]: !props.odd,
+            [styles.clickable]: props.valid,
+            [styles.disabled]: !props.valid,
+            [styles.selected]: props.selected
+        }
+    )
+    return <span className={classes} onClick={props.onClick  ? props.onClick : undefined}>{props.letter}</span>
 }

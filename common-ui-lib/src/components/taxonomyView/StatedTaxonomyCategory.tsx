@@ -21,70 +21,66 @@ interface StatedTaxonomyCategoryProps {
     onAddCategory: (categoryParentPath: number[], newCategory: NewCategoryJson) => Promise<void> | null;
     onAddSpecies: (categoryParentPath: number[], newSpecies: NewSpeciesJson) => Promise<void> | null;
 }
-interface StatedTaxonomyCategoryState {
 
-}
-export class StatedTaxonomyCategory extends React.Component<StatedTaxonomyCategoryProps, StatedTaxonomyCategoryState> {
-    render() {
-        const liClassName = classNames(
-            styles.category,
-            {
-                [styles.open]: this.props.category.expanded,
-                [styles.closed]: !this.props.category.expanded,
-                [styles.selected]: this.props.category.selected
-            }
-        )
-        const ulClassName = classNames(
-            {
-                [styles.even]: this.props.odd,
-                [styles.odd]: !this.props.odd,
-                [styles.hidden]: !this.props.category.expanded
-            }
-        )
-        const selectableSpecies = !!this.props.onSelectSpecies;
-        const selectableCategories = !!this.props.onSelectCategory;
-        const selectCategory = selectableCategories ? this.props.onSelectCategory.bind(null, this.props.path) : null;
-        return <li className={liClassName}>
-            <span className={styles.clickable} onClick={this.props.onExpandCategory.bind(null, this.props.path)}>
-                <span className={styles.categoryName}>{this.props.category.data.name}</span>
-                <span className={styles.categoryLevel}>{this.props.category.categoryLevel}</span>
-                {this.props.editableTaxonomy && <HiddenStatus hidden={this.props.category.data.hidden}/>}
+export const StatedTaxonomyCategory: React.FunctionComponent<StatedTaxonomyCategoryProps> = (props) => {
+    const liClassName = classNames(
+        styles.category,
+        {
+            [styles.open]: props.category.expanded,
+            [styles.closed]: !props.category.expanded,
+            [styles.selected]: props.category.selected
+        }
+    )
+    const ulClassName = classNames(
+        {
+            [styles.even]: props.odd,
+            [styles.odd]: !props.odd,
+            [styles.hidden]: !props.category.expanded
+        }
+    )
+    const selectableSpecies = !!props.onSelectSpecies;
+    const selectableCategories = !!props.onSelectCategory;
+    const selectCategory = selectableCategories ? props.onSelectCategory.bind(null, props.path) : null;
+    return <li className={liClassName}>
+            <span className={styles.clickable} onClick={props.onExpandCategory.bind(null, props.path)}>
+                <span className={styles.categoryName}>{props.category.data.name}</span>
+                <span className={styles.categoryLevel}>{props.category.categoryLevel}</span>
+                {props.editableTaxonomy && <HiddenStatus hidden={props.category.data.hidden}/>}
             </span>
-            <CategorySelector selectCategory={selectCategory} selected={this.props.category.selected}/>
-            <ul className={ulClassName}>
-                {this.props.editableTaxonomy && <EditTaxonomyForm
-                    parentCategory={this.props.category}
-                    addCategory={this.props.onAddCategory.bind(null, this.props.path)}
-                    addSpecies={this.props.onAddSpecies.bind(null, this.props.path)}
-                />}
-                {this.props.category.subCategories.map(
-                    (category) =>
-                        <StatedTaxonomyCategory
-                            key={"category-" + category.data.id}
-                            category={category}
-                            path={this.props.path.concat([category.data.id])}
-                            odd={!this.props.odd}
-                            selectedSpecies={this.props.selectedSpecies}
-                            onExpandCategory={this.props.onExpandCategory}
-                            onSelectCategory={selectableCategories ? this.props.onSelectCategory : null}
-                            onSelectSpecies={selectableSpecies ? this.props.onSelectSpecies : null}
-                            editableTaxonomy={this.props.editableTaxonomy}
-                            onAddCategory={this.props.editableTaxonomy ? this.props.onAddCategory : null}
-                            onAddSpecies={this.props.editableTaxonomy ? this.props.onAddSpecies : null}
-                        />
-                )}
-                {this.props.category.species.map(
-                    (species) =>
-                        <TaxonomySpecies
-                            key={"species-" + species.data.id}
-                            species={species.data}
-                            selected={this.props.selectedSpecies.includes(species.data.id)}
-                            onSelect={this.props.onSelectSpecies == null ? null : this.props.onSelectSpecies.bind(null, species.data.id)}
-                            editableTaxonomy={this.props.editableTaxonomy}
-                            odd={!this.props.odd}
-                        />
-                )}
-            </ul>
-        </li>
-    }
+        <CategorySelector selectCategory={selectCategory} selected={props.category.selected}/>
+        <ul className={ulClassName}>
+            {props.editableTaxonomy && <EditTaxonomyForm
+                parentCategory={props.category}
+                addCategory={props.onAddCategory.bind(null, props.path)}
+                addSpecies={props.onAddSpecies.bind(null, props.path)}
+            />}
+            {props.category.subCategories.map(
+                (category) =>
+                    <StatedTaxonomyCategory
+                        key={"category-" + category.data.id}
+                        category={category}
+                        path={props.path.concat([category.data.id])}
+                        odd={!props.odd}
+                        selectedSpecies={props.selectedSpecies}
+                        onExpandCategory={props.onExpandCategory}
+                        onSelectCategory={selectableCategories ? props.onSelectCategory : null}
+                        onSelectSpecies={selectableSpecies ? props.onSelectSpecies : null}
+                        editableTaxonomy={props.editableTaxonomy}
+                        onAddCategory={props.editableTaxonomy ? props.onAddCategory : null}
+                        onAddSpecies={props.editableTaxonomy ? props.onAddSpecies : null}
+                    />
+            )}
+            {props.category.species.map(
+                (species) =>
+                    <TaxonomySpecies
+                        key={"species-" + species.data.id}
+                        species={species.data}
+                        selected={props.selectedSpecies.includes(species.data.id)}
+                        onSelect={props.onSelectSpecies == null ? null : props.onSelectSpecies.bind(null, species.data.id)}
+                        editableTaxonomy={props.editableTaxonomy}
+                        odd={!props.odd}
+                    />
+            )}
+        </ul>
+    </li>
 }

@@ -1,3 +1,6 @@
 .species.selected {
     background-color: powderblue;
 }
+.clickable {
+    cursor: pointer;
+}

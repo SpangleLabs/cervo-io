@@ -10,28 +10,22 @@ interface AlphabetLetterResultProps {
     selectedSpeciesIds: number[];
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
-export class AlphabetLetterResult extends React.Component<AlphabetLetterResultProps, {}> {
-    constructor(props: AlphabetLetterResultProps) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
+
+export const AlphabetLetterResult: React.FunctionComponent<AlphabetLetterResultProps> = (props) => {
+    const onClick = () => {
+        props.onSelectSpecies(props.species.id)
     }
 
-    onClick() {
-        this.props.onSelectSpecies(this.props.species.id);
-    }
-
-    render() {
-        const selected = this.props.selectedSpeciesIds.includes(this.props.species.id);
-        const className = classNames(
-            style.species,
-            style.clickable,
-            {[style.selected]: selected}
-        )
-        return <li>
-            <span className={className} onClick={this.onClick}>
-                <span className={style.common_name}>{this.props.species.commonName}</span>
-                <TickBox selected={selected} />
+    const selected = props.selectedSpeciesIds.includes(props.species.id);
+    const className = classNames(
+        style.species,
+        style.clickable,
+        {[style.selected]: selected}
+    )
+    return <li>
+            <span className={className} onClick={onClick}>
+                <span className={style.common_name}>{props.species.commonName}</span>
+                <TickBox selected={selected}/>
             </span>
-        </li>
-    }
+    </li>
 }

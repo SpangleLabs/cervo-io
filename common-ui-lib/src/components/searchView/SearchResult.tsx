@@ -14,29 +14,22 @@ interface SearchResultProps {
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
 
-export class SearchResult extends React.Component<SearchResultProps, {}> {
-    constructor(props: SearchResultProps) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
+export const SearchResult: React.FunctionComponent<SearchResultProps> = (props) => {
+    const onClick = () => {
+        props.onSelectSpecies(props.species.id);
     }
-
-    onClick() {
-        this.props.onSelectSpecies(this.props.species.id);
-    }
-
-    render() {
-        const selected = this.props.selectedSpeciesIds.includes(this.props.species.id);
-        const className = classNames(
-            styles.clickable,
-            styles.species,
-            {
-                [styles.selected]: selected
-            }
-        )
-        const searchTerm = this.props.searchTerm;
-        const species = this.props.species;
-        return (<li>
-            <span className={className} onClick={this.onClick}>
+    const selected = props.selectedSpeciesIds.includes(props.species.id);
+    const className = classNames(
+        styles.clickable,
+        styles.species,
+        {
+            [styles.selected]: selected
+        }
+    )
+    const searchTerm = props.searchTerm;
+    const species = props.species;
+    return <li>
+            <span className={className} onClick={onClick}>
                 <span className={styles.common_name}>
                     <SearchHilightedText
                         text={species.commonName}
@@ -51,6 +44,5 @@ export class SearchResult extends React.Component<SearchResultProps, {}> {
                 </LatinName>
                 <TickBox selected={selected}/>
             </span>
-        </li>);
-    }
+    </li>
 }

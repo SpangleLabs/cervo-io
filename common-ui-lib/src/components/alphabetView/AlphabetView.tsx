@@ -1,6 +1,6 @@
 import * as React from "react";
 import {AnimalData, SpeciesData} from "../../animalData";
-import {Spinner} from "../images";
+import {Spinner} from "../images/images";
 import {AlphabetLetterResult} from "./AlphabetLetterResult";
 import {AlphabetLetter} from "./AlphabetLetter";
 

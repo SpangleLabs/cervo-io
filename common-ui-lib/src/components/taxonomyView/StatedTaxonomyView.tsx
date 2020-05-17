@@ -8,7 +8,7 @@ import {
     treeToggleSelectCategory
 } from "../../taxonomyState";
 import {NewCategoryJson, NewSpeciesJson} from "../../../../common-lib/src/apiInterfaces";
-import {Spinner} from "../images";
+import {Spinner} from "../images/images";
 import {AnimalData} from "../../animalData";
 import {StatedTaxonomyCategory} from "./StatedTaxonomyCategory";
 

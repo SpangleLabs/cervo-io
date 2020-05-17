@@ -2,7 +2,7 @@
   "name": "zoosite",
   "version": "1.0.0",
   "description": "Frontend for the cervo.io zoo listing website",
-  "main": "src/main.tsx",
+  "main": "src/MainComponent.tsx",
   "scripts": {
     "build": "parcel build src/index.html src/faq.html --public-url ./",
     "serve": "parcel serve src/index.html",
@@ -30,8 +30,8 @@
     "@cervoio/common-ui-lib": "../common-ui-lib",
     "@react-google-maps/api": "^1.6.0",
     "classnames": "^2.2.6",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@cervoio/common-lib": "../common-lib",

@@ -14,36 +14,27 @@ interface TaxonomySpeciesProps {
     editableTaxonomy: boolean;
     odd: boolean;
 }
-interface TaxonomySpeciesState {
-}
-export class TaxonomySpecies extends React.Component<TaxonomySpeciesProps, TaxonomySpeciesState> {
-    constructor(props: TaxonomySpeciesProps) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
-    }
 
-    onClick() {
-        this.props.onSelect();
+export const TaxonomySpecies: React.FunctionComponent<TaxonomySpeciesProps> = (props) => {
+    const onClick = () => {
+        props.onSelect();
     }
-
-    render() {
-        const liClassName = classNames(
-            styles.species,
-            {
-                [styles.selected]: this.props.selected,
-                [styles.odd]: this.props.odd,
-                [styles.even]: !this.props.odd
-            }
-        )
-        const spanClassName = classNames({[styles.clickable]: this.props.onSelect})
-        const selectableTaxonomy = this.props.onSelect != null;
-        return <li className={liClassName}>
-            <span className={spanClassName} onClick={this.onClick}>
-                <span className={styles.commonName}>{this.props.species.commonName}</span>
-                <LatinName>{this.props.species.latinName}</LatinName>
-                {this.props.editableTaxonomy && <HiddenStatus hidden={this.props.species.hidden}/>}
-                {selectableTaxonomy && <TickBox selected={this.props.selected} />}
+    const liClassName = classNames(
+        styles.species,
+        {
+            [styles.selected]: props.selected,
+            [styles.odd]: props.odd,
+            [styles.even]: !props.odd
+        }
+    )
+    const spanClassName = classNames({[styles.clickable]: props.onSelect})
+    const selectableTaxonomy = props.onSelect != null;
+    return <li className={liClassName}>
+            <span className={spanClassName} onClick={onClick}>
+                <span className={styles.commonName}>{props.species.commonName}</span>
+                <LatinName>{props.species.latinName}</LatinName>
+                {props.editableTaxonomy && <HiddenStatus hidden={props.species.hidden}/>}
+                {selectableTaxonomy && <TickBox selected={props.selected}/>}
             </span>
-        </li>
-    }
+    </li>
 }
