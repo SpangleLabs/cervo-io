@@ -1,4 +1,4 @@
-import {Spinner} from "@cervoio/common-ui-lib/src/components/images/images";
+import {Spinner} from "@cervoio/common-ui-lib/src/components/images/Spinner";
 import {SelectedZooResult} from "./SelectedZooResult";
 import * as React from "react";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";

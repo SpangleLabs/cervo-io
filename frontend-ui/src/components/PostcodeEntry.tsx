@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Spinner} from "@cervoio/common-ui-lib/src/components/images/images";
+import {Spinner} from "@cervoio/common-ui-lib/src/components/images/Spinner";
 import classNames from "classnames";
 
 const styles = require("./PostcodeEntry.css")

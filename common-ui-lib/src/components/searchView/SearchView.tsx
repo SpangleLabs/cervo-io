@@ -1,7 +1,7 @@
 import * as React from "react";
 import {SpeciesData} from "../../animalData";
 import {ViewProps} from "../../views";
-import {Spinner} from "../images/images";
+import {Spinner} from "../images/Spinner";
 import {SearchResult} from "./SearchResult";
 
 interface SearchState {
