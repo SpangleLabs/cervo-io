@@ -1,8 +1,8 @@
-import * as ReactDOM from "react-dom";
+import ReactDOM from "react-dom";
 import {
     StatedTaxonomyView
-} from "../common-ui-lib/src/components/taxonomyView/taxonomyView";
-import * as React from "react";
+} from "@cervoio/common-ui-lib/src/components/taxonomyView/StatedTaxonomyView";
+import React from "react";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 
 document.addEventListener("DOMContentLoaded", async function() {

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {SearchHilightedText} from "./SearchHilightedText";
 import {TickBox} from "../TickBox";
 import {SpeciesData} from "../../animalData";

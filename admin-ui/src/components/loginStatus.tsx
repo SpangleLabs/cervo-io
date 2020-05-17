@@ -1,7 +1,7 @@
-import {SessionTokenJson} from "../../../common-lib/src/apiInterfaces";
-import * as React from "react";
+import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
+import React from "react";
 import {checkLogin} from "../lib/authCheck";
-import {getAuthCookie} from "../../../common-ui-lib/src/utilities";
+import {getAuthCookie} from "@cervoio/common-ui-lib/src/utilities";
 
 interface SessionProps {
     session: SessionTokenJson

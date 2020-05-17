@@ -1,6 +1,6 @@
-import * as ReactDOM from "react-dom";
-import * as React from "react";
-import {StatedTaxonomyView} from "../common-ui-lib/src/components/taxonomyView/taxonomyView";
+import ReactDOM from "react-dom";
+import React from "react";
+import {StatedTaxonomyView} from "@cervoio/common-ui-lib/src/components/taxonomyView/StatedTaxonomyView";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import {LoginStatus} from "./components/loginStatus";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";

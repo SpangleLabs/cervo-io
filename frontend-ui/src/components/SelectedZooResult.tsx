@@ -1,5 +1,5 @@
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import * as React from "react";
+import React from "react";
 
 const styles = require("./SelectedZooResult.css")
 

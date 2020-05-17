@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {AlphabetViewComponent} from "./alphabetView/AlphabetView";
 import {SearchViewComponent} from "./searchView/SearchView";
 import {AnimalData} from "../animalData";

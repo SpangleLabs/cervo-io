@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {SpeciesData} from "../../animalData";
 import {ViewProps} from "../../views";
 import {Spinner} from "../images/Spinner";

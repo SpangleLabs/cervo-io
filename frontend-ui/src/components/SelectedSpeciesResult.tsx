@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {TickBox} from "@cervoio/common-ui-lib/src/components/TickBox";
 import {SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {LatinName} from "@cervoio/common-ui-lib/src/components/LatinName";

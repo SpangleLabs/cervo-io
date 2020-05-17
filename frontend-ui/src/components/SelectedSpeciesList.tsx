@@ -1,5 +1,5 @@
 import {SelectedSpeciesResult} from "./SelectedSpeciesResult";
-import * as React from "react";
+import React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 
 interface SelectedSpeciesListProps {

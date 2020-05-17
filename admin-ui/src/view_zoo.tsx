@@ -2,10 +2,10 @@ import {
     FullZooJson
 } from "@cervoio/common-lib/src/apiInterfaces";
 import {LoginStatus} from "./components/loginStatus";
-import * as React from "react";
+import React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {HiddenStatus} from "@cervoio/common-ui-lib/src/components/taxonomyView/admin/HiddenStatus";
-import * as ReactDOM from "react-dom";
+import ReactDOM from "react-dom";
 import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/ViewSelector";
 import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
 

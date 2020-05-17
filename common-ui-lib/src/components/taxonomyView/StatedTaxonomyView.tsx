@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
     create,
     TaxonomyTreeState,
@@ -7,7 +7,7 @@ import {
     treeExpandCategory,
     treeToggleSelectCategory
 } from "../../taxonomyState";
-import {NewCategoryJson, NewSpeciesJson} from "../../../../common-lib/src/apiInterfaces";
+import {NewCategoryJson, NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {Spinner} from "../images/Spinner";
 import {AnimalData} from "../../animalData";
 import {StatedTaxonomyCategory} from "./StatedTaxonomyCategory";

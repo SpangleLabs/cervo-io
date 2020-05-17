@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {Spinner} from "@cervoio/common-ui-lib/src/components/images/Spinner";
 import classNames from "classnames";
 

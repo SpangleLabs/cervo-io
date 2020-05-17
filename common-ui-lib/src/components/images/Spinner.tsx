@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 export const Spinner:React.FunctionComponent = () => {
     return <svg className="lds-spin" width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style={{animationPlayState: 'running', animationDelay: '0s', background: 'rgba(0, 0, 0, 0) none repeat scroll 0% 0%'}}>

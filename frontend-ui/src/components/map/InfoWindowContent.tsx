@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {FullZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {LatinName} from "@cervoio/common-ui-lib/src/components/LatinName";
 import classNames from "classnames";

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {PostcodeEntry} from "./PostcodeEntry";

@@ -13,7 +13,7 @@
     "noUnusedLocals": true,                /* Report errors on unused locals. */
     "noUnusedParameters": true,            /* Report errors on unused parameters. */
     "removeComments": true,
-    "outDir": "dist",
+    "outDir": "dist"
 
     /* Strict Type-Checking Options */
     //"strictFunctionTypes": true,           /* Enable strict checking of function types. */

@@ -1,6 +1,6 @@
 import {TaxonomyCategoryState} from "../../../taxonomyState";
-import {NewSpeciesJson} from "../../../../../common-lib/src/apiInterfaces";
-import * as React from "react";
+import {NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
+import React from "react";
 import {ChangeEvent, FormEvent} from "react";
 
 interface AddSpeciesFormProps {

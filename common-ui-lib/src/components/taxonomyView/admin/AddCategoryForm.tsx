@@ -1,6 +1,6 @@
 import {TaxonomyCategoryState} from "../../../taxonomyState";
-import {CategoryLevelJson, NewCategoryJson} from "../../../../../common-lib/src/apiInterfaces";
-import * as React from "react";
+import {CategoryLevelJson, NewCategoryJson} from "@cervoio/common-lib/src/apiInterfaces";
+import React from "react";
 import {ChangeEvent, FormEvent} from "react";
 
 

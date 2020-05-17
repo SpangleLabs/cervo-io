@@ -1,6 +1,6 @@
 import {TaxonomyCategoryState} from "../../../taxonomyState";
 import {NewCategoryJson, NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
-import * as React from "react";
+import React from "react";
 import {AddCategoryForm} from "./AddCategoryForm";
 import {AddSpeciesForm} from "./AddSpeciesForm";
 

@@ -1,8 +1,8 @@
-import * as React from "react";
+import React from "react";
 import {TaxonomySpecies} from "./TaxonomySpecies";
 import {HiddenStatus} from "./admin/HiddenStatus";
 import {TaxonomyCategoryState} from "../../taxonomyState";
-import {NewCategoryJson, NewSpeciesJson} from "../../../../common-lib/src/apiInterfaces";
+import {NewCategoryJson, NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {CategorySelector} from "./CategorySelector";
 import {EditTaxonomyForm} from "./admin/EditTaxonomyForm";
 import classNames from "classnames";

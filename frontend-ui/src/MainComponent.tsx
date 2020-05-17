@@ -1,6 +1,6 @@
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";

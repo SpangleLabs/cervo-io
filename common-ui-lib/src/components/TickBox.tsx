@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {BoxUnchecked} from "./images/boxUnchecked";
 import {BoxChecked} from "./images/boxChecked";
 

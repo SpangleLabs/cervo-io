@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 export const BoxUnchecked: React.FunctionComponent = () => {
     return <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 100 100" xmlSpace="preserve">
