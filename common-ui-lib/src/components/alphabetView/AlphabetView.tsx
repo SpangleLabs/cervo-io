@@ -3,6 +3,7 @@ import {AnimalData, SpeciesData} from "../../animalData";
 import {Spinner} from "../images/Spinner";
 import {AlphabetLetterResult} from "./AlphabetLetterResult";
 import {AlphabetLetter} from "./AlphabetLetter";
+import {useEffect, useState} from "react";
 
 const style = require("./AlphabetView.css")
 
@@ -12,57 +13,53 @@ interface AlphabetViewProps {
     selectedSpeciesIds: number[];
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
-interface AlphabetViewState {
-    validLetters: string[];
-    selectedLetter: string;
-    speciesList: SpeciesData[];
-    isLoading: boolean;
-}
-export class AlphabetViewComponent extends React.Component<AlphabetViewProps, AlphabetViewState> {
-    constructor(props: AlphabetViewProps) {
-        super(props);
-        this.state = {validLetters: [], selectedLetter: "", speciesList: [], isLoading: false};
-    }
 
-    async componentDidMount(): Promise<void> {
-        const validLetters = await this.props.animalData.promiseValidFirstLetters();
-        this.setState({validLetters: validLetters});
-    }
+export const AlphabetViewComponent:React.FunctionComponent<AlphabetViewProps> = (props) => {
+    const [validLetters, setValidLetters] = useState<string[]>([])
+    const [selectedLetter, setSelectedLetter] = useState("")
+    const [speciesList, setSpeciesList] = useState<SpeciesData[]>([])
+    const [isLoading, setIsLoading] = useState(false)
 
-    async letterClick(letter: string) {
-        this.setState({selectedLetter: letter, isLoading: true});
-        const speciesList = await this.props.animalData.promiseSpeciesByLetter(letter);
-        this.setState({speciesList: speciesList, isLoading: false});
-    }
+    useEffect(() => {
+        props.animalData.promiseValidFirstLetters().then((validLetters) => {
+            setValidLetters(validLetters)
+        })
+    }, [])
 
-    render() {
-        const alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().split("");
-        const validLetters = this.state.validLetters;
-        const self = this;
-        const letters = alphabet.map(
-            function (letter, index) {
-                const letterClick = self.letterClick.bind(self, letter);
-                const valid = validLetters.includes(letter);
-                return <AlphabetLetter
-                    key={letter}
-                    letter={letter}
-                    odd={index % 2 == 1}
-                    valid={valid}
-                    selected={letter == self.state.selectedLetter}
-                    onClick={valid ? letterClick : null}/>
-            });
-        const speciesList = this.state.speciesList.map(
-            (species) =>
-                <AlphabetLetterResult
-                    key={species.id}
-                    species={species}
-                    selectedSpeciesIds={this.props.selectedSpeciesIds}
-                    onSelectSpecies={this.props.onSelectSpecies}
-                />);
-        return <>
-                <div id={style.letterList}>{letters}</div>
-                {this.state.isLoading ? <Spinner /> : ""}
-                <ul id={style.letterResults}>{speciesList}</ul>
-            </>
-    }
+    const alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().split("")
+    const letters = alphabet.map(
+        function (letter, index) {
+
+            const letterClick = async () => {
+                setSelectedLetter(letter)
+                setIsLoading(true)
+                const speciesList = await props.animalData.promiseSpeciesByLetter(letter);
+                setSpeciesList(speciesList);
+                setIsLoading(false);
+            }
+
+            const valid = validLetters.includes(letter);
+            return <AlphabetLetter
+                key={letter}
+                letter={letter}
+                odd={index % 2 == 1}
+                valid={valid}
+                selected={letter == selectedLetter}
+                onClick={valid ? letterClick : null}/>
+        });
+
+    const speciesComponentList = speciesList.map(
+        (species) =>
+            <AlphabetLetterResult
+                key={species.id}
+                species={species}
+                selectedSpeciesIds={props.selectedSpeciesIds}
+                onSelectSpecies={props.onSelectSpecies}
+            />);
+    return <>
+        <div id={style.letterList}>{letters}</div>
+        {isLoading ? <Spinner/> : ""}
+        <ul id={style.letterResults}>{speciesComponentList}</ul>
+    </>
+    // return <div>Hello</div>
 }

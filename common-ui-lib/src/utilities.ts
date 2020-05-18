@@ -1,5 +1,4 @@
 import {config} from "./config";
-import $ from "jquery";
 
 export function promiseGet(path: string, headers?: Map<string, string>): Promise<any> {
     return promiseRequest("GET", path, null, headers);
@@ -63,10 +62,6 @@ export function arrayEquals<T>(array1: T[], array2: T[]): boolean {
         if (array1[idx] !== array2[idx]) return false;
     }
     return true;
-}
-
-export function tickboxImageElem(selected: boolean): JQuery<HTMLElement> {
-    return $(`<img src='images/${selected ? "box_checked.svg" : "box_unchecked.svg"}' alt='${selected ? "✔" : "➕"}'/>`);
 }
 
 export function toggleSelectionMembership<T>(selection: T[], element: T, selected?: boolean): T[] {
