@@ -14,7 +14,7 @@ interface AlphabetViewProps {
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
 
-export const AlphabetViewComponent:React.FunctionComponent<AlphabetViewProps> = (props) => {
+export const AlphabetViewComponent: React.FunctionComponent<AlphabetViewProps> = (props) => {
     const [validLetters, setValidLetters] = useState<string[]>([])
     const [selectedLetter, setSelectedLetter] = useState("")
     const [speciesList, setSpeciesList] = useState<SpeciesData[]>([])
