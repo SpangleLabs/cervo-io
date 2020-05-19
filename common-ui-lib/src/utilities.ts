@@ -90,3 +90,10 @@ export function toggleSelectionMembership<T>(selection: T[], element: T, selecte
 export function getAuthCookie(): string {
     return document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 }
+
+export async function withLoading(setLoading: (loading: boolean) => void, action: () => Promise<void>) {
+    setLoading(true)
+    const resp = await action()
+    setLoading(false)
+    return resp
+}

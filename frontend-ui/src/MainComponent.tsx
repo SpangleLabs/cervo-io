@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";
-import {getAuthCookie, toggleSelectionMembership} from "@cervoio/common-ui-lib/src/utilities";
+import {getAuthCookie, toggleSelectionMembership, withLoading} from "@cervoio/common-ui-lib/src/utilities";
 import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
 import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
 
@@ -47,41 +47,41 @@ const MainComponent: React.FunctionComponent = () => {
         if (postcode.length <= 3) {
             return;
         }
-        setLoadingDistances(true)
-        try {
-            const zooDistances = await animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo => String(zoo.zoo_id)));
-            const zooDistanceMap = zooDistances.reduce((map, obj) => {
-                map.set(obj.zoo_id, obj.metres);
-                return map
-            }, new Map<number, number>());
-            setZooDistances(zooDistanceMap)
-            setPostcodeError(false)
-            setSelectedZoos(selectedZoos)
-        } catch {
-            setZooDistances(new Map())
-            setPostcodeError(postcode.length !== 0)
-        }
-        setLoadingDistances(false)
+        await withLoading(setLoadingDistances, async () => {
+            try {
+                const zooDistances = await animalData.promiseGetZooDistances(postcode, selectedZoos.map(zoo => String(zoo.zoo_id)));
+                const zooDistanceMap = zooDistances.reduce((map, obj) => {
+                    map.set(obj.zoo_id, obj.metres);
+                    return map
+                }, new Map<number, number>());
+                setZooDistances(zooDistanceMap)
+                setPostcodeError(false)
+                setSelectedZoos(selectedZoos)
+            } catch {
+                setZooDistances(new Map())
+                setPostcodeError(postcode.length !== 0)
+            }
+        })
     }
 
     const updateSelectedZoos = async (selectedSpeciesIds: number[]) => {
-        setLoadingZoos(true)
-        const selectedSpecies = selectedSpeciesIds.map((speciesId) => animalData.species.get(speciesId)).filter((x): x is SpeciesData => x !== undefined);
-        const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
-        // Flatten list of lists
-        let selectedZoos: ZooJson[] = [];
-        for (const zooList of selectedZooses) {
-            selectedZoos = selectedZoos.concat(zooList);
-        }
-        // Uniqueify
-        selectedZoos = selectedZoos.filter(function (value, index, arr) {
-            const zooIds = arr.map(x => x.zoo_id);
-            return zooIds.indexOf(value.zoo_id) === index
-        });
-        // Set state
-        setSelectedZoos(selectedZoos)
-        await updateZooDistances(postcode, selectedZoos);
-        setLoadingZoos(false)
+        await withLoading(setLoadingZoos, async () => {
+            const selectedSpecies = selectedSpeciesIds.map((speciesId) => animalData.species.get(speciesId)).filter((x): x is SpeciesData => x !== undefined);
+            const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
+            // Flatten list of lists
+            let selectedZoos: ZooJson[] = [];
+            for (const zooList of selectedZooses) {
+                selectedZoos = selectedZoos.concat(zooList);
+            }
+            // Uniqueify
+            selectedZoos = selectedZoos.filter(function (value, index, arr) {
+                const zooIds = arr.map(x => x.zoo_id);
+                return zooIds.indexOf(value.zoo_id) === index
+            });
+            // Set state
+            setSelectedZoos(selectedZoos)
+            await updateZooDistances(postcode, selectedZoos);
+        })
     }
 
     const onClickZooMarker = async (zoo: ZooJson) => {
