@@ -10,25 +10,20 @@ interface PostcodeEntryProps {
     error: boolean;
     isLoading: boolean;
 }
-export class PostcodeEntry extends React.Component<PostcodeEntryProps, {}> {
-    constructor(props: PostcodeEntryProps) {
-        super(props);
-    }
 
-    render() {
-        const errorClass = classNames(
-            styles.error,
-            {
-                [styles.hidden]: !this.props.error
-            }
-        )
-        return <>
-            <label>
-                Enter your postcode to get distances to selected zoos:
-                <input id="postcode" type="text" value={this.props.postcode} onChange={this.props.onUpdate} />
-            </label>
-            <span className={errorClass}>Invalid postcode.</span>
-            {this.props.isLoading ? <Spinner /> : ""}
-        </>
-    }
+export const PostcodeEntry: React.FunctionComponent<PostcodeEntryProps> = (props) => {
+    const errorClass = classNames(
+        styles.error,
+        {
+            [styles.hidden]: !props.error
+        }
+    )
+    return <>
+        <label>
+            Enter your postcode to get distances to selected zoos:
+            <input id="postcode" type="text" value={props.postcode} onChange={props.onUpdate}/>
+        </label>
+        <span className={errorClass}>Invalid postcode.</span>
+        {props.isLoading ? <Spinner/> : ""}
+    </>
 }

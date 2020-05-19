@@ -10,19 +10,14 @@ interface SelectedSpeciesResultProps {
     species: SpeciesData;
     onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
-export class SelectedSpeciesResult extends React.Component<SelectedSpeciesResultProps, {}> {
-    constructor(props: SelectedSpeciesResultProps) {
-        super(props);
-    }
 
-    render() {
-        const onClick = this.props.onSelectSpecies.bind(null, this.props.species.id, false);
-        return <li>
+export const SelectedSpeciesResult: React.FunctionComponent<SelectedSpeciesResultProps> = (props) => {
+    const onClick = props.onSelectSpecies.bind(null, props.species.id, false);
+    return <li>
             <span className={classNames(styles.species, styles.clickable, styles.selected)} onClick={onClick}>
-                <span>{this.props.species.commonName}</span>
-                <LatinName>{this.props.species.latinName}</LatinName>
-                <TickBox selected={true} />
+                <span>{props.species.commonName}</span>
+                <LatinName>{props.species.latinName}</LatinName>
+                <TickBox selected={true}/>
             </span>
-        </li>
-    }
+    </li>
 }
