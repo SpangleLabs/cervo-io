@@ -43,6 +43,7 @@ export const Selections: React.FunctionComponent<SelectionsProps> = (props) => {
             onSelectZoos={props.onSelectZoos}
             zooDistances={props.zooDistances}
             loadingDistances={props.loadingDistances}
+            loadingZoos={props.loadingZoos}
         />
     </>
 }

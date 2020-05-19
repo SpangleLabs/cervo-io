@@ -7,7 +7,8 @@ interface SelectedZoosListProps {
     selectedZoos: ZooJson[];
     onSelectZoos: (zoo: ZooJson) => void;
     zooDistances: Map<number, number>;
-    loadingDistances: boolean
+    loadingDistances: boolean;
+    loadingZoos: boolean;
 }
 
 export const SelectedZoosList: React.FunctionComponent<SelectedZoosListProps> = (props) => {
@@ -31,7 +32,7 @@ export const SelectedZoosList: React.FunctionComponent<SelectedZoosListProps> = 
 
     return <>
     <h2>Zoos with selected species ({props.selectedZoos.length})</h2>
-        {props.loadingDistances ? <Spinner/> : ""}
+        {props.loadingDistances || props.loadingZoos ? <Spinner/> : ""}
         <ul id="selected-zoos">
             {orderedZoos.map((zoo) => {
                 const onSelect = props.onSelectZoos.bind(null, zoo);
