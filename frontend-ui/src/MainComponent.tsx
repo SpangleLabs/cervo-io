@@ -11,6 +11,7 @@ import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
 const styles = require("./MainComponent.css")
 
 
+let lastZooSpeciesIds: number[] = []  // debouncing zoo list calls, so last one called gets evaluated
 const MainComponent: React.FunctionComponent = () => {
     const [animalData] = useState(new AnimalData(getAuthCookie()))
     const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<number[]>([])
@@ -67,24 +68,32 @@ const MainComponent: React.FunctionComponent = () => {
         })
     }
 
-    const updateSelectedZoos = async (selectedSpeciesIds: number[]) => {
+    const updateSelectedZoos = async (newSelectedSpeciesIds: number[]) => {
         await withLoading(setLoadingZoos, async () => {
-            const selectedSpecies = selectedSpeciesIds.map((speciesId) => animalData.species.get(speciesId)).filter((x): x is SpeciesData => x !== undefined);
-            const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()));
-            // Flatten list of lists
-            let selectedZoos: ZooJson[] = [];
-            for (const zooList of selectedZooses) {
-                selectedZoos = selectedZoos.concat(zooList);
-            }
-            // Uniqueify
-            selectedZoos = selectedZoos.filter(function (value, index, arr) {
-                const zooIds = arr.map(x => x.zoo_id);
-                return zooIds.indexOf(value.zoo_id) === index
-            });
+            lastZooSpeciesIds = newSelectedSpeciesIds
+            const selectedZoos = await getZoosForSpeciesIds(newSelectedSpeciesIds)
             // Set state
-            setSelectedZoos(selectedZoos)
-            await updateZooDistances(postcode, selectedZoos);
+            if(lastZooSpeciesIds == newSelectedSpeciesIds) {
+                setSelectedZoos(selectedZoos)
+                await updateZooDistances(postcode, selectedZoos);
+            }
         })
+    }
+
+    const getZoosForSpeciesIds = async (speciesIds: number[]) => {
+        const selectedSpecies = speciesIds.map((speciesId) => animalData.species.get(speciesId)).filter((x): x is SpeciesData => x !== undefined);
+        const selectedZooses = await Promise.all(selectedSpecies.map((species) => species.getZooList()))
+        // Flatten list of lists
+        let selectedZoos: ZooJson[] = [];
+        for (const zooList of selectedZooses) {
+            selectedZoos = selectedZoos.concat(zooList);
+        }
+        // Uniqueify
+        selectedZoos = selectedZoos.filter(function (value, index, arr) {
+            const zooIds = arr.map(x => x.zoo_id);
+            return zooIds.indexOf(value.zoo_id) === index
+        });
+        return selectedZoos
     }
 
     const onClickZooMarker = async (zoo: ZooJson) => {
