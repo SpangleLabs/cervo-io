@@ -12,7 +12,7 @@ const styles = require("./MainComponent.css")
 
 
 const MainComponent: React.FunctionComponent = () => {
-    const animalData = new AnimalData(getAuthCookie())
+    const [animalData] = useState(new AnimalData(getAuthCookie()))
     const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<number[]>([])
     const [selectedZoos, setSelectedZoos] = useState<ZooJson[]>([])
     const [postcode, setPostcode] = useState("")
@@ -22,10 +22,13 @@ const MainComponent: React.FunctionComponent = () => {
     const [loadingDistances, setLoadingDistances] = useState(false)
     const [loadingZoos, setLoadingZoos] = useState(false)
 
-    const onSelectSpecies = async (speciesId: number, selected?: boolean) => {
-        const newSelection = toggleSelectionMembership(selectedSpeciesIds, speciesId, selected)
-        await updateSelectedZoos(newSelection)
-        setSelectedSpeciesIds(newSelection)
+    const onSelectSpecies = (speciesId: number, selected?: boolean) => {
+        setSelectedSpeciesIds(
+            selectedSpeciesIds => {
+                const newSelection = toggleSelectionMembership(selectedSpeciesIds, speciesId, selected)
+                updateSelectedZoos(newSelection).then()
+                return newSelection
+            })
     }
 
     const onPostcodeUpdate = async (e: React.FormEvent<HTMLInputElement>) => {

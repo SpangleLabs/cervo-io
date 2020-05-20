@@ -10,7 +10,7 @@ interface SelectionsProps extends ViewProps {
     // selected species list
     animalData: AnimalData;
     selectedSpeciesIds: number[];
-    onSelectSpecies: (speciesId: number, selected?: boolean) => Promise<void>;
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
     // postcode entry
     postcode: string;
     postcodeError: boolean;

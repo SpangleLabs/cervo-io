@@ -5,7 +5,7 @@ import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 interface SelectedSpeciesListProps {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
-    onSelectSpecies: (speciesId: number, selected?: boolean) => Promise<void>;
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
 }
 
 export const SelectedSpeciesList: React.FunctionComponent<SelectedSpeciesListProps> = (props) => {

@@ -2,11 +2,11 @@ import {CategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {AnimalData, CategoryData, SpeciesData} from "./animalData";
 
 
-export async function create(animalData: AnimalData, onSelectSpecies: (speciesId: number, selected?: boolean) => void): Promise<TaxonomyTreeState> {
+export async function create(animalData: AnimalData, onSelectSpecies?: (speciesId: number, selected?: boolean) => void): Promise<TaxonomyTreeState> {
     const categoryLevelsPromise = animalData.promiseCategoryLevels();
     const baseCategoriesPromise = animalData.promiseBaseCategories();
     const [categoryLevels, baseCategories] = await Promise.all([categoryLevelsPromise, baseCategoriesPromise]);
-    const rootCategories: TaxonomyCategoryState[] = await Promise.all(baseCategories.map(async function(x) {
+    const rootCategories: TaxonomyCategoryState[] = await Promise.all(baseCategories.map(async function (x) {
         return {
             data: x,
             categoryLevel: await x.getCategoryName(),
@@ -54,10 +54,10 @@ export async function treeAddSpecies(state: TaxonomyTreeState, categoryParentPat
 }
 
 async function categoryToggleSelectCategory(category: TaxonomyCategoryState, categoryIds: number[]): Promise<TaxonomyCategoryState> {
-    if(category.data.id != categoryIds[0]) {
+    if (category.data.id != categoryIds[0]) {
         return category;
     }
-    if(categoryIds.length == 1) {
+    if (categoryIds.length == 1) {
         return toggleSelectCategory(category);
     }
     category = await populateCategory(category);
@@ -74,10 +74,10 @@ async function categoryToggleSelectCategory(category: TaxonomyCategoryState, cat
 }
 
 async function categoryExpandCategory(category: TaxonomyCategoryState, categoryIds: number[]): Promise<TaxonomyCategoryState> {
-    if(category.data.id != categoryIds[0]) {
+    if (category.data.id != categoryIds[0]) {
         return category;
     }
-    if(categoryIds.length == 1) {
+    if (categoryIds.length == 1) {
         return expandCategory(category);
     }
     category = await populateCategory(category);
@@ -94,10 +94,10 @@ async function categoryExpandCategory(category: TaxonomyCategoryState, categoryI
 }
 
 async function categoryAddCategory(category: TaxonomyCategoryState, parentCategoryPath: number[], newCategory: CategoryData): Promise<TaxonomyCategoryState> {
-    if(category.data.id != parentCategoryPath[0]) {
+    if (category.data.id != parentCategoryPath[0]) {
         return category;
     }
-    if(parentCategoryPath.length == 1) {
+    if (parentCategoryPath.length == 1) {
         return addCategory(category, newCategory);
     }
     category = await populateCategory(category);
@@ -114,10 +114,10 @@ async function categoryAddCategory(category: TaxonomyCategoryState, parentCatego
 }
 
 async function categoryAddSpecies(category: TaxonomyCategoryState, parentCategoryPath: number[], newSpecies: SpeciesData): Promise<TaxonomyCategoryState> {
-    if(category.data.id != parentCategoryPath[0]) {
+    if (category.data.id != parentCategoryPath[0]) {
         return category;
     }
-    if(parentCategoryPath.length == 1) {
+    if (parentCategoryPath.length == 1) {
         return addSpecies(category, newSpecies);
     }
     category = await populateCategory(category);
@@ -135,7 +135,10 @@ async function categoryAddSpecies(category: TaxonomyCategoryState, parentCategor
 
 async function selectCategory(category: TaxonomyCategoryState, selected: boolean): Promise<TaxonomyCategoryState> {
     category = await populateCategory(category);
-    category.species.map(x => category.onSelectSpecies(x.data.id, selected));
+    const onSelectSpecies = category.onSelectSpecies
+    if (onSelectSpecies !== undefined) {
+        category.species.map(x => onSelectSpecies(x.data.id, selected));
+    }
     return {
         data: category.data,
         categoryLevel: category.categoryLevel,
@@ -229,7 +232,7 @@ async function populateCategory(category: TaxonomyCategoryState): Promise<Taxono
         return category;
     }
     const [subCategoryData, speciesData] = await Promise.all([category.data.getSubCategories(), category.data.getSpecies()]);
-    const subCategories = await Promise.all(subCategoryData.map(async function(x) {
+    const subCategories = await Promise.all(subCategoryData.map(async function (x) {
         return {
             data: x,
             categoryLevel: await x.getCategoryName(),
@@ -272,7 +275,7 @@ export interface TaxonomyCategoryState {
     populated: boolean;
     selected: boolean;
     expanded: boolean;
-    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
+    onSelectSpecies?: (speciesId: number, selected?: boolean) => void;
 }
 
 export interface TaxonomySpeciesState {

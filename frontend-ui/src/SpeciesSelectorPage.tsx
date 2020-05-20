@@ -7,7 +7,7 @@ import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 interface SpeciesSelectorPageProps {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
-    onSelectSpecies: (speciesId: number, selected?: boolean) => Promise<void>;
+    onSelectSpecies: (speciesId: number, selected?: boolean) => void;
     onClickZooMarker: (zoo: ZooJson) => Promise<void>;
     selectedZoos: ZooJson[];
     postcode: string;

@@ -15,8 +15,8 @@ interface StatedTaxonomyCategoryProps {
     odd: boolean;
     selectedSpecies: number[];
     onExpandCategory: (categoryPath: number[]) => Promise<void>;
-    onSelectCategory: (categoryPath: number[]) => Promise<void> | null;
-    onSelectSpecies: (speciesId: number) => void | null;
+    onSelectCategory?: (categoryPath: number[]) => Promise<void>
+    onSelectSpecies?: (speciesId: number) => Promise<void>
     editableTaxonomy: boolean;
     onAddCategory: (categoryParentPath: number[], newCategory: NewCategoryJson) => Promise<void> | null;
     onAddSpecies: (categoryParentPath: number[], newSpecies: NewSpeciesJson) => Promise<void> | null;
