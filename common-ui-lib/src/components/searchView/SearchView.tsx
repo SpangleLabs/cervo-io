@@ -3,6 +3,7 @@ import {SpeciesData} from "../../animalData";
 import {ViewProps} from "../../views";
 import {Spinner} from "../images/Spinner";
 import {SearchResult} from "./SearchResult";
+import {withLoading} from "../../utilities";
 
 
 export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) => {
@@ -18,11 +19,12 @@ export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) =
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLastSearch(searchTerm);
-        setIsLoading(true)
-        const species = await props.animalData.promiseSearchSpecies(searchTerm);
-        setSpeciesList(species)
-        setIsLoading(false)
+        const cleanSearch = searchTerm.trim()
+        setLastSearch(cleanSearch);
+        await withLoading(setIsLoading, async () => {
+            const species = await props.animalData.promiseSearchSpecies(cleanSearch);
+            setSpeciesList(species)
+        })
     }
 
     const speciesElements = speciesList.map(
