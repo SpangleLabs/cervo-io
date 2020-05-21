@@ -36,6 +36,10 @@ export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEn
 
     return <li className={className} onClick={onClick}>
         <span>
+            {
+                onSelectSpecies != null &&
+                <TickBox selected={selected}/>
+            }
                 <span className={styles.common_name}>
                     {
                         props.searchTerm == null
@@ -61,10 +65,6 @@ export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEn
             }
             {
                 props.children
-            }
-            {
-                onSelectSpecies != null &&
-                <TickBox selected={selected}/>
             }
         </span>
     </li>
