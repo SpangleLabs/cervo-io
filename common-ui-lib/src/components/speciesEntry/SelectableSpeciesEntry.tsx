@@ -2,7 +2,7 @@ import {SpeciesData} from "../../animalData";
 import {SearchHilightedText} from "../searchView/SearchHilightedText";
 import {LatinName} from "./LatinName";
 import {TickBox} from "../TickBox";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import classNames from "classnames";
 
 const styles = require("./SelectableSpeciesEntry.css")
@@ -17,6 +17,11 @@ interface SelectableSpeciesEntryProps {
 }
 
 export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEntryProps> = (props) => {
+    const [zooCount, setZooCount] = useState<number|null>(null)
+
+    useEffect(() => {
+        props.species.getZooList().then((zl) => setZooCount(zl.length))
+    }, [props.species])
 
     const onSelectSpecies = props.onSelectSpecies
     const selected = props.selectedSpeciesIds != null && props.selectedSpeciesIds.includes(props.species.id);
@@ -62,6 +67,9 @@ export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEn
                             />
                     }
                 </LatinName>
+            }
+            {
+                zooCount != null && <>[{zooCount}]</>
             }
             {
                 props.children
