@@ -1,6 +1,6 @@
-import {SelectedSpeciesResult} from "./SelectedSpeciesResult";
 import React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
+import {SelectableSpeciesEntry} from "@cervoio/common-ui-lib/src/components/speciesEntry/SelectableSpeciesEntry";
 
 interface SelectedSpeciesListProps {
     animalData: AnimalData;
@@ -20,9 +20,11 @@ export const SelectedSpeciesList: React.FunctionComponent<SelectedSpeciesListPro
         <h2>Selected species ({props.selectedSpeciesIds.length})</h2>
         <ul>
             {selectedSpecies.map((species) =>
-                <SelectedSpeciesResult
+                <SelectableSpeciesEntry
                     key={species.id}
                     species={species}
+                    showLatinName={true}
+                    selectedSpeciesIds={[species.id]}
                     onSelectSpecies={props.onSelectSpecies}
                 />)
             }

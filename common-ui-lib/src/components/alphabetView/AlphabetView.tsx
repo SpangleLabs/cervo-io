@@ -1,9 +1,9 @@
 import React from "react";
 import {AnimalData, SpeciesData} from "../../animalData";
 import {Spinner} from "../images/Spinner";
-import {AlphabetLetterResult} from "./AlphabetLetterResult";
 import {AlphabetLetter} from "./AlphabetLetter";
 import {useEffect, useState} from "react";
+import {SelectableSpeciesEntry} from "../speciesEntry/SelectableSpeciesEntry";
 
 const style = require("./AlphabetView.css")
 
@@ -50,10 +50,11 @@ export const AlphabetViewComponent: React.FunctionComponent<AlphabetViewProps> =
 
     const speciesComponentList = speciesList.map(
         (species) =>
-            <AlphabetLetterResult
+            <SelectableSpeciesEntry
                 key={species.id}
                 species={species}
                 selectedSpeciesIds={props.selectedSpeciesIds}
+                showLatinName={false}
                 onSelectSpecies={props.onSelectSpecies}
             />);
     return <>

@@ -2,9 +2,9 @@ import React, {useState} from "react";
 import {SpeciesData} from "../../animalData";
 import {ViewProps} from "../../views";
 import {Spinner} from "../images/Spinner";
-import {SearchResult} from "./SearchResult";
 import {withLoading} from "../../utilities";
 import {SearchNoResults} from "./SearchNoResults";
+import {SelectableSpeciesEntry} from "../speciesEntry/SelectableSpeciesEntry";
 
 
 export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) => {
@@ -33,12 +33,13 @@ export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) =
 
     const speciesElements = speciesList.map(
         (species) =>
-            <SearchResult
+            <SelectableSpeciesEntry
                 key={species.id}
                 species={species}
-                searchTerm={lastSearch}
                 selectedSpeciesIds={props.selectedSpeciesIds}
+                showLatinName={true}
                 onSelectSpecies={props.onSelectSpecies}
+                searchTerm={lastSearch}
             />
     );
     return (

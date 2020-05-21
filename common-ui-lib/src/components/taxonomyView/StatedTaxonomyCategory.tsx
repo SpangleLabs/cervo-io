@@ -1,11 +1,11 @@
 import React from "react";
-import {TaxonomySpecies} from "./TaxonomySpecies";
 import {HiddenStatus} from "./admin/HiddenStatus";
 import {TaxonomyCategoryState} from "../../taxonomyState";
 import {NewCategoryJson, NewSpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {CategorySelector} from "./CategorySelector";
 import {EditTaxonomyForm} from "./admin/EditTaxonomyForm";
 import classNames from "classnames";
+import {SelectableSpeciesEntry} from "../speciesEntry/SelectableSpeciesEntry";
 
 const styles = require("./StatedTaxonomyCategory.css")
 
@@ -72,14 +72,16 @@ export const StatedTaxonomyCategory: React.FunctionComponent<StatedTaxonomyCateg
             )}
             {props.category.species.map(
                 (species) =>
-                    <TaxonomySpecies
-                        key={"species-" + species.data.id}
+                    <SelectableSpeciesEntry
+                        key={species.data.id}
                         species={species.data}
                         selectedSpeciesIds={props.selectedSpecies}
+                        showLatinName={true}
                         onSelectSpecies={props.onSelectSpecies}
-                        editableTaxonomy={props.editableTaxonomy}
                         odd={!props.odd}
-                    />
+                    >
+                        {props.editableTaxonomy && <HiddenStatus hidden={species.data.hidden}/>}
+                    </SelectableSpeciesEntry>
             )}
         </ul>
     </li>
