@@ -3,7 +3,7 @@ import React from "react";
 import {TickBox} from "../TickBox";
 import {HiddenStatus} from "./admin/HiddenStatus";
 import classNames from "classnames";
-import {LatinName} from "../LatinName";
+import {LatinName} from "../speciesEntry/LatinName";
 
 const styles = require("./TaxonomySpecies.css")
 
