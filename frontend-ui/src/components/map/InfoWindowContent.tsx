@@ -11,13 +11,14 @@ interface InfoWindowContentProps {
 }
 
 export const InfoWindowContent: React.FunctionComponent<InfoWindowContentProps> = (props) => {
+    const orderedSpecies = props.zoo.species.sort((a, b) => a.common_name.localeCompare(b.common_name))
     return <>
         <h1>{props.zoo.name}</h1>
         <a href={props.zoo.link}>{props.zoo.link}</a><br/>
         <span>Postcode: </span>{props.zoo.postcode}<br/>
         <h2>Species:</h2>
         <ul className={styles.zoo_species}>
-            {props.zoo.species.map((species) => {
+            {orderedSpecies.map((species) => {
                     const classes = classNames(
                         styles.zoo_species,
                         styles.species,
