@@ -4,6 +4,7 @@ import {ViewProps} from "../../views";
 import {Spinner} from "../images/Spinner";
 import {SearchResult} from "./SearchResult";
 import {withLoading} from "../../utilities";
+import {SearchNoResults} from "./SearchNoResults";
 
 
 export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) => {
@@ -20,6 +21,9 @@ export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) =
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const cleanSearch = searchTerm.trim()
+        if (cleanSearch.length == 0) {
+            return
+        }
         setLastSearch(cleanSearch);
         await withLoading(setIsLoading, async () => {
             const species = await props.animalData.promiseSearchSpecies(cleanSearch);
@@ -48,7 +52,15 @@ export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) =
                 {isLoading ? <Spinner/> : ""}
             </form>
             <ul>
-                {speciesElements}
+                {
+                    lastSearch.length > 0
+                        ? (
+                            speciesElements.length > 0
+                                ? speciesElements
+                                : <SearchNoResults searchTerm={lastSearch}/>
+                        )
+                        : <></>
+                }
             </ul>
         </div>
     )
