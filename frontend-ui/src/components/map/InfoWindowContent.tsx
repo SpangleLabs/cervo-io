@@ -1,6 +1,6 @@
 import React from "react";
 import {FullZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {LatinName} from "@cervoio/common-ui-lib/src/components/LatinName";
+import {LatinName} from "@cervoio/common-ui-lib/src/components/speciesEntry/LatinName";
 import classNames from "classnames";
 
 const styles = require("./InfoWindowContent.css")

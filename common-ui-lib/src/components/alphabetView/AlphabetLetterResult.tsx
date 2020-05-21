@@ -1,9 +1,6 @@
 import {SpeciesData} from "../../animalData";
 import React from "react";
-import classNames from "classnames";
-import {TickBox} from "../TickBox";
-
-const style = require("./AlphabetLetterResult.css")
+import {SelectableSpeciesEntry} from "../speciesEntry/SelectableSpeciesEntry";
 
 interface AlphabetLetterResultProps {
     species: SpeciesData;
@@ -12,20 +9,12 @@ interface AlphabetLetterResultProps {
 }
 
 export const AlphabetLetterResult: React.FunctionComponent<AlphabetLetterResultProps> = (props) => {
-    const onClick = () => {
-        props.onSelectSpecies(props.species.id)
-    }
-
-    const selected = props.selectedSpeciesIds.includes(props.species.id);
-    const className = classNames(
-        style.species,
-        style.clickable,
-        {[style.selected]: selected}
-    )
     return <li>
-            <span className={className} onClick={onClick}>
-                <span className={style.common_name}>{props.species.commonName}</span>
-                <TickBox selected={selected}/>
-            </span>
+        <SelectableSpeciesEntry
+            species={props.species}
+            selectedSpeciesIds={props.selectedSpeciesIds}
+            showLatinName={false}
+            onSelectSpecies={props.onSelectSpecies}
+        />
     </li>
 }

@@ -1,11 +1,6 @@
 import React from "react";
-import {SearchHilightedText} from "./SearchHilightedText";
-import {TickBox} from "../TickBox";
 import {SpeciesData} from "../../animalData";
-import classNames from "classnames";
-import {LatinName} from "../LatinName";
-
-const styles = require("./SearchResult.css")
+import {SelectableSpeciesEntry} from "../speciesEntry/SelectableSpeciesEntry";
 
 interface SearchResultProps {
     searchTerm: string;
@@ -15,34 +10,13 @@ interface SearchResultProps {
 }
 
 export const SearchResult: React.FunctionComponent<SearchResultProps> = (props) => {
-    const onClick = () => {
-        props.onSelectSpecies(props.species.id);
-    }
-    const selected = props.selectedSpeciesIds.includes(props.species.id);
-    const className = classNames(
-        styles.clickable,
-        styles.species,
-        {
-            [styles.selected]: selected
-        }
-    )
-    const searchTerm = props.searchTerm;
-    const species = props.species;
     return <li>
-            <span className={className} onClick={onClick}>
-                <span className={styles.common_name}>
-                    <SearchHilightedText
-                        text={species.commonName}
-                        searchTerm={searchTerm}
-                    />
-                </span>
-                <LatinName>
-                    <SearchHilightedText
-                        text={species.latinName}
-                        searchTerm={searchTerm}
-                    />
-                </LatinName>
-                <TickBox selected={selected}/>
-            </span>
+        <SelectableSpeciesEntry
+            species={props.species}
+            selectedSpeciesIds={props.selectedSpeciesIds}
+            showLatinName={true}
+            onSelectSpecies={props.onSelectSpecies}
+            searchTerm={props.searchTerm}
+        />
     </li>
 }
