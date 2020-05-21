@@ -16,13 +16,13 @@ export class AnimalData {
     token?: string;
     species: Map<number, SpeciesData>;
     categories: Map<number, CategoryData>;
-    categoryLevels: Promise<CategoryLevelJson[]>;
-    baseCategory: Promise<CategoryData[]>;
-    validFirstLetters: Promise<string[]>;
+    categoryLevels?: Promise<CategoryLevelJson[]>;
+    baseCategory?: Promise<CategoryData[]>;
+    validFirstLetters?: Promise<string[]>;
     speciesByLetter: Map<string, Promise<SpeciesData[]>>;
-    cacheZooDistances: {[key: string]: {[key: string]: number}} = {};
+    cacheZooDistances: { [key: string]: { [key: string]: number } } = {};
     fullZoos: Map<number, FullZooJson>;
-    private _listZoos: ZooJson[] = null;
+    private _listZoos?: ZooJson[];
     private _listedSpecies: boolean = false;
 
     constructor(token?: string) {
@@ -34,89 +34,90 @@ export class AnimalData {
     }
 
     getPath(path: string): Promise<any> {
-        let authHeaders = undefined;
-        if(this.token) {
+        let authHeaders: Map<string, string> | undefined = undefined;
+        if (this.token) {
             authHeaders = new Map([["authorization", this.token]]);
         }
         return promiseGet(path, authHeaders);
     }
 
     postPath(path: string, data: any): Promise<any> {
-        let authHeaders = undefined;
-        if(this.token) {
+        let authHeaders: Map<string, string> | undefined = undefined;
+        if (this.token) {
             authHeaders = new Map([["authorization", this.token]]);
         }
         return promisePost(path, data, authHeaders);
     }
 
     deletePath(path: string, data: any): Promise<any> {
-        let authHeaders = undefined;
-        if(this.token) {
+        let authHeaders: Map<string, string> | undefined = undefined;
+        if (this.token) {
             authHeaders = new Map([["authorization", this.token]]);
         }
         return promiseDelete(path, data, authHeaders);
     }
 
-    promiseCategoryLevels() : Promise<CategoryLevelJson[]> {
+    promiseCategoryLevels(): Promise<CategoryLevelJson[]> {
         if (!this.categoryLevels) {
             this.categoryLevels = this.getPath("category_levels/");
         }
         return this.categoryLevels;
     }
 
-    promiseBaseCategories() : Promise<CategoryData[]> {
+    promiseBaseCategories(): Promise<CategoryData[]> {
         if (!this.baseCategory) {
             const self = this;
-            this.baseCategory = this.getPath("categories/").then(function(data: CategoryJson[]) {
+            this.baseCategory = this.getPath("categories/").then(function (data: CategoryJson[]) {
                 return data.map(x => self.getOrCreateCategory(x));
             });
         }
         return this.baseCategory;
     }
 
-    promiseValidFirstLetters() : Promise<string[]> {
+    promiseValidFirstLetters(): Promise<string[]> {
         if (!this.validFirstLetters) {
             this.validFirstLetters = this.getPath("species/valid_first_letters/");
         }
         return this.validFirstLetters;
     }
 
-    promiseSpeciesByLetter(letter: string) : Promise<SpeciesData[]> {
-        if (!this.speciesByLetter.has(letter)) {
+    promiseSpeciesByLetter(letter: string): Promise<SpeciesData[]> {
+        let letterPromise = this.speciesByLetter.get(letter);
+        if (!letterPromise) {
             const self = this;
-            const speciesPromise = this.getPath(`species/?common_name=${letter}%25`).then(function(data: SpeciesJson[]) {
+            letterPromise = this.getPath(`species/?common_name=${letter}%25`).then(function (data: SpeciesJson[]) {
                 return data.map(x => self.getOrCreateSpecies(x));
             });
-            this.speciesByLetter.set(letter, speciesPromise);
+            this.speciesByLetter.set(letter, letterPromise);
         }
-        return this.speciesByLetter.get(letter);
+        return letterPromise;
     }
 
-    promiseSearchSpecies(search: string) : Promise<SpeciesData[]> {
+    promiseSearchSpecies(search: string): Promise<SpeciesData[]> {
         const self = this;
-        return this.getPath(`species/?name=%25${search}%25`).then(function(animals: SpeciesJson[]) {
+        return this.getPath(`species/?name=%25${search}%25`).then(function (animals: SpeciesJson[]) {
             return animals.map(x => self.getOrCreateSpecies(x));
         });
     }
 
-    getOrCreateCategory(categoryData: CategoryJson): CategoryData {
-        const categoryId = categoryData.category_id;
-        if (!this.categories.has(categoryId)) {
-            const newCategory = new CategoryData(categoryData, this);
-            this.categories.set(categoryId, newCategory);
+    getOrCreateCategory(categoryJson: CategoryJson): CategoryData {
+        const categoryId = categoryJson.category_id;
+        let categoryData = this.categories.get(categoryId)
+        if (!categoryData) {
+            categoryData = new CategoryData(categoryJson, this);
+            this.categories.set(categoryId, categoryData);
         }
-        return this.categories.get(categoryId);
+        return categoryData;
     }
 
-    getOrCreateSpecies(speciesData: SpeciesJson) : SpeciesData {
-        const speciesId = speciesData.species_id;
-        if (this.species.has(speciesId)) {
-            return this.species.get(speciesId);
-        } else {
-            const newSpecies = new SpeciesData(speciesData, this);
-            this.species.set(speciesId, newSpecies);
-            return newSpecies;
+    getOrCreateSpecies(speciesJson: SpeciesJson): SpeciesData {
+        const speciesId = speciesJson.species_id
+        let speciesData = this.species.get(speciesId)
+        if (!speciesData) {
+            speciesData = new SpeciesData(speciesJson, this);
+            this.species.set(speciesId, speciesData);
         }
+        return speciesData
     }
 
     cacheAddZooDistances(postcode: string, zooDistanceData: ZooDistanceJson[]) {
@@ -148,7 +149,7 @@ export class AnimalData {
             return foundDistances;
         }
         //create url to request
-        let path = `zoo_distances/${postcode}/`+zoosNeedingDistance.join(",");
+        let path = `zoo_distances/${postcode}/` + zoosNeedingDistance.join(",");
         //get response
         const newDistances = await this.getPath(path);
         this.cacheAddZooDistances(postcode, newDistances);
@@ -156,8 +157,9 @@ export class AnimalData {
     }
 
     async promiseFullZoo(zooId: number): Promise<FullZooJson> {
-        if(this.fullZoos.get(zooId)) {
-            return this.fullZoos.get(zooId);
+        const zooData = this.fullZoos.get(zooId)
+        if (zooData) {
+            return zooData;
         }
         const fullData = await this.getPath(`zoos/${zooId}`);
         this.fullZoos.set(zooId, fullData[0]);
@@ -165,7 +167,7 @@ export class AnimalData {
     }
 
     async listZoos(): Promise<ZooJson[]> {
-        if(this._listZoos) {
+        if (this._listZoos) {
             return this._listZoos;
         }
         const listZoos = await this.getPath("zoos/");
@@ -174,11 +176,11 @@ export class AnimalData {
     }
 
     async listSpecies(): Promise<SpeciesData[]> {
-        if(!this._listedSpecies) {
+        if (!this._listedSpecies) {
             const listSpecies: SpeciesJson[] = await this.getPath("species/");
             const self = this;
-            listSpecies.forEach(function(species: SpeciesJson) {
-                if(!self.species.has(species.species_id)) {
+            listSpecies.forEach(function (species: SpeciesJson) {
+                if (!self.species.has(species.species_id)) {
                     const newSpecies = new SpeciesData(species, self);
                     self.species.set(species.species_id, newSpecies);
                 }
@@ -190,21 +192,23 @@ export class AnimalData {
     async addCategory(newCategory: NewCategoryJson): Promise<CategoryData> {
         const category: CategoryJson = await this.postPath("categories/", newCategory);
         const categoryId = category.category_id;
-        if (!this.categories.has(categoryId)) {
-            const categoryData = new CategoryData(category, this);
+        let categoryData = this.categories.get(categoryId)
+        if (!categoryData) {
+            categoryData = new CategoryData(category, this);
             this.categories.set(categoryId, categoryData);
         }
-        return this.categories.get(categoryId);
+        return categoryData;
     }
 
     async addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesData> {
         const species: SpeciesJson = await this.postPath("species/", newSpecies);
         const speciesId = species.species_id;
-        if (!this.species.has(speciesId)) {
-            const speciesData = new SpeciesData(species, this);
+        let speciesData = this.species.get(speciesId)
+        if (!speciesData) {
+            speciesData = new SpeciesData(species, this);
             this.species.set(speciesId, speciesData);
         }
-        return this.species.get(speciesId);
+        return speciesData
     }
 
     async addZooSpeciesLink(zooId: number, speciesId: number): Promise<ZooSpeciesLinkJson> {
@@ -273,7 +277,7 @@ export class CategoryData {
     async getCategoryName(): Promise<string> {
         const categoryLevels = await this.animalData.promiseCategoryLevels();
         const matching = categoryLevels.filter((level) => level.category_level_id == this.categoryLevelId);
-        if(matching.length) {
+        if (matching.length) {
             return matching[0].name;
         } else {
             return "(unknown rank)";
@@ -304,7 +308,7 @@ export class SpeciesData {
     }
 
     async getZooList(): Promise<ZooJson[]> {
-        if(this.zooList == null) {
+        if (this.zooList == null) {
             this.zooList = this.animalData.getPath("species/" + this.id).then(function (data: FullSpeciesJson[]) {
                 return data[0].zoos;
             });
