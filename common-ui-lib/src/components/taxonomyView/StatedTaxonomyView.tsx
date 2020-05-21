@@ -20,7 +20,7 @@ interface StatedTaxonomyViewProps {
     selectableSpecies?: boolean;
     selectableCategories?: boolean;
     onSelectSpecies?: (speciesId: number, selected?: boolean) => void;
-    editableTaxonomy?: boolean
+    editableTaxonomy: boolean
     onNewSpeciesCreated?: (speciesId: number) => Promise<void>;
 }
 interface StatedTaxonomyViewState {
@@ -59,11 +59,13 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
     }
 
     async addSpecies(categoryParentPath: number[], newSpecies: NewSpeciesJson): Promise<void> {
-        this.setState({isLoading: true});
-        const species = await this.props.animalData.addSpecies(newSpecies);
-        await this.props.onNewSpeciesCreated(species.id);
-        const newTree = await treeAddSpecies(this.state.taxonomy, categoryParentPath, species);
-        this.setState({taxonomy: newTree, isLoading: false});
+        if (this.props.onNewSpeciesCreated != null) {
+            this.setState({isLoading: true});
+            const species = await this.props.animalData.addSpecies(newSpecies);
+            await this.props.onNewSpeciesCreated(species.id);
+            const newTree = await treeAddSpecies(this.state.taxonomy, categoryParentPath, species);
+            this.setState({taxonomy: newTree, isLoading: false});
+        }
     }
 
     render() {
@@ -76,11 +78,11 @@ export class StatedTaxonomyView extends React.Component<StatedTaxonomyViewProps,
                     odd={true}
                     selectedSpecies={this.props.selectedSpecies}
                     onExpandCategory={this.expandCategory.bind(this)}
-                    onSelectCategory={this.props.selectableCategories ? this.selectCategory.bind(this) : null}
-                    onSelectSpecies={this.props.selectableSpecies ? this.props.onSelectSpecies : null}
+                    onSelectCategory={this.props.selectableCategories ? this.selectCategory.bind(this) : undefined}
+                    onSelectSpecies={this.props.selectableSpecies ? this.props.onSelectSpecies : undefined}
                     editableTaxonomy={this.props.editableTaxonomy}
-                    onAddCategory={this.props.editableTaxonomy ? this.addCategory.bind(this) : null}
-                    onAddSpecies={this.props.editableTaxonomy ? this.addSpecies.bind(this) : null}
+                    onAddCategory={this.props.editableTaxonomy ? this.addCategory.bind(this) : undefined}
+                    onAddSpecies={this.props.editableTaxonomy ? this.addSpecies.bind(this) : undefined}
                 />);
         return <ul className={styles.odd}>
             {baseCategories}

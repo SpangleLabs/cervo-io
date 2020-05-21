@@ -2,7 +2,7 @@ import React from "react";
 import {TickBox} from "../TickBox";
 
 interface CategorySelectorProps {
-    selectCategory: () => Promise<void> | null;
+    selectCategory?: () => Promise<void>;
     selected: boolean;
 }
 
