@@ -75,8 +75,8 @@ export const StatedTaxonomyCategory: React.FunctionComponent<StatedTaxonomyCateg
                     <TaxonomySpecies
                         key={"species-" + species.data.id}
                         species={species.data}
-                        selected={props.selectedSpecies.includes(species.data.id)}
-                        onSelect={props.onSelectSpecies == null ? null : props.onSelectSpecies.bind(null, species.data.id)}
+                        selectedSpeciesIds={props.selectedSpecies}
+                        onSelectSpecies={props.onSelectSpecies}
                         editableTaxonomy={props.editableTaxonomy}
                         odd={!props.odd}
                     />

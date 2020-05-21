@@ -8,12 +8,10 @@ interface SelectedSpeciesResultProps {
 }
 
 export const SelectedSpeciesResult: React.FunctionComponent<SelectedSpeciesResultProps> = (props) => {
-    return <li>
-        <SelectableSpeciesEntry
-            species={props.species}
-            showLatinName={true}
-            selectedSpeciesIds={[props.species.id]}
-            onSelectSpecies={props.onSelectSpecies}
-        />
-    </li>
+    return <SelectableSpeciesEntry
+        species={props.species}
+        showLatinName={true}
+        selectedSpeciesIds={[props.species.id]}
+        onSelectSpecies={props.onSelectSpecies}
+    />
 }

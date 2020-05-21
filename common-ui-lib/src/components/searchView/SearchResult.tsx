@@ -10,13 +10,11 @@ interface SearchResultProps {
 }
 
 export const SearchResult: React.FunctionComponent<SearchResultProps> = (props) => {
-    return <li>
-        <SelectableSpeciesEntry
-            species={props.species}
-            selectedSpeciesIds={props.selectedSpeciesIds}
-            showLatinName={true}
-            onSelectSpecies={props.onSelectSpecies}
-            searchTerm={props.searchTerm}
-        />
-    </li>
+    return <SelectableSpeciesEntry
+        species={props.species}
+        selectedSpeciesIds={props.selectedSpeciesIds}
+        showLatinName={true}
+        onSelectSpecies={props.onSelectSpecies}
+        searchTerm={props.searchTerm}
+    />
 }

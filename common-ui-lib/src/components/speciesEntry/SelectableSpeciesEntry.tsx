@@ -24,7 +24,9 @@ export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEn
         styles.species,
         {
             [styles.clickable]: onSelectSpecies != null,
-            [styles.selected]: selected
+            [styles.selected]: selected,
+            [styles.odd]: props.odd === true,
+            [styles.even]: props.odd === false
         }
     )
 
@@ -32,7 +34,8 @@ export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEn
         onSelectSpecies(props.species.id);
     } : undefined
 
-    return <span className={className} onClick={onClick}>
+    return <li className={className} onClick={onClick}>
+        <span>
                 <span className={styles.common_name}>
                     {
                         props.searchTerm == null
@@ -43,25 +46,26 @@ export const SelectableSpeciesEntry: React.FunctionComponent<SelectableSpeciesEn
                             />
                     }
                 </span>
-        {
-            props.showLatinName &&
-            <LatinName>
-                {
-                    props.searchTerm == null
-                        ? props.species.latinName
-                        : <SearchHilightedText
-                            text={props.species.latinName}
-                            searchTerm={props.searchTerm}
-                        />
-                }
-            </LatinName>
-        }
-        {
-            props.children
-        }
-        {
-            onSelectSpecies != null &&
-            <TickBox selected={selected}/>
-        }
-            </span>
+            {
+                props.showLatinName &&
+                <LatinName>
+                    {
+                        props.searchTerm == null
+                            ? props.species.latinName
+                            : <SearchHilightedText
+                                text={props.species.latinName}
+                                searchTerm={props.searchTerm}
+                            />
+                    }
+                </LatinName>
+            }
+            {
+                props.children
+            }
+            {
+                onSelectSpecies != null &&
+                <TickBox selected={selected}/>
+            }
+        </span>
+    </li>
 }

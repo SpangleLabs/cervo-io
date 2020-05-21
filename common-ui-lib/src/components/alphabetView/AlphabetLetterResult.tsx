@@ -9,12 +9,10 @@ interface AlphabetLetterResultProps {
 }
 
 export const AlphabetLetterResult: React.FunctionComponent<AlphabetLetterResultProps> = (props) => {
-    return <li>
-        <SelectableSpeciesEntry
-            species={props.species}
-            selectedSpeciesIds={props.selectedSpeciesIds}
-            showLatinName={false}
-            onSelectSpecies={props.onSelectSpecies}
-        />
-    </li>
+    return <SelectableSpeciesEntry
+        species={props.species}
+        selectedSpeciesIds={props.selectedSpeciesIds}
+        showLatinName={false}
+        onSelectSpecies={props.onSelectSpecies}
+    />
 }

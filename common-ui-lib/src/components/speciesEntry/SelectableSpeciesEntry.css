@@ -4,3 +4,12 @@
 .clickable {
     cursor: pointer;
 }
+.species.selected.odd {
+    background-color: cornflowerblue;
+}
+.species.selected.even {
+    background-color: royalblue;
+}
+li.species:before {
+    content: "🦌";
+}
