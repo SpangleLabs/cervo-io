@@ -100,7 +100,8 @@ const MainComponent: React.FunctionComponent = () => {
         const fullZoo = await animalData.promiseFullZoo(zoo.zoo_id);
         const zooIds = visibleInfoWindowZoos.map(x => x.zoo_id)
         if (!zooIds.includes(zoo.zoo_id)) {
-            const newList = visibleInfoWindowZoos.concat([fullZoo])
+            //const newList = visibleInfoWindowZoos.concat([fullZoo])
+            const newList = [fullZoo]
             setVisibleInfoWindowZoos(newList)
         }
     }
