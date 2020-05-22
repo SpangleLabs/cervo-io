@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import config from "../../config";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {GoogleMap, InfoWindow, LoadScript, Marker} from "@react-google-maps/api";
@@ -16,11 +16,22 @@ interface MapProps {
 }
 
 export const MapContainer: React.FunctionComponent<MapProps> = (props) => {
+    const [map, setMap] = useState<google.maps.Map|null>(null)
+    const [zoom, setZoom] = useState(6)
+    const [centre, setCentre] = useState({lat: 55, lng: -3})
+
+    const updateCentre = () => {
+        if(map != null) {
+            setZoom(map.getZoom())
+            setCentre(map.getCenter().toJSON())
+        }
+    }
 
     const infoWindowMap = props.visibleInfoWindowsZoos.reduce(function (map, obj) {
         map.set(obj.zoo_id, obj);
         return map;
     }, new Map<number, FullZooJson>());
+
     const currentMarkers: Map<number, JSX.Element> = new Map(props.selectedZoos.map((zoo) => {
         const onClick = () => {
             props.onMarkerClick(zoo);
@@ -56,9 +67,12 @@ export const MapContainer: React.FunctionComponent<MapProps> = (props) => {
             <div id={styles.mapContainer}>
                 <LoadScript googleMapsApiKey={config['google_maps_key']}>
                     <GoogleMap
-                        zoom={6}
-                        center={{lat: 55, lng: -3}}
+                        zoom={zoom}
+                        center={centre}
                         id={styles.map}
+                        onZoomChanged={updateCentre}
+                        onDragEnd={updateCentre}
+                        onLoad={setMap}
                     >
                         {Array.from(currentMarkers.values())}
                     </GoogleMap>
