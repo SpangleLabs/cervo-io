@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./bin/www",
+    "serve": "tsc-watch --onSuccess 'npm start'",
     "test": "tsc && npm run test-unit",
     "test-unit": "mocha dist/**/*.spec.js"
   },

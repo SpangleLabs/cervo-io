@@ -4,20 +4,20 @@
   "description": "Common ui ",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no tests for common UI lib\" && exit 1"
   },
   "dependencies": {
     "classnames": "^2.2.6"
   },
   "peerDependencies": {
+    "@cervoio/common-lib": "../common-lib",
+    "@types/react": "^16.9.2",
     "react": "^16.13.1"
   },
   "devDependencies": {
-    "@cervoio/common-lib": "../common-lib",
     "@types/classnames": "^2.2.10",
     "@types/jquery": "^3.3.30",
     "@types/node": "^13.13.5",
-    "@types/react": "^16.9.2",
     "awesome-typescript-loader": "^5.2.1",
     "parcel": "^1.12.4",
     "source-map-loader": "^0.2.4",

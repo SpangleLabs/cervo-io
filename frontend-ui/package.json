@@ -47,7 +47,8 @@
     "source-map-loader": "^0.2.4",
     "tslint": "^5.18.0",
     "tslint-loader": "^3.5.4",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "yarn": "^1.22.4"
   },
   "browserslist": [
     "since 2017-06"
