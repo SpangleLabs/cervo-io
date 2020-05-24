@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "node ./bin/www",
-    "serve": "tsc-watch --onSuccess 'npm start'",
+    "start": "node ./bin/www.ts",
+    "serve": "tsc-watch --onSuccess \"npm run start\"",
     "test": "tsc && npm run test-unit",
     "test-unit": "mocha dist/**/*.spec.js"
   },
@@ -37,6 +37,7 @@
     "chai-http": "^4.3.0",
     "mocha": "^6.1.0",
     "runtypes": "^4.0.1",
+    "tsc-watch": "^4.2.8",
     "typescript": "^3.5.3"
   },
   "optionalDependencies": {
