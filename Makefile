@@ -17,11 +17,13 @@ build: install
 	$(MAKE) build -C common-ui-lib
 	$(MAKE) build -C frontend-ui
 
-serve: install
-	$(MAKE) run -C backend-api
-	$(MAKE) serve -C frontend-ui
+serve:
+	echo "Please use either 'make serve-api' or 'make serve-ui'"
 
-serve-frontend: install
+serve-api: install
+	$(MAKE) serve -C backend-api
+
+serve-ui: install
 	$(MAKE) serve -C frontend-ui
 
 test:
