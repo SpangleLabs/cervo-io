@@ -46,7 +46,7 @@ export class SpeciesRouter extends AbstractRouter {
                 });
                 // Searching by (either latin or common) name
             } else if (req.query.name) {
-                const search = req.query.name;
+                const search = req.query.name.toString();
                 self.species.getSpeciesByName(search).then(function (rows) {
                     return self.authChecker.filterOutHidden(req, rows);
                 }).then(function(filteredRows) {
@@ -56,7 +56,7 @@ export class SpeciesRouter extends AbstractRouter {
                 });
                 // Searching by common name
             } else if (req.query.common_name) {
-                const search = req.query.common_name;
+                const search = req.query.common_name.toString();
                 self.species.getSpeciesByCommonName(search).then(function (rows) {
                     return self.authChecker.filterOutHidden(req, rows);
                 }).then(function(filteredRows) {
