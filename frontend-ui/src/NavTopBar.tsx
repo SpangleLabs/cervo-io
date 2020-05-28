@@ -19,7 +19,7 @@ export const NavTopBar: React.FunctionComponent<NavTopBarProps> = (props) => {
             Select by species
         </div>
         <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.byZoos})}>
-            List zoos
+            <abbr title="Coming soon">List zoos</abbr>
         </div>
         <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.faq})}>
             <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a>
