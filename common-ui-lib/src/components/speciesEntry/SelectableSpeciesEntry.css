@@ -1,14 +1,14 @@
 .species.selected {
-    background-color: powderblue;
+    background-color: var(--selected_species);
 }
 .clickable {
     cursor: pointer;
 }
 .species.selected.odd {
-    background-color: cornflowerblue;
+    background-color: var(--selected_species_tax);
 }
 .species.selected.even {
-    background-color: royalblue;
+    background-color: var(--selected_species_tax_alt);
 }
 li.species:before {
     content: "🦌";

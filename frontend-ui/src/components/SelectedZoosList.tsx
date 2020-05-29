@@ -2,6 +2,9 @@ import {Spinner} from "@cervoio/common-ui-lib/src/components/images/Spinner";
 import {SelectedZooResult} from "./SelectedZooResult";
 import React from "react";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {PostcodeEntry} from "./PostcodeEntry";
+
+const styles = require("./SelectedZoosList.css")
 
 interface SelectedZoosListProps {
     selectedZoos: ZooJson[];
@@ -9,6 +12,10 @@ interface SelectedZoosListProps {
     zooDistances: Map<number, number>;
     loadingDistances: boolean;
     loadingZoos: boolean;
+
+    postcode: string;
+    postcodeError: boolean;
+    onPostcodeUpdate: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 export const SelectedZoosList: React.FunctionComponent<SelectedZoosListProps> = (props) => {
@@ -31,7 +38,15 @@ export const SelectedZoosList: React.FunctionComponent<SelectedZoosListProps> = 
     const orderedZoos = props.selectedZoos.sort(compareZoos);
 
     return <>
-    <h2>Zoos with selected species ({props.selectedZoos.length})</h2>
+        <h2 className={styles.title}>
+            Zoos with selected species ({props.selectedZoos.length})
+        </h2>
+        <PostcodeEntry
+            postcode={props.postcode}
+            error={props.postcodeError}
+            onUpdate={props.onPostcodeUpdate}
+            isLoading={props.loadingDistances}
+        />
         {props.loadingDistances || props.loadingZoos ? <Spinner/> : ""}
         <ul id="selected-zoos">
             {orderedZoos.map((zoo) => {

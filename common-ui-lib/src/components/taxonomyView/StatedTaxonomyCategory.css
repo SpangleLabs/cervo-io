@@ -11,6 +11,7 @@
     cursor: pointer;
 }
 ul {
+    margin: 0;
     padding-left: 10px;
     border-left: 1px dotted black;
 }
@@ -24,14 +25,14 @@ li {
     padding-right: 3px;
 }
 ul.odd > li.selected {
-    background-color: palevioletred;
+    background-color: var(--selected_category);
 }
 ul.even > li.selected {
-    background-color: indianred;
+    background-color: var(--selected_category_alt);
 }
 ul.odd {
-    background-color: lightgrey;
+    background-color: var(--category);
 }
 ul.even {
-    background-color: darkgray;
+    background-color: var(--category-alt);
 }

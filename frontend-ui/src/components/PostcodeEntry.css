@@ -1,5 +1,5 @@
 .error {
-    color: red;
+    color: var(--error_text);
     font-weight: bold;
 }
 .hidden {

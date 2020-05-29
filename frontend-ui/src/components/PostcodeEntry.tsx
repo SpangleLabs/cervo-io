@@ -20,7 +20,7 @@ export const PostcodeEntry: React.FunctionComponent<PostcodeEntryProps> = (props
     )
     return <>
         <label>
-            Enter your postcode to get distances to selected zoos:
+            Enter your postcode to get distances:
             <input id="postcode" type="text" value={props.postcode} onChange={props.onUpdate}/>
         </label>
         <span className={errorClass}>Invalid postcode.</span>

@@ -3,6 +3,7 @@ import {AlphabetViewComponent} from "./alphabetView/AlphabetView";
 import {SearchViewComponent} from "./searchView/SearchView";
 import {AnimalData} from "../animalData";
 import {StatedTaxonomyView} from "./taxonomyView/StatedTaxonomyView";
+import classNames from "classnames";
 
 const styles = require("./ViewSelector.css")
 
@@ -29,40 +30,27 @@ export const ViewSelectorComponent: React.FunctionComponent<ViewSelectorProps> =
     const onChange = (newView: ViewsEnum) => {
         setCurrentView(newView)
     }
-
-    return <div id="species-selection">
-        <div id="view-selector">
-            Selector type:
-            <label>
-                <input
-                    type="radio"
-                    name="selector-type"
-                    value="taxonomic"
-                    onChange={() => onChange(ViewsEnum.Taxonomic)}
-                    checked={currentView == ViewsEnum.Taxonomic}
-                />
-                Taxonomic
-            </label>
-            <label>
-                <input
-                    type="radio"
-                    name="selector-type"
-                    value="alphabetical"
-                    onChange={() => onChange(ViewsEnum.Alphabetical)}
-                    checked={currentView == ViewsEnum.Alphabetical}
-                />
-                Alphabetical
-            </label>
-            <label>
-                <input
-                    type="radio"
-                    name="selector-type"
-                    value="search"
-                    onChange={() => onChange(ViewsEnum.Search)}
-                    checked={currentView == ViewsEnum.Search}
-                />
+s
+    return <div>
+        <div className={styles.selector_type}>
+            <div
+                className={classNames(styles.option, styles.clickable, {[styles.selected]: currentView == ViewsEnum.Taxonomic})}
+                onClick={() => onChange(ViewsEnum.Taxonomic)}
+            >
+                Taxonomy
+            </div>
+            <div
+                className={classNames(styles.option, styles.clickable, {[styles.selected]: currentView == ViewsEnum.Alphabetical})}
+                onClick={() => onChange(ViewsEnum.Alphabetical)}
+            >
+                Alphabet
+            </div>
+            <div
+                className={classNames(styles.option, styles.clickable, {[styles.selected]: currentView == ViewsEnum.Search})}
+                onClick={() => onChange(ViewsEnum.Search)}
+            >
                 Search
-            </label>
+            </div>
         </div>
         <div id="animals-taxonomic"
              className={currentView == ViewsEnum.Taxonomic ? "" : styles.hidden}>

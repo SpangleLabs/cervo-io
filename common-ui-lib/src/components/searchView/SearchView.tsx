@@ -6,6 +6,7 @@ import {withLoading} from "../../utilities";
 import {SearchNoResults} from "./SearchNoResults";
 import {SelectableSpeciesEntry} from "../speciesEntry/SelectableSpeciesEntry";
 
+const styles = require("./SearchView.css")
 
 export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) => {
     const [searchTerm, setSearchTerm] = useState("")
@@ -43,7 +44,7 @@ export const SearchViewComponent: React.FunctionComponent<ViewProps> = (props) =
             />
     );
     return (
-        <div>
+        <div className={styles.searchView}>
             <form onSubmit={onSubmit}>
                 <label>
                     Search:

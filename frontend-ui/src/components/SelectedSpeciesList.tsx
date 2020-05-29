@@ -2,6 +2,8 @@ import React from "react";
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import {SelectableSpeciesEntry} from "@cervoio/common-ui-lib/src/components/speciesEntry/SelectableSpeciesEntry";
 
+const styles = require("./SelectedSpeciesList.css")
+
 interface SelectedSpeciesListProps {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
@@ -17,7 +19,9 @@ export const SelectedSpeciesList: React.FunctionComponent<SelectedSpeciesListPro
     );
 
     return <>
-        <h2>Selected species ({props.selectedSpeciesIds.length})</h2>
+        <h2 className={styles.title}>
+            Selected species ({props.selectedSpeciesIds.length})
+        </h2>
         <ul>
             {selectedSpecies.map((species) =>
                 <SelectableSpeciesEntry

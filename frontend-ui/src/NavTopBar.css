@@ -1,14 +1,12 @@
 .navBar {
-    background-color: #d5cc87;
+    background-color: var(--option_inactive);
     width: 100%;
 }
 .navButton {
     box-sizing: border-box;
-    padding: 10px;
-    margin-right: 5px;
-    background-color: #c9ee7f;
+    padding: 0.2em 1em 0.3em;
     display: inline-block;
 }
 .navButton.selected {
-    background-color: #a5c632;
+    border-bottom: 5px solid var(--option_active);
 }

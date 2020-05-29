@@ -32,18 +32,16 @@ export const Selections: React.FunctionComponent<SelectionsProps> = (props) => {
             selectedSpeciesIds={props.selectedSpeciesIds}
             onSelectSpecies={props.onSelectSpecies}
         />
-        <PostcodeEntry
-            postcode={props.postcode}
-            error={props.postcodeError}
-            onUpdate={props.onPostcodeUpdate}
-            isLoading={props.loadingDistances}
-        />
         <SelectedZoosList
             selectedZoos={props.selectedZoos}
             onSelectZoos={props.onSelectZoos}
             zooDistances={props.zooDistances}
             loadingDistances={props.loadingDistances}
             loadingZoos={props.loadingZoos}
+
+            postcode={props.postcode}
+            postcodeError={props.postcodeError}
+            onPostcodeUpdate={props.onPostcodeUpdate}
         />
     </>
 }

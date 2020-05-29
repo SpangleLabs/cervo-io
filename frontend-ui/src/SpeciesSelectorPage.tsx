@@ -4,6 +4,8 @@ import {Selections} from "./components/Selections";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
+const styles = require("./SpeciesSelectorPage.css")
+
 interface SpeciesSelectorPageProps {
     animalData: AnimalData;
     selectedSpeciesIds: number[];
@@ -20,7 +22,9 @@ interface SpeciesSelectorPageProps {
 
 export const SpeciesSelectorPage: React.FunctionComponent<SpeciesSelectorPageProps> = (props) => {
     return <div>
-        <h1>Select which species you are interested in</h1>
+        <h1 className={styles.select_title}>
+            Find zoos by species
+        </h1>
         <ViewSelectorComponent
             animalData={props.animalData}
             selectedSpeciesIds={props.selectedSpeciesIds}

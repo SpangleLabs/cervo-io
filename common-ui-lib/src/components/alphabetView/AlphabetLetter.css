@@ -3,19 +3,19 @@
     padding: 0 5px;
 }
 .odd {
-    background-color: lightgrey;
+    background-color: var(--category);
 }
 .even {
-    background-color: darkgray;
+    background-color: var(--category-alt);
 }
 .odd.selected {
-    background-color: palevioletred;
+    background-color: var(--selected_category);
 }
 .even.selected {
-    background-color: indianred;
+    background-color: var(--selected_category_alt);
 }
 .disabled {
-    color: gray;
+    color: var(--disabled_text);
 }
 .clickable {
     cursor: pointer;

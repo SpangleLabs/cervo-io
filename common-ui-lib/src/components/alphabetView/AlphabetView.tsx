@@ -58,9 +58,9 @@ export const AlphabetViewComponent: React.FunctionComponent<AlphabetViewProps> =
                 onSelectSpecies={props.onSelectSpecies}
             />);
     return <>
-        <div id={style.letterList}>{letters}</div>
+        <div className={style.letterList}>{letters}</div>
         {isLoading ? <Spinner/> : ""}
-        <ul id={style.letterResults}>{speciesComponentList}</ul>
+        <ul className={style.letterResults}>{speciesComponentList}</ul>
     </>
     // return <div>Hello</div>
 }

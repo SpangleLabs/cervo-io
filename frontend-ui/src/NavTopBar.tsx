@@ -14,7 +14,7 @@ export enum NavTopBarOptions {
 }
 
 export const NavTopBar: React.FunctionComponent<NavTopBarProps> = (props) => {
-    return <div className={styles.navBar}>|
+    return <div className={styles.navBar}>
         <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.bySpecies})}>
             Select by species
         </div>
@@ -22,7 +22,7 @@ export const NavTopBar: React.FunctionComponent<NavTopBarProps> = (props) => {
             <abbr title="Coming soon">List zoos</abbr>
         </div>
         <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.faq})}>
-            <a href="faq.html">Frequently asked questions, privacy policy, and terms & conditions</a>
+            <a href="faq.html">Frequently asked questions</a>
         </div>
     </div>
 }
