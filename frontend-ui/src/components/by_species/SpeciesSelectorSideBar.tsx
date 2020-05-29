@@ -1,10 +1,10 @@
 import React from "react";
 import {ViewSelectorComponent} from "@cervoio/common-ui-lib/src/components/ViewSelector";
-import {Selections} from "./components/Selections";
+import {Selections} from "./Selections";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 
-const styles = require("./SpeciesSelectorPage.css")
+const styles = require("./SpeciesSelectorSideBar.css")
 
 interface SpeciesSelectorPageProps {
     animalData: AnimalData;
@@ -20,7 +20,7 @@ interface SpeciesSelectorPageProps {
     loadingZoos: boolean;
 }
 
-export const SpeciesSelectorPage: React.FunctionComponent<SpeciesSelectorPageProps> = (props) => {
+export const SpeciesSelectorSideBar: React.FunctionComponent<SpeciesSelectorPageProps> = (props) => {
     return <div>
         <h1 className={styles.select_title}>
             Find zoos by species

@@ -1,7 +1,6 @@
 import React from "react";
 import {ViewProps} from "@cervoio/common-ui-lib/src/views";
 import {ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {PostcodeEntry} from "./PostcodeEntry";
 import {SelectedZoosList} from "./SelectedZoosList";
 import {SelectedSpeciesList} from "./SelectedSpeciesList";
 import {AnimalData} from "@cervoio/common-ui-lib/src/animalData";

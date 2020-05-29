@@ -5,7 +5,7 @@ import {createBrowserHistory} from "history";
 import ReactDOM from "react-dom";
 import {ListSpeciesPage} from "./ListSpeciesPage";
 import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
-import {FAQ} from "./FAQ";
+import {FAQPage} from "./FAQPage";
 
 const browserHistory = createBrowserHistory({
     basename: "/"
@@ -22,18 +22,22 @@ export const App: React.FunctionComponent= () => {
 export const Routes: React.FunctionComponent = () => {
     const history = useHistory()
 
+    const changePage = (page: string) => {
+        history.push(page)
+    }
+
     return (
         <Switch>
             <Route exact path={["/", "/list-species"]}>
-                <NavTopBar selected={NavTopBarOptions.bySpecies} history={history} />
-                <ListSpecesPage history={history}/>
+                <NavTopBar selected={NavTopBarOptions.bySpecies} changePage={changePage} />
+                <ListSpeciesPage />
             </Route>
             <Route exact path="/faq">
-                <NavTopBar selected={NavTopBarOptions.faq} history={history} />
-                <FAQ />
+                <NavTopBar selected={NavTopBarOptions.faq} changePage={changePage} />
+                <FAQPage />
             </Route>
             <Route exact path="/list-zoos">
-                <NavTopBar selected={NavTopBarOptions.byZoos} history={history} />
+                <NavTopBar selected={NavTopBarOptions.byZoos} changePage={changePage} />
                 Zoo listing is under construction
             </Route>
         </Switch>

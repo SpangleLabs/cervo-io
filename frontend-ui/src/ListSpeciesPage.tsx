@@ -4,7 +4,7 @@ import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";
 import {getAuthCookie, toggleSelectionMembership, withLoading} from "@cervoio/common-ui-lib/src/utilities";
-import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
+import {SpeciesSelectorSideBar} from "./components/by_species/SpeciesSelectorSideBar";
 
 const styles = require("./ListSpeciesPage.css")
 
@@ -111,7 +111,7 @@ export const ListSpeciesPage: React.FunctionComponent = () => {
 
     return <>
         <div id={styles.selector}>
-            <SpeciesSelectorPage
+            <SpeciesSelectorSideBar
                 animalData={animalData}
                 selectedSpeciesIds={selectedSpeciesIds}
                 onSelectSpecies={onSelectSpecies}

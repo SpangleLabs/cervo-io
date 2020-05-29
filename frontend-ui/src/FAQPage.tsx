@@ -1,7 +1,7 @@
 import React from "react";
 
 
-export const FAQ: React.FunctionComponent = () => {
+export const FAQPage: React.FunctionComponent = () => {
     return <div>
         <h3>Why isn't [whatever] species listed?</h3>
         <p>I am starting with species of deer and expanding out. I think even then I may skip invertibrates and fish, as
