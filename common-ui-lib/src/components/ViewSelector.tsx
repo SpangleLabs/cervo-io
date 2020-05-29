@@ -30,7 +30,7 @@ export const ViewSelectorComponent: React.FunctionComponent<ViewSelectorProps> =
     const onChange = (newView: ViewsEnum) => {
         setCurrentView(newView)
     }
-s
+
     return <div>
         <div className={styles.selector_type}>
             <div
