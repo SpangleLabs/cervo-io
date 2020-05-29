@@ -1,18 +1,16 @@
 import {AnimalData, SpeciesData} from "@cervoio/common-ui-lib/src/animalData";
 import React, {useState} from "react";
-import ReactDOM from "react-dom";
 import {FullZooJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {MapContainer} from "./components/map/MapContainer";
 import config from "./config";
 import {getAuthCookie, toggleSelectionMembership, withLoading} from "@cervoio/common-ui-lib/src/utilities";
-import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
 import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
 
 const styles = require("./MainComponent.css")
 
 
 let lastZooSpeciesIds: number[] = []  // debouncing zoo list calls, so last one called gets evaluated
-const MainComponent: React.FunctionComponent = () => {
+export const MainComponent: React.FunctionComponent = () => {
     const [animalData] = useState(new AnimalData(getAuthCookie()))
     const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<number[]>([])
     const [selectedZoos, setSelectedZoos] = useState<ZooJson[]>([])
@@ -113,7 +111,6 @@ const MainComponent: React.FunctionComponent = () => {
 
     return <>
         <div id={styles.selector}>
-            <NavTopBar selected={NavTopBarOptions.bySpecies}/>
             <SpeciesSelectorPage
                 animalData={animalData}
                 selectedSpeciesIds={selectedSpeciesIds}
@@ -141,8 +138,3 @@ const MainComponent: React.FunctionComponent = () => {
         />
     </>
 }
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    ReactDOM.render(<MainComponent/>, document.getElementById("main"));
-});

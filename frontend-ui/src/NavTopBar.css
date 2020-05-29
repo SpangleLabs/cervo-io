@@ -6,6 +6,7 @@
     box-sizing: border-box;
     padding: 0.2em 1em 0.3em;
     display: inline-block;
+    cursor: pointer;
 }
 .navButton.selected {
     border-bottom: 5px solid var(--option_active);

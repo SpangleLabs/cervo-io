@@ -4,7 +4,7 @@
   "description": "Frontend for the cervo.io zoo listing website",
   "main": "src/MainComponent.tsx",
   "scripts": {
-    "build": "parcel build src/index.html src/faq.html --public-url ./",
+    "build": "parcel build src/index.html --public-url ./",
     "serve": "nodemon --watch ../common-ui-lib --ext 'css,tsx' --exec \"parcel serve src/index.html\"",
     "serve-map": "parcel serve src/maptest.html",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -31,8 +31,10 @@
     "@cervoio/common-ui-lib": "../common-ui-lib",
     "@react-google-maps/api": "^1.6.0",
     "classnames": "^2.2.6",
+    "history": "^4.10.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
     "@cervoio/common-lib": "../common-lib",
@@ -41,6 +43,7 @@
     "@types/node": "^13.13.5",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
+    "@types/react-router-dom": "^5.1.5",
     "awesome-typescript-loader": "^5.2.1",
     "nodemon": "^2.0.4",
     "parcel": "^1.12.4",

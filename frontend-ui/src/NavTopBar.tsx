@@ -5,6 +5,7 @@ const styles = require("./NavTopBar.css")
 
 interface NavTopBarProps {
     selected: NavTopBarOptions
+    history: History
 }
 
 export enum NavTopBarOptions {
@@ -15,14 +16,23 @@ export enum NavTopBarOptions {
 
 export const NavTopBar: React.FunctionComponent<NavTopBarProps> = (props) => {
     return <div className={styles.navBar}>
-        <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.bySpecies})}>
+        <div
+            className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.bySpecies})}
+            onClick={() => props.history.push("/list-species")}
+        >
             Select by species
         </div>
-        <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.byZoos})}>
-            <abbr title="Coming soon">List zoos</abbr>
+        <div
+            className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.byZoos})}
+            onClick={() => props.history.push("/list-zoos")}
+        >
+            List zoos
         </div>
-        <div className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.faq})}>
-            <a href="faq.html">Frequently asked questions</a>
+        <div
+            className={classNames(styles.navButton, {[styles.selected]: props.selected==NavTopBarOptions.faq})}
+            onClick={() => props.history.push("/faq")}
+        >
+            Frequently asked questions
         </div>
     </div>
 }
