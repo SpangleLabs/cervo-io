@@ -2,7 +2,7 @@
   "name": "zoosite",
   "version": "1.0.0",
   "description": "Frontend for the cervo.io zoo listing website",
-  "main": "src/MainComponent.tsx",
+  "main": "src/App.tsx",
   "scripts": {
     "build": "parcel build src/index.html --public-url ./",
     "serve": "nodemon --watch ../common-ui-lib --ext 'css,tsx' --exec \"parcel serve src/index.html\"",

@@ -3,7 +3,7 @@ import React from "react";
 import {useHistory} from 'react-router-dom'
 import {createBrowserHistory} from "history";
 import ReactDOM from "react-dom";
-import {MainComponent} from "./MainComponent";
+import {ListSpeciesPage} from "./ListSpeciesPage";
 import {NavTopBar, NavTopBarOptions} from "./NavTopBar";
 import {FAQ} from "./FAQ";
 
@@ -26,7 +26,7 @@ export const Routes: React.FunctionComponent = () => {
         <Switch>
             <Route exact path={["/", "/list-species"]}>
                 <NavTopBar selected={NavTopBarOptions.bySpecies} history={history} />
-                <MainComponent history={history}/>
+                <ListSpecesPage history={history}/>
             </Route>
             <Route exact path="/faq">
                 <NavTopBar selected={NavTopBarOptions.faq} history={history} />

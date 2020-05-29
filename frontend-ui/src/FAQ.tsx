@@ -40,9 +40,10 @@ export const FAQ: React.FunctionComponent = () => {
         <p>For logins, which are currently an admin-only issue, the IP address of the session token is stored, to ensure
             the token is not hijacked. Any admins (of which there is currently only me) may request that data be
             removed, which would just mean logging them out and deleting their current session token.</p>
-        <p>As for security, this whole site is published on github and can be audited. Passwords are hashed and salted
-            with bcrypt, with a decent number of runs to ensure hash cracking would be difficult. There's no personal
-            data stored within anyway, so there's not really a risk from that avenue.</p>
+        <p>As for security, this whole site is <a href="https://github.com/joshcoales/cervo-io">published on github</a>
+            and can be audited. Passwords are hashed and salted with bcrypt, with a decent number of runs to ensure hash
+            cracking would be difficult. There's no personal data stored within anyway, so there's not really a risk
+            from that avenue.</p>
 
         <h1>Terms and Conditions</h1>
         <p>I can't guarantee that the data on here is 100% up to date, so take things with a pinch of salt. Please don't

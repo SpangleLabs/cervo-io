@@ -6,11 +6,11 @@ import config from "./config";
 import {getAuthCookie, toggleSelectionMembership, withLoading} from "@cervoio/common-ui-lib/src/utilities";
 import {SpeciesSelectorPage} from "./SpeciesSelectorPage";
 
-const styles = require("./MainComponent.css")
+const styles = require("./ListSpeciesPage.css")
 
 
 let lastZooSpeciesIds: number[] = []  // debouncing zoo list calls, so last one called gets evaluated
-export const MainComponent: React.FunctionComponent = () => {
+export const ListSpeciesPage: React.FunctionComponent = () => {
     const [animalData] = useState(new AnimalData(getAuthCookie()))
     const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<number[]>([])
     const [selectedZoos, setSelectedZoos] = useState<ZooJson[]>([])

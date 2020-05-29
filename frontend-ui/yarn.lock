@@ -866,7 +866,7 @@
     "@parcel/utils" "^1.11.0"
     physical-cpu-count "^2.0.0"
 
-"@react-google-maps/api@^1.6.0":
+"@react-google-maps/api@^1.9.3":
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/@react-google-maps/api/-/api-1.9.3.tgz#3bc2d30e7b03c6ce160c0a9c0bf545a7ae5ec3d1"
   integrity sha512-m4ATeyIS2K7i2DaKYSZe/wyxuCzcF8uCf2ozsg0PsB7hHynz7jAA0XG3wAL5jLhLuiBhyiH7JiOl7luVdqnJ4g==
