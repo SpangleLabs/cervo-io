@@ -8,11 +8,17 @@ import {SpeciesSelectorSideBar} from "./components/by_species/SpeciesSelectorSid
 
 const styles = require("./ListSpeciesPage.css")
 
+interface ListSpeciesPageProps {
+    changeSpeciesList: (speciesIds: number[]) => void
+    match: {params: {ids: string}}
+}
 
 let lastZooSpeciesIds: number[] = []  // debouncing zoo list calls, so last one called gets evaluated
-export const ListSpeciesPage: React.FunctionComponent = () => {
+export const ListSpeciesPage: React.FunctionComponent<ListSpeciesPageProps> = (props) => {
+    const changeSpeciesListInUrl = props.changeSpeciesList
+    const urlSelected = props.match.params.ids.split("-").map((s) => parseInt(s))
     const [animalData] = useState(new AnimalData(getAuthCookie()))
-    const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<number[]>([])
+    const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<number[]>(urlSelected)
     const [selectedZoos, setSelectedZoos] = useState<ZooJson[]>([])
     const [postcode, setPostcode] = useState("")
     const [postcodeError, setPostcodeError] = useState(false)
@@ -26,6 +32,7 @@ export const ListSpeciesPage: React.FunctionComponent = () => {
             selectedSpeciesIds => {
                 const newSelection = toggleSelectionMembership(selectedSpeciesIds, speciesId, selected)
                 updateSelectedZoos(newSelection).then()
+                changeSpeciesListInUrl(newSelection)
                 return newSelection
             })
     }

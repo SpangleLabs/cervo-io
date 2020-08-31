@@ -26,12 +26,19 @@ export const Routes: React.FunctionComponent = () => {
         history.push(page)
     }
 
+    const changeSpeciesList = (speciesIds: number[]) => {
+        console.log(speciesIds)
+        history.push("/list-species/" + speciesIds.join("-"))
+    }
+
     return (
         <Switch>
-            <Route exact path={["/", "/list-species"]}>
+            <Route exact path={["/", "/list-species", "/list-species/:ids"]} children={({match}) => (
+                <>
                 <NavTopBar selected={NavTopBarOptions.bySpecies} changePage={changePage} />
-                <ListSpeciesPage />
-            </Route>
+                <ListSpeciesPage changeSpeciesList={changeSpeciesList} match={match}/>
+                </>
+            )} />
             <Route exact path="/faq">
                 <NavTopBar selected={NavTopBarOptions.faq} changePage={changePage} />
                 <FAQPage />
