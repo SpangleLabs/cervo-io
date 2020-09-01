@@ -1,5 +1,5 @@
 {
-  "name": "common-ui-lib",
+  "name": "@cervoio/common-ui-lib",
   "version": "1.0.0",
   "description": "Common ui ",
   "main": "src/main.js",
@@ -10,11 +10,11 @@
     "classnames": "^2.2.6"
   },
   "peerDependencies": {
-    "@cervoio/common-lib": "../common-lib",
     "@types/react": "^16.9.2",
     "react": "^16.13.1"
   },
   "devDependencies": {
+    "@cervoio/common-lib": "../common-lib",
     "@types/classnames": "^2.2.10",
     "@types/jquery": "^3.3.30",
     "@types/node": "^13.13.5",
