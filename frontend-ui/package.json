@@ -1,5 +1,5 @@
 {
-  "name": "zoosite",
+  "name": "@cervoio/zoosite",
   "version": "1.0.0",
   "description": "Frontend for the cervo.io zoo listing website",
   "main": "src/App.tsx",

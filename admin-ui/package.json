@@ -1,5 +1,5 @@
 {
-  "name": "admin-ui",
+  "name": "@cervoio/admin-ui",
   "version": "1.0.0",
   "description": "Administration frontend for the cervo.io zoo listing website",
   "main": "src/main.js",
