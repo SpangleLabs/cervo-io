@@ -12,14 +12,16 @@ jobs:
       matrix:
         node-version: [8.x, 10.x]
 
+    defaults:
+      run:
+        working-directory: ./backend-api
+
     steps:
       - uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Enter backend directory
-        run: cd backend-api
       - name: Install dependencies
         run: npm install
       - name: Build backend
