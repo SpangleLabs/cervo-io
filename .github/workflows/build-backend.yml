@@ -1,0 +1,28 @@
+name: "Build backend"
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Enter backend directory
+        run: cd backend-api
+      - name: Install dependencies
+        run: npm install
+      - name: Build backend
+        run: npm run build
+        env:
+          CONFIG_FILE: config-travis.json
