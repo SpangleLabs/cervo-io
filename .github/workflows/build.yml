@@ -1,0 +1,78 @@
+name: "Build"
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x]
+
+    defaults:
+      run:
+        working-directory: ./backend-api
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build backend
+        run: yarn run build
+        env:
+          CONFIG_FILE: config-travis.json
+
+  build-admin-ui:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x]
+    
+    defaults:
+      run:
+        working-directory: ./admin-ui
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build admin UI
+        run: yarn run build
+        env:
+          CONFIG_FILE: config-travis.json
+
+  build-frontend-ui:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x]
+    
+    defaults:
+      run:
+        working-directory: ./frontend-ui
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build admin UI
+        run: yarn run build
+        env:
+          CONFIG_FILE: config-travis.json
+          
+          
