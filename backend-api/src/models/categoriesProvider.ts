@@ -1,7 +1,5 @@
-import {ConnectionProvider} from "../dbconnection";
-import {AbstractProvider} from "./abstractProvider";
-import {CategoryJson, NewCategoryJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {NewEntryData} from "../dbInterfaces";
+import {AbstractProvider} from "./abstractProvider"
+import {CategoryJson, NewCategoryJson} from "@cervoio/common-lib/src/apiInterfaces"
 
 function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {
     return data.map(function (datum: CategoryJson | any) {
@@ -17,16 +15,11 @@ function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {
 
 export class CategoriesProvider extends AbstractProvider {
 
-    constructor (connection: ConnectionProvider) {
-        super(connection);
-    }
-
-    getBaseCategories(): Promise<CategoryJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id is null order by `name`");
-            conn.end();
-            return result;
-        }).then(processIntoCategoryJson);
+    async getBaseCategories(): Promise<CategoryJson[]> {
+        await this.client.connect()
+        const result = await this.client.query("select * from categories where parent_category_id is null order by name")
+        await this.client.end()
+        return processIntoCategoryJson(result.rows)
     }
 
     getCategoryById(id: number): Promise<CategoryJson[]> {

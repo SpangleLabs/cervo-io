@@ -46,7 +46,10 @@ export class MockCategoriesProvider extends CategoriesProvider {
     testCategories: CategoryJson[];
 
     constructor(testCategories: CategoryJson[]) {
-        super(() => { throw new Error("Mock database.");});
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.testCategories = testCategories;
     }
 
@@ -87,7 +90,10 @@ export class MockSpeciesProvider extends SpeciesProvider {
     testZooSpecies: ZooSpeciesLinkJson[];
 
     constructor(testSpecies: SpeciesJson[], testZooSpecies?: ZooSpeciesLinkJson[]) {
-        super(() => { throw new Error("Mock database.");});
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.testSpecies = testSpecies;
         if (!testZooSpecies) {
             testZooSpecies = [];
@@ -166,7 +172,10 @@ export class MockZoosProvider extends ZoosProvider {
     testZooSpecies: ZooSpeciesLinkJson[];
 
     constructor(testZoos: ZooJson[], testZooSpecies?: ZooSpeciesLinkJson[]) {
-        super(() => { throw new Error("Mock database.");});
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.testZoos = testZoos;
         if (!testZooSpecies) {
             testZooSpecies = [];
@@ -226,7 +235,10 @@ export class MockZooDistanceProvider extends ZooDistancesProvider {
     testZooDistances: ZooDistanceJson[];
 
     constructor(testZooDistances: ZooDistanceJson[]) {
-        super(() => { throw new Error("Mock database."); });
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.testZooDistances = testZooDistances
     }
 
@@ -251,7 +263,10 @@ export class MockUserPostcodeProvider extends UserPostcodesProvider {
     testUserPostcodes: UserPostcodeJson[];
 
     constructor(testUserPostcodes: UserPostcodeJson[]) {
-        super(() => { throw new Error("Mock database."); });
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.testUserPostcodes = testUserPostcodes
     }
 
@@ -305,7 +320,10 @@ export class MockSessionsProvider extends SessionsProvider {
     users: {user_id: number, username: string, is_admin: boolean}[];
 
     constructor(sessionTokens: SessionTokenJson[]) {
-        super(() => { throw new Error("Mock database."); });
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.sessionTokens = sessionTokens;
         this.failedLogins = new Map<string, number>();
         this.validPasswordHashes = new Map<string, {password: string}[]>();
@@ -365,7 +383,10 @@ export class MockZooSpeciesProvider extends ZooSpeciesProvider {
     testZooSpeciesLinks: ZooSpeciesLinkJson[];
 
     constructor(testZooSpeciesLinks: ZooSpeciesLinkJson[]) {
-        super(() => { throw new Error("Mock database."); });
+        super(
+            () => { throw new Error("Mock database.");},
+            (null as unknown as Client),
+        );
         this.testZooSpeciesLinks = testZooSpeciesLinks;
     }
 

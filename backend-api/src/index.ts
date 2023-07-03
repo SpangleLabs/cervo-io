@@ -40,14 +40,14 @@ App.enable('trust proxy');
 const client = new Client();
 
 // Create data providers
-const categoryProvider = new CategoriesProvider(connection);
+const categoryProvider = new CategoriesProvider(connection, client);
 const categoryLevelsProvider = new CategoryLevelsProvider(connection, client);
-const sessionsProvider = new SessionsProvider(connection);
-const speciesProvider = new SpeciesProvider(connection);
-const userPostcodesProvider = new UserPostcodesProvider(connection);
-const zooDistancesProvider = new ZooDistancesProvider(connection);
-const zooSpeciesProvider = new ZooSpeciesProvider(connection);
-const zoosProvider = new ZoosProvider(connection);
+const sessionsProvider = new SessionsProvider(connection, client);
+const speciesProvider = new SpeciesProvider(connection, client);
+const userPostcodesProvider = new UserPostcodesProvider(connection, client);
+const zooDistancesProvider = new ZooDistancesProvider(connection, client);
+const zooSpeciesProvider = new ZooSpeciesProvider(connection, client);
+const zoosProvider = new ZoosProvider(connection, client);
 
 // Create auth checker
 const authChecker = new AuthChecker(sessionsProvider);

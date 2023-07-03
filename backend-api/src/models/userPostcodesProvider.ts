@@ -1,4 +1,3 @@
-import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 import {NewUserPostcodeJson, UserPostcodeJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
@@ -13,11 +12,6 @@ function processIntoUserPostcodeJson(data: UserPostcodeJson[] | any): UserPostco
 }
 
 export class UserPostcodesProvider extends AbstractProvider {
-
-    constructor(connection: ConnectionProvider) {
-        super(connection);
-        
-    }
 
     getUserPostcodeById(id: number): Promise<UserPostcodeJson[]> {
         return this.connection().then(function (conn) {

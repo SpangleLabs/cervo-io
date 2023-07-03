@@ -1,14 +1,9 @@
-import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 import {NewZooDistanceJson, ZooDistanceJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
 
 export class ZooDistancesProvider extends AbstractProvider {
 
-    constructor(connection: ConnectionProvider) {
-        super(connection);
-    }
-    
     getZooDistanceByZooIdAndUserPostcodeId(zoo_id: number, user_postcode_id: number): Promise<ZooDistanceJson[]> {
         return this.connection().then(function (conn) {
             const result = conn.query("select * from zoo_distances where zoo_id=? and user_postcode_id=?", [zoo_id, user_postcode_id]);

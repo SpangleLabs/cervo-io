@@ -1,12 +1,7 @@
 import {AbstractProvider} from "./abstractProvider";
-import {ConnectionProvider} from "../dbconnection";
 import {SessionTokenJson} from "@cervoio/common-lib/src/apiInterfaces";
 
 export class SessionsProvider extends AbstractProvider {
-
-    constructor(connection: ConnectionProvider) {
-        super(connection);
-    }
 
     getValidPasswordHash(username: string): Promise<{ password: string }[]> {
         return this.connection().then(function (conn) {

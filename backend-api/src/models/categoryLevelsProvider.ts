@@ -1,7 +1,5 @@
-import {ConnectionProvider} from "../dbconnection"
 import {AbstractProvider} from "./abstractProvider"
 import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces"
-import {Client} from "pg"
 
 function processIntoCategoryLevelJson(data: CategoryLevelJson[] | any): CategoryLevelJson[] {
     return data.map( (datum: CategoryJson | any) => ({
@@ -11,12 +9,6 @@ function processIntoCategoryLevelJson(data: CategoryLevelJson[] | any): Category
 }
 
 export class CategoryLevelsProvider extends AbstractProvider {
-    private client: Client
-
-    constructor (connection: ConnectionProvider, client: Client) {
-        super(connection)
-        this.client = client
-    }
     
     async getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
         await this.client.connect()

@@ -1,4 +1,3 @@
-import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 import {LetterJson, NewEntryData} from "../dbInterfaces";
 import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
@@ -16,10 +15,6 @@ function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
 }
 
 export class SpeciesProvider extends AbstractProvider {
-
-    constructor (connection: ConnectionProvider) {
-        super(connection);
-    }
 
     getAllSpecies(): Promise<SpeciesJson[]> {
         return this.connection().then(function (conn) {

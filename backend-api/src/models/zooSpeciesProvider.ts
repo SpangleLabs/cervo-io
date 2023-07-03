@@ -1,4 +1,3 @@
-import {ConnectionProvider} from "../dbconnection";
 import {AbstractProvider} from "./abstractProvider";
 import {NewZooSpeciesLinkJson, ZooSpeciesLinkJson} from "@cervoio/common-lib/src/apiInterfaces";
 import {NewEntryData} from "../dbInterfaces";
@@ -19,10 +18,6 @@ function processIntoZooSpeciesLinkJson(data: ZooSpeciesLinkJson[] | any): ZooSpe
 
 export class ZooSpeciesProvider extends AbstractProvider {
 
-    constructor(connection: ConnectionProvider) {
-        super(connection);
-    }
-    
     getZooSpeciesByZooId(id: number): Promise<ZooSpeciesLinkJson[]> {
         return this.connection().then(function (conn) {
             const result = conn.query("select * from zoo_species where zoo_id=?", [id]);
