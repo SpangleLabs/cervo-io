@@ -17,6 +17,7 @@ import {ZooDistancesProvider} from "./models/zooDistancesProvider";
 import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
 import {ZoosProvider} from "./models/zoosProvider";
 import {AuthChecker} from "./authChecker";
+import { Client } from "pg";
 
 const express = require('express');
 const path = require('path');
@@ -34,6 +35,9 @@ App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({extended: false}));
 App.use(express.static(path.join(__dirname, 'public')));
 App.enable('trust proxy');
+
+// Create db client
+const client = new Client();
 
 // Create data providers
 const categoryProvider = new CategoriesProvider(connection);
