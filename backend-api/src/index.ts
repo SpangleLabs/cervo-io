@@ -41,7 +41,7 @@ const client = new Client();
 
 // Create data providers
 const categoryProvider = new CategoriesProvider(connection);
-const categoryLevelsProvider = new CategoryLevelsProvider(connection);
+const categoryLevelsProvider = new CategoryLevelsProvider(connection, client);
 const sessionsProvider = new SessionsProvider(connection);
 const speciesProvider = new SpeciesProvider(connection);
 const userPostcodesProvider = new UserPostcodesProvider(connection);

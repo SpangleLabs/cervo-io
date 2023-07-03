@@ -1,66 +1,59 @@
-import {ConnectionProvider} from "../dbconnection";
-import {AbstractProvider} from "./abstractProvider";
-import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {NewEntryData} from "../dbInterfaces";
+import {ConnectionProvider} from "../dbconnection"
+import {AbstractProvider} from "./abstractProvider"
+import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces"
+import {Client} from "pg"
 
 function processIntoCategoryLevelJson(data: CategoryLevelJson[] | any): CategoryLevelJson[] {
-    return data.map(function (datum: CategoryJson | any) {
-        return {
-            category_level_id: datum.category_level_id,
-            name: datum.name
-        }
-    });
+    return data.map( (datum: CategoryJson | any) => ({
+        category_level_id: datum.category_level_id,
+        name: datum.name
+    }))
 }
 
 export class CategoryLevelsProvider extends AbstractProvider {
+    private client: Client
 
-    constructor (connection: ConnectionProvider) {
-        super(connection);
+    constructor (connection: ConnectionProvider, client: Client) {
+        super(connection)
+        this.client = client
     }
     
-    getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from category_levels");
-            conn.end();
-            return result;
-        }).then(processIntoCategoryLevelJson);
+    async getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
+        await this.client.connect()
+        const result = await this.client.query("select * from category_levels")
+        await this.client.end()
+        return processIntoCategoryLevelJson(result.rows)
     }
 
-    getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from category_levels where category_level_id=?", [id]);
-            conn.end();
-            return result;
-        }).then(processIntoCategoryLevelJson);
+    async getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
+        await this.client.connect()
+        const result = await this.client.query("select * from category_levels where category_level_id=$1", [id])
+        await this.client.end()
+        return processIntoCategoryLevelJson(result)
     }
 
-    addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("insert into category_levels (`name`) values (?)", [newCategoryLevel.name]);
-            conn.end();
-            return result.then(function (data: NewEntryData) {
-                const result: CategoryLevelJson = {
-                    category_level_id: data.insertId,
-                    name: newCategoryLevel.name
-                };
-                return result;
-            });
-        });
+    async addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
+        await this.client.connect()
+        const result = await this.client.query(
+            "insert into category_levels (`name`) values ($1) returning category_level_id",
+            [newCategoryLevel.name]
+        )
+        await this.client.end()
+        return {
+            category_level_id: result.rows[0].category_level_id,
+            name: newCategoryLevel.name,
+        }
     }
 
-    deleteCategoryLevel(id: number): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("delete from category_levels where category_level_id=?", [id]);
-            conn.end();
-            return;
-        });
+    async deleteCategoryLevel(id: number): Promise<void> {
+        await this.client.connect()
+        await this.client.query("delete from category_levels where category_level_id=$1", [id])
+        await this.client.end()
     }
     
-    updateCategoryLevel(id: number, CategoryLevel: NewCategoryLevelJson): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("update category_levels set name=? where category_level_id=?", [CategoryLevel.name, id]);
-            conn.end();
-            return;
-        });
+    async updateCategoryLevel(id: number, CategoryLevel: NewCategoryLevelJson): Promise<void> {
+        await this.client.connect()
+        await this.client.query("update category_levels set name=$1 where category_level_id=$2", [CategoryLevel.name, id])
+        await this.client.end()
     }
 }

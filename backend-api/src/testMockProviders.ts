@@ -15,6 +15,7 @@ import {UserPostcodesProvider} from "./models/userPostcodesProvider";
 import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
 import {SessionsProvider} from "./models/sessionsProvider";
 import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
+import {Client} from "pg";
 
 
 function createNewId(currentIds: number[]) {
@@ -277,7 +278,10 @@ export class MockCategoryLevelsProvider extends CategoryLevelsProvider {
     testCategoryLevels: CategoryLevelJson[];
 
     constructor(testCategoryLevels: CategoryLevelJson[]) {
-        super(() => { throw new Error("Mock database."); });
+        super(
+            () => { throw new Error("Mock database."); },
+            (null as unknown as Client),
+        );
         this.testCategoryLevels = testCategoryLevels
     }
 
