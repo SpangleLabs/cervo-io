@@ -7,7 +7,6 @@ import {ZooSpeciesRouter} from "./routes/zooSpeciesRouter";
 import {ZoosRouter} from "./routes/zoosRouter";
 import {SpeciesRouter} from "./routes/speciesRouter";
 import {ZooDistancesRouter} from "./routes/zooDistancesRouter";
-import {connection} from "./dbconnection";
 import {CategoriesProvider} from "./models/categoriesProvider";
 import {SpeciesProvider} from "./models/speciesProvider";
 import {CategoryLevelsProvider} from "./models/categoryLevelsProvider";
@@ -40,14 +39,14 @@ App.enable('trust proxy');
 const client = new Client();
 
 // Create data providers
-const categoryProvider = new CategoriesProvider(connection, client);
-const categoryLevelsProvider = new CategoryLevelsProvider(connection, client);
-const sessionsProvider = new SessionsProvider(connection, client);
-const speciesProvider = new SpeciesProvider(connection, client);
-const userPostcodesProvider = new UserPostcodesProvider(connection, client);
-const zooDistancesProvider = new ZooDistancesProvider(connection, client);
-const zooSpeciesProvider = new ZooSpeciesProvider(connection, client);
-const zoosProvider = new ZoosProvider(connection, client);
+const categoryProvider = new CategoriesProvider(client);
+const categoryLevelsProvider = new CategoryLevelsProvider(client);
+const sessionsProvider = new SessionsProvider(client);
+const speciesProvider = new SpeciesProvider(client);
+const userPostcodesProvider = new UserPostcodesProvider(client);
+const zooDistancesProvider = new ZooDistancesProvider(client);
+const zooSpeciesProvider = new ZooSpeciesProvider(client);
+const zoosProvider = new ZoosProvider(client);
 
 // Create auth checker
 const authChecker = new AuthChecker(sessionsProvider);
