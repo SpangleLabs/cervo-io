@@ -9,49 +9,49 @@ export class AuthChecker {
         this.sessions = sessionsProvider;
     }
 
-    isLoggedIn(req: Request): Promise<boolean> {
+    async isLoggedIn(req: Request): Promise<boolean> {
         const authToken = <string>req.headers['authorization'];
         const ipAddr = <string>req.ip;
-        return this.checkToken(authToken, ipAddr).then(function () {
-            return true;
-        }).catch(function() {
-            return false;
-        })
+        try {
+            await this.checkToken(authToken, ipAddr)
+            return true
+        } catch (err) {
+            return false
+        }
     }
 
-    isAdmin(req: Request): Promise<boolean> {
+    async isAdmin(req: Request): Promise<boolean> {
         const authToken = <string>req.headers['authorization'];
         const ipAddr = <string>req.ip;
-        return this.checkToken(authToken, ipAddr).then(function (token) {
-            return token.is_admin;
-        }).catch(function() {
-            return false;
-        })
+        try {
+            const token = await this.checkToken(authToken, ipAddr)
+            return token.is_admin
+        } catch (err) {
+            return false
+        }
     }
 
     //Handy check login function?
-    checkToken(authToken: string, ipAddr: string): Promise<SessionTokenJson> {
+    async checkToken(authToken: string, ipAddr: string): Promise<SessionTokenJson> {
         // Check auth header is provided
         if (!authToken) {
             return Promise.reject(new Error("No auth token provided."));
         }
         // Check expiry isn't in the past
         // Check auth header token matches database token
-        return this.sessions.getSessionToken(authToken, ipAddr).then(function (storeResult) {
-            if (storeResult.length !== 1 || !storeResult[0]["user_id"]) {
-                throw new Error("User is not logged in.");
-            } else {
-                return storeResult[0];
-            }
-        });
+        const storeResult = await this.sessions.getSessionToken(authToken, ipAddr)
+        if (storeResult.length !== 1 || !storeResult[0]["user_id"]) {
+            throw new Error("User is not logged in.");
+        } else {
+            return storeResult[0];
+        }
     }
 
-    filterOutHidden<T extends {hidden: boolean}>(req: Request, items: T[]): Promise<T[]> {
-        return this.isAdmin(req).then(function(isAdmin) {
-            if(!isAdmin) {
-                items = items.filter(x => !x.hidden);
-            }
-            return items;
-        });
+    async filterOutHidden<T extends {hidden: boolean}>(req: Request, items: T[]): Promise<T[]> {
+        const isAdmin = await this.isAdmin(req)
+        if(!isAdmin) {
+            items = items.filter(x => !x.hidden);
+        }
+        return items;
     }
 }
