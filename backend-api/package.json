@@ -6,7 +6,7 @@
     "build": "tsc",
     "start": "node ./bin/www.ts",
     "serve": "tsc-watch --onSuccess \"npm run start\"",
-    "test": "tsc && npm run test-unit",
+    "test": "tsc && yarn run test-unit",
     "test-unit": "mocha dist/**/*.spec.js"
   },
   "main": "lambda.js",
