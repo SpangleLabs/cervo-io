@@ -16,7 +16,7 @@ import {ZooDistancesProvider} from "./models/zooDistancesProvider";
 import {ZooSpeciesProvider} from "./models/zooSpeciesProvider";
 import {ZoosProvider} from "./models/zoosProvider";
 import {AuthChecker} from "./authChecker";
-import { Client } from "pg";
+import {Pool} from "pg";
 
 const express = require('express');
 const path = require('path');
@@ -35,18 +35,18 @@ App.use(bodyParser.urlencoded({extended: false}));
 App.use(express.static(path.join(__dirname, 'public')));
 App.enable('trust proxy');
 
-// Create db client
-const client = new Client();
+// Create db connection pool
+const pool = new Pool()
 
 // Create data providers
-const categoryProvider = new CategoriesProvider(client);
-const categoryLevelsProvider = new CategoryLevelsProvider(client);
-const sessionsProvider = new SessionsProvider(client);
-const speciesProvider = new SpeciesProvider(client);
-const userPostcodesProvider = new UserPostcodesProvider(client);
-const zooDistancesProvider = new ZooDistancesProvider(client);
-const zooSpeciesProvider = new ZooSpeciesProvider(client);
-const zoosProvider = new ZoosProvider(client);
+const categoryProvider = new CategoriesProvider(pool);
+const categoryLevelsProvider = new CategoryLevelsProvider(pool);
+const sessionsProvider = new SessionsProvider(pool);
+const speciesProvider = new SpeciesProvider(pool);
+const userPostcodesProvider = new UserPostcodesProvider(pool);
+const zooDistancesProvider = new ZooDistancesProvider(pool);
+const zooSpeciesProvider = new ZooSpeciesProvider(pool);
+const zoosProvider = new ZoosProvider(pool);
 
 // Create auth checker
 const authChecker = new AuthChecker(sessionsProvider);

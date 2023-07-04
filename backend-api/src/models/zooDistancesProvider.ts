@@ -4,12 +4,10 @@ import {NewZooDistanceJson, ZooDistanceJson} from "@cervoio/common-lib/src/apiIn
 export class ZooDistancesProvider extends AbstractProvider {
 
     async getZooDistanceByZooIdAndUserPostcodeId(zoo_id: number, user_postcode_id: number): Promise<ZooDistanceJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from zoo_distances where zoo_id=$1 and user_postcode_id=$2",
             [zoo_id, user_postcode_id]
         )
-        await this.client.end()
         return result.rows.map(
             (datum: ZooDistanceJson) => ({
                 zoo_distance_id: datum.zoo_distance_id,
@@ -21,12 +19,10 @@ export class ZooDistancesProvider extends AbstractProvider {
     }
 
     async addZooDistance(ZooDistance: NewZooDistanceJson): Promise<ZooDistanceJson> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "insert into zoo_distances (`zoo_id`,`user_postcode_id`,`metres`) values ($1,$2,$3) returning zoo_distance_id",
             [ZooDistance.zoo_id, ZooDistance.user_postcode_id, ZooDistance.metres]
         )
-        await this.client.end()
         return {
             metres: ZooDistance.metres,
             user_postcode_id: ZooDistance.user_postcode_id,

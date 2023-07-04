@@ -15,43 +15,35 @@ function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
 export class SpeciesProvider extends AbstractProvider {
 
     async getAllSpecies(): Promise<SpeciesJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from species order by common_name"
         )
-        await this.client.end()
         return processIntoSpeciesJson(result.rows)
     }
 
     async getSpeciesById(id: number): Promise<SpeciesJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from species where species_id=$1",
             [id]
         )
-        await this.client.end()
         return processIntoSpeciesJson(result.rows)
     }
 
     async getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from species where category_id=$1 order by common_name",
             [id]
         )
-        await this.client.end()
-        return processIntoSpeciesJson(result)
+        return processIntoSpeciesJson(result.rows)
     }
 
     async getSpeciesByZooId(zoo_id: number): Promise<SpeciesEntryForZooJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from zoo_species " +
             "left join species on zoo_species.species_id = species.species_id " +
             "where zoo_species.zoo_id = $1",
             [zoo_id]
         )
-        await this.client.end()
         return result.rows.map(
             (datum: SpeciesEntryForZooJson) => ({
                 species_id: datum.species_id,
@@ -66,37 +58,31 @@ export class SpeciesProvider extends AbstractProvider {
     }
 
     async getSpeciesByName(search: string): Promise<SpeciesJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from species " +
             "where common_name like $1 or latin_name like $2 " +
             "order by common_name",
             [search, search]
         )
-        await this.client.end()
         return processIntoSpeciesJson(result.rows)
     }
 
     async getSpeciesByCommonName(search: string): Promise<SpeciesJson[]> {
-        await this.client.connect()
-        const result = this.client.query(
+        const result = await this.pool.query(
             "select * from species " +
             "where common_name like $1 " +
             "order by common_name",
             [search]
         )
-        await this.client.end()
-        return processIntoSpeciesJson(result)
+        return processIntoSpeciesJson(result.rows)
     }
 
     async getFirstLetters(): Promise<LetterJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select distinct upper(left(common_name, 1)) as letter, hidden " +
             "from species " +
             "order by letter"
         )
-        await this.client.end()
         return result.rows.map((datum: LetterJson) => ({
             letter: datum.letter,
             hidden: datum.hidden
@@ -104,13 +90,11 @@ export class SpeciesProvider extends AbstractProvider {
     }
 
     async addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "insert into species (`common_name`,`latin_name`,`category_id`,`hidden`) " +
                 "values ($1,$2,$3,$4) returning species_id",
             [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]
         )
-        await this.client.end()
         return {
             species_id: result.rows[0].species_id,
             common_name: newSpecies.common_name,
@@ -121,17 +105,13 @@ export class SpeciesProvider extends AbstractProvider {
     }
 
     async deleteSpecies(id: number): Promise<void> {
-        await this.client.connect()
-        await this.client.query("delete from species where species_id=$1", [id])
-        await this.client.end()
+        await this.pool.query("delete from species where species_id=$1", [id])
     }
 
     async updateSpecies(id: number, Species: NewSpeciesJson): Promise<void> {
-        await this.client.connect()
-        await this.client.query(
+        await this.pool.query(
             "update species set common_name=$1, latin_name=$2, category_id=$3 where species_id=$4",
             [Species.common_name, Species.latin_name, Species.category_id, id]
         )
-        await this.client.end()
     }
 }

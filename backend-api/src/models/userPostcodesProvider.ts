@@ -11,32 +11,26 @@ function processIntoUserPostcodeJson(data: UserPostcodeJson[] | any): UserPostco
 export class UserPostcodesProvider extends AbstractProvider {
 
     async getUserPostcodeById(id: number): Promise<UserPostcodeJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from user_postcodes where user_postcode_id=$1",
             [id],
         )
-        await this.client.end()
         return processIntoUserPostcodeJson(result.rows)
     }
 
     async getUserPostcodeByPostcodeSector(sector: string): Promise<UserPostcodeJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from user_postcodes where postcode_sector=$1",
             [sector]
         )
-        await this.client.end()
-        return processIntoUserPostcodeJson(result)
+        return processIntoUserPostcodeJson(result.rows)
     }
 
     async addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<UserPostcodeJson> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "insert into user_postcodes (`postcode_sector`) values ($1) returning user_postcode_id",
             [newUserPostcode.postcode_sector],
         )
-        await this.client.end()
         return {
             user_postcode_id: result.rows[0].user_postcode_id,
             postcode_sector: newUserPostcode.postcode_sector,
@@ -44,11 +38,9 @@ export class UserPostcodesProvider extends AbstractProvider {
     }
 
     async deleteUserPostcode(id: string): Promise<void> {
-        await this.client.connect()
-        await this.client.query(
+        await this.pool.query(
             "delete from user_postcodes where user_postcodes_id=$1",
             [id],
         )
-        await this.client.end()
     }
 }

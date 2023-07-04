@@ -1,9 +1,9 @@
-import {Client} from "pg";
+import {Pool} from "pg";
 
 export abstract class AbstractProvider {
-    client: Client
+    pool: Pool
 
-    constructor(client: Client) {
-        this.client = client
+    constructor(pool: Pool) {
+        this.pool = pool
     }
 }

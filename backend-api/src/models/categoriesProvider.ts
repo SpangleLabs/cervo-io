@@ -16,39 +16,31 @@ function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {
 export class CategoriesProvider extends AbstractProvider {
 
     async getBaseCategories(): Promise<CategoryJson[]> {
-        await this.client.connect()
-        const result = await this.client.query("select * from categories where parent_category_id is null order by name")
-        await this.client.end()
+        const result = await this.pool.query("select * from categories where parent_category_id is null order by name")
         return processIntoCategoryJson(result.rows)
     }
 
     async getCategoryById(id: number): Promise<CategoryJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from categories where category_id=$1",
             [id]
         )
-        await this.client.end()
         return processIntoCategoryJson(result.rows)
     }
 
     async getCategoriesByParentId(id: number): Promise<CategoryJson[]> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "select * from categories where parent_category_id=$1 order by name",
             [id]
         )
-        await this.client.end()
         return processIntoCategoryJson(result.rows)
     }
 
     async addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "insert into categories (`name`,`category_level_id`,`parent_category_id`) values ($1,$2,$3) returning category_id",
             [newCategory.name, newCategory.category_level_id, newCategory.parent_category_id]
         )
-        await this.client.end()
         return {
             category_id: result.rows[0].category_id,
             category_level_id: newCategory.category_level_id,
@@ -59,17 +51,13 @@ export class CategoriesProvider extends AbstractProvider {
     }
 
     async deleteCategory(id: number): Promise<void> {
-        await this.client.connect()
-        await this.client.query("delete from categories where zoo_id=$1", [id])
-        await this.client.end()
+        await this.pool.query("delete from categories where zoo_id=$1", [id])
     }
 
     async updateCategory(id: number, updatedCategory: NewCategoryJson): Promise<void> {
-        await this.client.connect()
-        await this.client.query(
+        await this.pool.query(
             "update categories set name=$1, category_level_id=$2, parent_category_id=$3 where category_id=$4",
             [updatedCategory.name, updatedCategory.category_level_id, updatedCategory.parent_category_id, id]
         )
-        await this.client.end()
     }
 }

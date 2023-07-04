@@ -11,26 +11,20 @@ function processIntoCategoryLevelJson(data: CategoryLevelJson[] | any): Category
 export class CategoryLevelsProvider extends AbstractProvider {
     
     async getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
-        await this.client.connect()
-        const result = await this.client.query("select * from category_levels")
-        await this.client.end()
+        const result = await this.pool.query("select * from category_levels")
         return processIntoCategoryLevelJson(result.rows)
     }
 
     async getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
-        await this.client.connect()
-        const result = await this.client.query("select * from category_levels where category_level_id=$1", [id])
-        await this.client.end()
-        return processIntoCategoryLevelJson(result)
+        const result = await this.pool.query("select * from category_levels where category_level_id=$1", [id])
+        return processIntoCategoryLevelJson(result.rows)
     }
 
     async addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
-        await this.client.connect()
-        const result = await this.client.query(
+        const result = await this.pool.query(
             "insert into category_levels (`name`) values ($1) returning category_level_id",
             [newCategoryLevel.name]
         )
-        await this.client.end()
         return {
             category_level_id: result.rows[0].category_level_id,
             name: newCategoryLevel.name,
@@ -38,14 +32,10 @@ export class CategoryLevelsProvider extends AbstractProvider {
     }
 
     async deleteCategoryLevel(id: number): Promise<void> {
-        await this.client.connect()
-        await this.client.query("delete from category_levels where category_level_id=$1", [id])
-        await this.client.end()
+        await this.pool.query("delete from category_levels where category_level_id=$1", [id])
     }
     
     async updateCategoryLevel(id: number, CategoryLevel: NewCategoryLevelJson): Promise<void> {
-        await this.client.connect()
-        await this.client.query("update category_levels set name=$1 where category_level_id=$2", [CategoryLevel.name, id])
-        await this.client.end()
+        await this.pool.query("update category_levels set name=$1 where category_level_id=$2", [CategoryLevel.name, id])
     }
 }
