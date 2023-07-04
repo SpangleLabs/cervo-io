@@ -85,6 +85,6 @@ export const handler500 = function (err: Error, req: Request, res: Response, nex
 
     // render the error page
     res.status(res.statusCode || 500);
-    res.json(err);
+    res.json({"error": err});
 };
 App.use(handler500);

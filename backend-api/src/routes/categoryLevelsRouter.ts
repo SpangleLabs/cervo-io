@@ -21,14 +21,14 @@ export class CategoryLevelsRouter extends AbstractRouter {
                         const rows = await self.categoryLevels.getCategoryLevelById(categoryLevelId)
                         res.json(rows)
                     } catch (err) {
-                        res.status(500).json(err)
+                        res.status(500).json({"error": err})
                     }
                 } else {
                     try {
                         const rows = await self.categoryLevels.getAllCategoryLevels();
                         res.json(rows)
                     } catch (err) {
-                        res.status(500).json(err)
+                        res.status(500).json({"error": err})
                     }
                 }
             }
