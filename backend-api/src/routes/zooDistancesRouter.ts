@@ -1,30 +1,36 @@
-import {config} from "../config";
-import Postcode from "postcode";
-import fetch from "node-fetch";
-import {AbstractRouter} from "./abstractRouter";
-import {UserPostcodesProvider} from "../models/userPostcodesProvider";
-import {ZooDistancesProvider} from "../models/zooDistancesProvider";
-import {ZoosProvider} from "../models/zoosProvider";
-import {AuthChecker} from "../authChecker";
-import {NewUserPostcodeJson, NewZooDistanceJson, UserPostcodeJson, ZooDistanceJson, ZooJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {config} from "../config"
+import Postcode from "postcode"
+import fetch from "node-fetch"
+import {AbstractRouter} from "./abstractRouter"
+import {UserPostcodesProvider} from "../models/userPostcodesProvider"
+import {ZooDistancesProvider} from "../models/zooDistancesProvider"
+import {ZoosProvider} from "../models/zoosProvider"
+import {AuthChecker} from "../authChecker"
+import {
+    NewUserPostcodeJson,
+    NewZooDistanceJson,
+    UserPostcodeJson,
+    ZooDistanceJson,
+    ZooJson
+} from "@cervoio/common-lib/src/apiInterfaces"
 
 export class ZooDistancesRouter extends AbstractRouter {
-    zooDistances: ZooDistancesProvider;
-    userPostcodes: UserPostcodesProvider;
-    zoos: ZoosProvider;
+    zooDistances: ZooDistancesProvider
+    userPostcodes: UserPostcodesProvider
+    zoos: ZoosProvider
 
     constructor(authChecker: AuthChecker, zooDistancesProvider: ZooDistancesProvider, userPostcodesProvider: UserPostcodesProvider, zoosProvider: ZoosProvider) {
-        super("/zoo_distances", authChecker);
-        this.zooDistances = zooDistancesProvider;
-        this.userPostcodes = userPostcodesProvider;
-        this.zoos = zoosProvider;
+        super("/zoo_distances", authChecker)
+        this.zooDistances = zooDistancesProvider
+        this.userPostcodes = userPostcodesProvider
+        this.zoos = zoosProvider
     }
 
     initialise(): void {
         const self = this;
 
         /* GET zoo distances. */
-        this.router.get('/:postcode/:zooIdList', function (req, res, next) {
+        this.router.get('/:postcode/:zooIdList', async function (req, res, next) {
             // Get parameters
             const paramPostcode: string = req.params.postcode;
             const paramZooIdList: string = req.params.zooIdList;
@@ -41,143 +47,136 @@ export class ZooDistancesRouter extends AbstractRouter {
             const zooIdList: number[] = paramZooIdList.split(",").map(x => parseInt(x));
             const uniqueZooIdList: number[] = [...new Set(zooIdList)];
             // Check for (or create) postcode id
-            self.getOrCreatePostcode(sector).then(function (postcodeData) {
-                return self.getOrCreateZooDistances(postcodeData, uniqueZooIdList);
-            }).then(function (zooDistances) {
+            try {
+                const postcodeData = await self.getOrCreatePostcode(sector)
+                const zooDistances = await self.getOrCreateZooDistances(postcodeData, uniqueZooIdList)
                 const uniqueDistanceMap: Map<number, ZooDistanceJson> = new Map(
                     zooDistances.map(x => [x.zoo_id, x])
                 );
                 const results = zooIdList.map(x => uniqueDistanceMap.get(x));
                 res.json(results);
-            }).catch(function (err) {
+            } catch (err) {
                 console.log(err);
                 res.status(500).json({"error": "Failure to determine distances.", "more_detail": err.toLocaleString()});
-            });
-        });
+            }
+        })
     }
 
-    getOrCreatePostcode(postcodeSector: string): Promise<UserPostcodeJson> {
+    async getOrCreatePostcode(postcodeSector: string): Promise<UserPostcodeJson> {
         const self = this;
-        return this.userPostcodes.getUserPostcodeByPostcodeSector(postcodeSector).then(function (data) {
-            if (data.length === 0) {
-                const userPostcode: NewUserPostcodeJson = {
-                    postcode_sector: postcodeSector
-                };
-                return self.userPostcodes.addUserPostcode(userPostcode);
-            }
-            return data[0];
-        });
+        const data = await this.userPostcodes.getUserPostcodeByPostcodeSector(postcodeSector)
+        if (data.length === 0) {
+            const userPostcode: NewUserPostcodeJson = {
+                postcode_sector: postcodeSector
+            };
+            return self.userPostcodes.addUserPostcode(userPostcode);
+        }
+        return data[0];
     }
 
-    getCachedDistanceOrNot(postcodeId: number, zooId: number): Promise<ZooDistanceJson | boolean> {
-        return this.zooDistances.getZooDistanceByZooIdAndUserPostcodeId(zooId, postcodeId).then(function (data) {
+    async getCachedDistanceOrNot(postcodeId: number, zooId: number): Promise<ZooDistanceJson | boolean> {
+        try {
+            const data = await this.zooDistances.getZooDistanceByZooIdAndUserPostcodeId(zooId, postcodeId)
             if (data.length !== 0) {
-                return data[0];
+                return data[0]
             }
-            return false;
-        }).catch(function () {
-            return false;
-        });
+            return false
+        } catch (err) {
+            return false
+        }
     }
 
-    getZooData(zooId: number): Promise<ZooJson> {
-        return this.zoos.getZooById(zooId).then(function (data) {
-            return data[0];
-        });
+    async getZooData(zooId: number): Promise<ZooJson> {
+        const data = await this.zoos.getZooById(zooId)
+        return data[0]
     }
 
     async fetchGoogleResponse(url: string): Promise<{status: string, rows: {elements: {distance: {value: number}}[]}[]}> {
-        return (await fetch(url)).json();
+        return (await fetch(url)).json()
     }
 
-    queryGoogleDistancesToAddresses(start: string, destinationList: string[]): Promise<number[]> {
+    async queryGoogleDistancesToAddresses(start: string, destinationList: string[]): Promise<number[]> {
         // Chunk the addresses into strings of 25 at a time
-        const chunkedDestinations: string[][] = [];
-        const chunkSize = 25;
+        const chunkedDestinations: string[][] = []
+        const chunkSize = 25
         for (let b = 0; b < destinationList.length; b += chunkSize) {
-            chunkedDestinations.push(destinationList.slice(b, b + chunkSize));
+            chunkedDestinations.push(destinationList.slice(b, b + chunkSize))
         }
         // Make all the API requests
-        const googleApiKey = config.google_distance_api_key; //Location locked,fine to commit
-        const requestPromises: Promise<number[]>[] = [];
+        const googleApiKey = config.google_distance_api_key //Location locked,fine to commit
+        const requestPromises: Promise<number[]>[] = []
         for (let zooPostcodeListChunk of chunkedDestinations) {
-            const zooPostcodeString = zooPostcodeListChunk.join("|");
+            const zooPostcodeString = zooPostcodeListChunk.join("|")
             const googleApiString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + start + "&destinations=" + zooPostcodeString + "&key=" + googleApiKey;
-            requestPromises.push(this.fetchGoogleResponse(googleApiString).then(function (data) {
+            requestPromises.push((async () => {
+                const data = await this.fetchGoogleResponse(googleApiString)
                 if(data.status !== "OK") {
-                    throw new Error("Distance metrics API failed, response: " + JSON.stringify(data));
+                    throw new Error("Distance metrics API failed, response: " + JSON.stringify(data))
                 }
-                const distanceResults: {distance: {value: number}}[] = data.rows[0].elements;
+                const distanceResults: {distance: {value: number}}[] = data.rows[0].elements
                 if (distanceResults.length !== zooPostcodeListChunk.length) {
-                    throw new Error("Incorrect amount of distances returned from google maps API");
+                    throw new Error("Incorrect amount of distances returned from google maps API")
                 }
-                return distanceResults.map(x => x.distance.value);
-            }));
+                return distanceResults.map(x => x.distance.value)
+            })())
         }
         // Flatten list
-        return Promise.all(requestPromises).then(function(values: number[][]) {
-            let results: number[] = [];
-            values.forEach(x => results = results.concat(x));
-            return results;
-        });
+        const values = await Promise.all(requestPromises)
+        let results: number[] = []
+        values.forEach(x => results = results.concat(x))
+        return results
     }
 
-    queryGoogleForZooDistances(userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]): Promise<NewZooDistanceJson[]> {
+    async queryGoogleForZooDistances(userPostcodeData: UserPostcodeJson, zooDataList: ZooJson[]): Promise<NewZooDistanceJson[]> {
         // Organise postcodes
         const userPostcode = userPostcodeData.postcode_sector + "AA";
         const zooPostcodeList: string[] = zooDataList.map(x => x.postcode);
         // Chunk the postcodes into strings of 25 at a time, with nation selector
         const userAddress = userPostcode + ",UK";
         const destinationAddresses = zooPostcodeList.map(x => x + ",UK");
-        return this.queryGoogleDistancesToAddresses(userAddress, destinationAddresses).then(function (allDistances) {
-            const zooDistances: NewZooDistanceJson[] = allDistances.map(function (distance: number, index: number) {
-                return {
-                    user_postcode_id: userPostcodeData.user_postcode_id,
-                    zoo_id: zooDataList[index].zoo_id,
-                    metres: distance
-                }
-            });
-            return zooDistances;
+        const allDistances = await this.queryGoogleDistancesToAddresses(userAddress, destinationAddresses)
+        return allDistances.map(function (distance: number, index: number) {
+            return {
+                user_postcode_id: userPostcodeData.user_postcode_id,
+                zoo_id: zooDataList[index].zoo_id,
+                metres: distance
+            }
         });
     }
 
-    createZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
+    async createZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
         if (zooIdList.length === 0) {
             return Promise.all([]);
         }
         const zooDataPromises = zooIdList.map(x => this.getZooData(x));
         const self = this;
-        return Promise.all(zooDataPromises).then(function (zooDataList) {
-            return self.queryGoogleForZooDistances(userPostcodeData, zooDataList);
-        }).then(function (newZooDistances) {
-            // Save google api responses to database
-            const savePromises: Promise<ZooDistanceJson>[] = newZooDistances.map(x => self.zooDistances.addZooDistance(x));
-            return Promise.all(savePromises);
-        });
+        const zooDataList = await Promise.all(zooDataPromises)
+        const newZooDistances = await self.queryGoogleForZooDistances(userPostcodeData, zooDataList)
+        // Save google api responses to database
+        const savePromises: Promise<ZooDistanceJson>[] = newZooDistances.map(x => self.zooDistances.addZooDistance(x));
+        return await Promise.all(savePromises);
     }
 
-    getOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
+    async getOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
         const getCachedPromises = zooIdList.map(x => this.getCachedDistanceOrNot(userPostcodeData.user_postcode_id, x));
         const self = this;
-        return Promise.all(getCachedPromises).then(function (resultList) {
-            const missingDistances: number[] = resultList.map((result, index) => {
-                if (isBool(result)) {
-                    return zooIdList[index];
-                } else {
-                    return null;
-                }
-            }).filter(notEmpty);
-            const cachedDistances = new Map(
-                resultList.filter(notBool).map(x => [x.zoo_id, x])
-            );
-            return self.createZooDistances(userPostcodeData, missingDistances).then(function(distances) {
-                const newDistances = new Map(
-                    distances.map(x => [x.zoo_id, x])
-                );
-                const allDistances = new Map([...cachedDistances, ...newDistances]);
-                return zooIdList.map(x => allDistances.get(x)).filter(notEmpty);
-            });
-        });
+        const resultList = await Promise.all(getCachedPromises)
+        const missingDistances: number[] = resultList.map((result, index) => {
+            if (isBool(result)) {
+                return zooIdList[index];
+            } else {
+                return null;
+            }
+        }).filter(notEmpty);
+        const cachedDistances = new Map(
+            resultList.filter(notBool).map(x => [x.zoo_id, x])
+        );
+        const distances = await self.createZooDistances(userPostcodeData, missingDistances)
+        const newDistances = new Map(
+            distances.map(x => [x.zoo_id, x])
+        );
+        const allDistances = new Map([...cachedDistances, ...newDistances]);
+        return zooIdList.map(x => allDistances.get(x)).filter(notEmpty);
     }
 }
 
