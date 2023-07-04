@@ -56,8 +56,8 @@ export class ZooDistancesRouter extends AbstractRouter {
                 const results = zooIdList.map(x => uniqueDistanceMap.get(x));
                 res.json(results);
             } catch (err) {
-                console.log(err);
-                res.status(500).json({"error": "Failure to determine distances.", "more_detail": err.toLocaleString()});
+                console.log("Failed to determine distances: ", err)
+                res.status(500).json({"error": "Failure to determine distances.", "more_detail": err.toLocaleString()})
             }
         })
     }
