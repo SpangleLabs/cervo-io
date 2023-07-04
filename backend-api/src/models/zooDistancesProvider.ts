@@ -1,5 +1,5 @@
-import {AbstractProvider} from "./abstractProvider";
-import {NewZooDistanceJson, ZooDistanceJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {AbstractProvider} from "./abstractProvider"
+import {NewZooDistanceJson, ZooDistanceJson} from "@cervoio/common-lib/src/apiInterfaces"
 
 export class ZooDistancesProvider extends AbstractProvider {
 

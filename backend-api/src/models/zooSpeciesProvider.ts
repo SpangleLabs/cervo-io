@@ -1,8 +1,8 @@
-import {AbstractProvider} from "./abstractProvider";
-import {NewZooSpeciesLinkJson, ZooSpeciesLinkJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {AbstractProvider} from "./abstractProvider"
+import {NewZooSpeciesLinkJson, ZooSpeciesLinkJson} from "@cervoio/common-lib/src/apiInterfaces"
 
 function hasUniqueId(arg: any): arg is ZooSpeciesLinkJson {
-    return arg.zoo_species_id !== undefined;
+    return arg.zoo_species_id !== undefined
 }
 
 function processIntoZooSpeciesLinkJson(data: ZooSpeciesLinkJson[] | any): ZooSpeciesLinkJson[] {
@@ -10,7 +10,7 @@ function processIntoZooSpeciesLinkJson(data: ZooSpeciesLinkJson[] | any): ZooSpe
         zoo_species_id: datum.zoo_species_id,
         zoo_id: datum.zoo_id,
         species_id: datum.species_id,
-    }));
+    }))
 }
 
 export class ZooSpeciesProvider extends AbstractProvider {
