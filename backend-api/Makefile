@@ -8,13 +8,13 @@ install:
 	yarn
 
 build: install
-	npm run build
+	yarn run build
 
 run: install
-	npm run start
+	yarn run start
 
 serve: install
-	npm run serve
+	yarn run serve
 
 test: install
-	npm run test
+	yarn run test

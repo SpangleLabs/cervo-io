@@ -14,20 +14,22 @@ export class CategoryLevelsRouter extends AbstractRouter {
         const self = this;
 
         /* GET category levels listing */
-        this.router.get('/:id?', function (req, res, next) {
+        this.router.get('/:id?', async function (req, res, next) {
                 if (req.params.id) {
                     const categoryLevelId = Number(req.params.id);
-                    self.categoryLevels.getCategoryLevelById(categoryLevelId).then(function (rows) {
-                        res.json(rows);
-                    }).catch(function (err) {
-                        res.status(500).json(err);
-                    });
+                    try {
+                        const rows = await self.categoryLevels.getCategoryLevelById(categoryLevelId)
+                        res.json(rows)
+                    } catch (err) {
+                        res.status(500).json({"error": err})
+                    }
                 } else {
-                    self.categoryLevels.getAllCategoryLevels().then(function (rows) {
-                        res.json(rows);
-                    }).catch(function (err) {
-                        res.status(500).json(err);
-                    });
+                    try {
+                        const rows = await self.categoryLevels.getAllCategoryLevels();
+                        res.json(rows)
+                    } catch (err) {
+                        res.status(500).json({"error": err})
+                    }
                 }
             }
         );

@@ -1,9 +1,9 @@
-import {ConnectionProvider} from "../dbconnection";
+import {Pool} from "pg";
 
 export abstract class AbstractProvider {
-    connection: ConnectionProvider;
+    pool: Pool
 
-    protected constructor(connection: ConnectionProvider) {
-        this.connection = connection;
+    constructor(pool: Pool) {
+        this.pool = pool
     }
 }

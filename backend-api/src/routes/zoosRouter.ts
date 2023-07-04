@@ -19,56 +19,53 @@ export class ZoosRouter extends AbstractRouter {
         const self = this;
 
         /* GET zoos listing. */
-        this.router.get('/:id?', function (req, res, next) {
+        this.router.get('/:id?', async function (req, res, next) {
             if (req.params.id) {
                 const zooId = Number(req.params.id);
-                self.zoos.getZooById(zooId).then(function (rows) {
-                    return Promise.all(rows.map(x => self.fillOutZoo(x, req)))
-                }).then(function (fullRows) {
-                    res.json(fullRows);
-                }).catch(function (err) {
-                    res.status(500).json(err);
-                });
+                try {
+                    const rows = await self.zoos.getZooById(zooId)
+                    const fullRows = await Promise.all(rows.map(x => self.fillOutZoo(x, req)))
+                    res.json(fullRows)
+                } catch (err) {
+                    res.status(500).json({"error": err})
+                }
             } else {
-                self.zoos.getAllZoos().then(function (rows) {
-                    res.json(rows);
-                }).catch(function (err) {
-                    res.status(500).json(err);
-                });
+                try {
+                    const rows = await self.zoos.getAllZoos()
+                    res.json(rows)
+                } catch (err) {
+                    res.status(500).json({"error": err})
+                }
             }
-        });
+        })
 
         /* POST a new zoo */
-        this.router.post('/', function (req, res, next) {
-            self.authChecker.isAdmin(req).then(function (isAdmin) {
-                if(isAdmin) {
-                    self.zoos.addZoo(req.body).then(function (newZoo) {
-                        res.json(newZoo);
-                    }).catch(function (err) {
-                        res.status(500).json(err);
-                    });
-                } else {
-                    res.status(403).json({"error": "Not authorized."});
+        this.router.post('/', async function (req, res, next) {
+            const isAdmin = self.authChecker.isAdmin(req)
+            if(isAdmin) {
+                try {
+                    const newZoo = await self.zoos.addZoo(req.body)
+                    res.json(newZoo)
+                } catch (err) {
+                    res.status(500).json({"error": err})
                 }
-            })
+            } else {
+                res.status(403).json({"error": "Not authorized."})
+            }
         });
     }
 
-    fillOutZoo(zoo: ZooJson, req: Request): Promise<FullZooJson> {
-        const self = this;
-        return this.species.getSpeciesByZooId(zoo.zoo_id).then(function(species) {
-            return self.authChecker.filterOutHidden(req, species);
-        }).then(function(filteredSpecies) {
-            const fullZoo: FullZooJson = {
-                zoo_id: zoo.zoo_id,
-                name: zoo.name,
-                link: zoo.link,
-                postcode: zoo.postcode,
-                latitude: zoo.latitude,
-                longitude: zoo.longitude,
-                species: filteredSpecies
-            };
-            return fullZoo;
-        })
+    async fillOutZoo(zoo: ZooJson, req: Request): Promise<FullZooJson> {
+        const species = await this.species.getSpeciesByZooId(zoo.zoo_id)
+        const filteredSpecies = await this.authChecker.filterOutHidden(req, species)
+        return {
+            zoo_id: zoo.zoo_id,
+            name: zoo.name,
+            link: zoo.link,
+            postcode: zoo.postcode,
+            latitude: zoo.latitude,
+            longitude: zoo.longitude,
+            species: filteredSpecies,
+        }
     }
 }

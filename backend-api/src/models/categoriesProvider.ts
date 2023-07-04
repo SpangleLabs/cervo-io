@@ -1,82 +1,63 @@
-import {ConnectionProvider} from "../dbconnection";
-import {AbstractProvider} from "./abstractProvider";
-import {CategoryJson, NewCategoryJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {NewEntryData} from "../dbInterfaces";
+import {AbstractProvider} from "./abstractProvider"
+import {CategoryJson, NewCategoryJson} from "@cervoio/common-lib/src/apiInterfaces"
 
 function processIntoCategoryJson(data: CategoryJson[] | any): CategoryJson[] {
-    return data.map(function (datum: CategoryJson | any) {
-        return {
+    return data.map((datum: CategoryJson | any) => (
+        {
             category_id: datum.category_id,
             name: datum.name,
             category_level_id: datum.category_level_id,
             parent_category_id: datum.parent_category_id,
-            hidden: datum.hidden
+            hidden: datum.hidden,
         }
-    });
+    ))
 }
 
 export class CategoriesProvider extends AbstractProvider {
 
-    constructor (connection: ConnectionProvider) {
-        super(connection);
+    async getBaseCategories(): Promise<CategoryJson[]> {
+        const result = await this.pool.query("select * from categories where parent_category_id is null order by name")
+        return processIntoCategoryJson(result.rows)
     }
 
-    getBaseCategories(): Promise<CategoryJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id is null order by `name`");
-            conn.end();
-            return result;
-        }).then(processIntoCategoryJson);
+    async getCategoryById(id: number): Promise<CategoryJson[]> {
+        const result = await this.pool.query(
+            "select * from categories where category_id=$1",
+            [id]
+        )
+        return processIntoCategoryJson(result.rows)
     }
 
-    getCategoryById(id: number): Promise<CategoryJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from categories where category_id=?", [id]);
-            conn.end();
-            return result;
-        }).then(processIntoCategoryJson);
+    async getCategoriesByParentId(id: number): Promise<CategoryJson[]> {
+        const result = await this.pool.query(
+            "select * from categories where parent_category_id=$1 order by name",
+            [id]
+        )
+        return processIntoCategoryJson(result.rows)
     }
 
-    getCategoriesByParentId(id: number): Promise<CategoryJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from categories where parent_category_id=? order by `name`", [id]);
-            conn.end();
-            return result;
-        }).then(processIntoCategoryJson);
+    async addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
+        const result = await this.pool.query(
+            "insert into categories (`name`,`category_level_id`,`parent_category_id`) values ($1,$2,$3) returning category_id",
+            [newCategory.name, newCategory.category_level_id, newCategory.parent_category_id]
+        )
+        return {
+            category_id: result.rows[0].category_id,
+            category_level_id: newCategory.category_level_id,
+            name: newCategory.name,
+            parent_category_id: newCategory.parent_category_id,
+            hidden: newCategory.hidden,
+        }
     }
 
-    addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("insert into categories (`name`,`category_level_id`,`parent_category_id`) " +
-                "values (?,?,?)", [newCategory.name, newCategory.category_level_id, newCategory.parent_category_id]);
-            conn.end();
-            return result.then(function (data: NewEntryData) {
-                const result: CategoryJson = {
-                    category_id: data.insertId,
-                    category_level_id: newCategory.category_level_id,
-                    name: newCategory.name,
-                    parent_category_id: newCategory.parent_category_id,
-                    hidden: newCategory.hidden
-                };
-                return result;
-            })
-        });
+    async deleteCategory(id: number): Promise<void> {
+        await this.pool.query("delete from categories where zoo_id=$1", [id])
     }
 
-    deleteCategory(id: number): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("delete from categories where zoo_id=?", [id]);
-            conn.end();
-            return;
-        });
-    }
-
-    updateCategory(id: number, updatedCategory: NewCategoryJson): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("update categories set name=?, category_level_id=?, parent_category_id=? where category_id=?",
-                [updatedCategory.name, updatedCategory.category_level_id, updatedCategory.parent_category_id, id]);
-            conn.end();
-            return;
-        });
+    async updateCategory(id: number, updatedCategory: NewCategoryJson): Promise<void> {
+        await this.pool.query(
+            "update categories set name=$1, category_level_id=$2, parent_category_id=$3 where category_id=$4",
+            [updatedCategory.name, updatedCategory.category_level_id, updatedCategory.parent_category_id, id]
+        )
     }
 }

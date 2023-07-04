@@ -1,66 +1,41 @@
-import {ConnectionProvider} from "../dbconnection";
-import {AbstractProvider} from "./abstractProvider";
-import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces";
-import {NewEntryData} from "../dbInterfaces";
+import {AbstractProvider} from "./abstractProvider"
+import {CategoryJson, CategoryLevelJson, NewCategoryLevelJson} from "@cervoio/common-lib/src/apiInterfaces"
 
 function processIntoCategoryLevelJson(data: CategoryLevelJson[] | any): CategoryLevelJson[] {
-    return data.map(function (datum: CategoryJson | any) {
-        return {
-            category_level_id: datum.category_level_id,
-            name: datum.name
-        }
-    });
+    return data.map( (datum: CategoryJson | any) => ({
+        category_level_id: datum.category_level_id,
+        name: datum.name
+    }))
 }
 
 export class CategoryLevelsProvider extends AbstractProvider {
+    
+    async getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
+        const result = await this.pool.query("select * from category_levels")
+        return processIntoCategoryLevelJson(result.rows)
+    }
 
-    constructor (connection: ConnectionProvider) {
-        super(connection);
+    async getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
+        const result = await this.pool.query("select * from category_levels where category_level_id=$1", [id])
+        return processIntoCategoryLevelJson(result.rows)
+    }
+
+    async addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
+        const result = await this.pool.query(
+            "insert into category_levels (`name`) values ($1) returning category_level_id",
+            [newCategoryLevel.name]
+        )
+        return {
+            category_level_id: result.rows[0].category_level_id,
+            name: newCategoryLevel.name,
+        }
+    }
+
+    async deleteCategoryLevel(id: number): Promise<void> {
+        await this.pool.query("delete from category_levels where category_level_id=$1", [id])
     }
     
-    getAllCategoryLevels(): Promise<CategoryLevelJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from category_levels");
-            conn.end();
-            return result;
-        }).then(processIntoCategoryLevelJson);
-    }
-
-    getCategoryLevelById(id: number): Promise<CategoryLevelJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from category_levels where category_level_id=?", [id]);
-            conn.end();
-            return result;
-        }).then(processIntoCategoryLevelJson);
-    }
-
-    addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("insert into category_levels (`name`) values (?)", [newCategoryLevel.name]);
-            conn.end();
-            return result.then(function (data: NewEntryData) {
-                const result: CategoryLevelJson = {
-                    category_level_id: data.insertId,
-                    name: newCategoryLevel.name
-                };
-                return result;
-            });
-        });
-    }
-
-    deleteCategoryLevel(id: number): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("delete from category_levels where category_level_id=?", [id]);
-            conn.end();
-            return;
-        });
-    }
-    
-    updateCategoryLevel(id: number, CategoryLevel: NewCategoryLevelJson): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("update category_levels set name=? where category_level_id=?", [CategoryLevel.name, id]);
-            conn.end();
-            return;
-        });
+    async updateCategoryLevel(id: number, CategoryLevel: NewCategoryLevelJson): Promise<void> {
+        await this.pool.query("update category_levels set name=$1 where category_level_id=$2", [CategoryLevel.name, id])
     }
 }

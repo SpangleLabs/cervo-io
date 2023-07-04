@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+RUN mkdir /usr/cervo-api
+RUN mkdir /usr/cervo-api/common-lib
+RUN mkdir /usr/cervo-api/backend-api
+WORKDIR /usr/cervo-api/backend-api
+
+COPY common-lib /usr/cervo-api/common-lib
+COPY backend-api /usr/cervo-api/backend-api
+
+
+RUN yarn
+RUN npm run build
+EXPOSE 3000/tcp
+
+ENTRYPOINT ["npm", "run", "start"]

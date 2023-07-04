@@ -1,141 +1,117 @@
-import {ConnectionProvider} from "../dbconnection";
-import {AbstractProvider} from "./abstractProvider";
-import {LetterJson, NewEntryData} from "../dbInterfaces";
-import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "@cervoio/common-lib/src/apiInterfaces";
+import {AbstractProvider} from "./abstractProvider"
+import {LetterJson} from "../dbInterfaces"
+import {NewSpeciesJson, SpeciesEntryForZooJson, SpeciesJson} from "@cervoio/common-lib/src/apiInterfaces"
 
 function processIntoSpeciesJson(data: SpeciesJson[] | any): SpeciesJson[] {
-    return data.map(function (datum: SpeciesJson | any): SpeciesJson {
-        return {
-            species_id: datum.species_id,
-            common_name: datum.common_name,
-            latin_name: datum.latin_name,
-            category_id: datum.category_id,
-            hidden: datum.hidden
-        }
-    });
+    return data.map((datum: SpeciesJson | any) => ({
+        species_id: datum.species_id,
+        common_name: datum.common_name,
+        latin_name: datum.latin_name,
+        category_id: datum.category_id,
+        hidden: datum.hidden,
+    }))
 }
 
 export class SpeciesProvider extends AbstractProvider {
 
-    constructor (connection: ConnectionProvider) {
-        super(connection);
+    async getAllSpecies(): Promise<SpeciesJson[]> {
+        const result = await this.pool.query(
+            "select * from species order by common_name"
+        )
+        return processIntoSpeciesJson(result.rows)
     }
 
-    getAllSpecies(): Promise<SpeciesJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from species order by `common_name`");
-            conn.end();
-            return result;
-        }).then(processIntoSpeciesJson);
+    async getSpeciesById(id: number): Promise<SpeciesJson[]> {
+        const result = await this.pool.query(
+            "select * from species where species_id=$1",
+            [id]
+        )
+        return processIntoSpeciesJson(result.rows)
     }
 
-    getSpeciesById(id: number): Promise<SpeciesJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from species where species_id=?", [id]);
-            conn.end();
-            return result;
-        }).then(processIntoSpeciesJson);
+    async getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
+        const result = await this.pool.query(
+            "select * from species where category_id=$1 order by common_name",
+            [id]
+        )
+        return processIntoSpeciesJson(result.rows)
     }
 
-    getSpeciesByCategoryId(id: number): Promise<SpeciesJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from species where category_id=? order by `common_name`", [id]);
-            conn.end();
-            return result;
-        }).then(processIntoSpeciesJson);
-    }
-
-    getSpeciesByZooId(zoo_id: number): Promise<SpeciesEntryForZooJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from zoo_species " +
-                "left join species on zoo_species.species_id = species.species_id " +
-                "where zoo_species.zoo_id = ?", [zoo_id]);
-            conn.end();
-            return result;
-        }).then(function (data: SpeciesEntryForZooJson[]) {
-            return data.map(function (datum: SpeciesEntryForZooJson) {
-                return {
-                    species_id: datum.species_id,
-                    common_name: datum.common_name,
-                    latin_name: datum.latin_name,
-                    category_id: datum.category_id,
-                    hidden: datum.hidden,
-                    zoo_species_id: datum.zoo_species_id,
-                    zoo_id: datum.zoo_id
-                }
-            });
-        });
-    }
-
-    getSpeciesByName(search: string): Promise<SpeciesJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from species " +
-                "where common_name like ? or latin_name like ? " +
-                "order by common_name", [search, search]);
-            conn.end();
-            return result;
-        }).then(processIntoSpeciesJson);
-    }
-
-    getSpeciesByCommonName(search: string): Promise<SpeciesJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select * from species " +
-                "where common_name like ? " +
-                "order by common_name", [search]);
-            conn.end();
-            return result;
-        }).then(processIntoSpeciesJson);
-    }
-
-    getFirstLetters(): Promise<LetterJson[]> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("select distinct upper(left(common_name, 1)) as letter, hidden " +
-                "from species " +
-                "order by letter");
-            conn.end();
-            return result;
-        }).then(function (data: LetterJson[]) {
-            return data.map(function (datum: LetterJson) {
-                return {
-                    letter: datum.letter,
-                    hidden: datum.hidden
-                }
+    async getSpeciesByZooId(zoo_id: number): Promise<SpeciesEntryForZooJson[]> {
+        const result = await this.pool.query(
+            "select * from zoo_species " +
+            "left join species on zoo_species.species_id = species.species_id " +
+            "where zoo_species.zoo_id = $1",
+            [zoo_id]
+        )
+        return result.rows.map(
+            (datum: SpeciesEntryForZooJson) => ({
+                species_id: datum.species_id,
+                common_name: datum.common_name,
+                latin_name: datum.latin_name,
+                category_id: datum.category_id,
+                hidden: datum.hidden,
+                zoo_species_id: datum.zoo_species_id,
+                zoo_id: datum.zoo_id,
             })
-        })
+        )
     }
 
-    addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
-        return this.connection().then(function (conn) {
-            const result = conn.query("insert into species (`common_name`,`latin_name`,`category_id`,`hidden`) " +
-                "values (?,?,?,?)", [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]);
-            conn.end();
-            return result.then(function (data: NewEntryData) {
-                const result: SpeciesJson = {
-                    species_id: data.insertId,
-                    common_name: newSpecies.common_name,
-                    latin_name: newSpecies.latin_name,
-                    category_id: newSpecies.category_id,
-                    hidden: newSpecies.hidden
-                };
-                return result;
-            });
-        });
+    async getSpeciesByName(search: string): Promise<SpeciesJson[]> {
+        const result = await this.pool.query(
+            "select * from species " +
+            "where common_name like $1 or latin_name like $2 " +
+            "order by common_name",
+            [search, search]
+        )
+        return processIntoSpeciesJson(result.rows)
     }
 
-    deleteSpecies(id: number): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("delete from species where species_id=?", [id]);
-            conn.end();
-            return;
-        });
+    async getSpeciesByCommonName(search: string): Promise<SpeciesJson[]> {
+        const result = await this.pool.query(
+            "select * from species " +
+            "where common_name like $1 " +
+            "order by common_name",
+            [search]
+        )
+        return processIntoSpeciesJson(result.rows)
     }
 
-    updateSpecies(id: number, Species: NewSpeciesJson): Promise<void> {
-        return this.connection().then(function (conn) {
-            conn.query("update species set common_name=?, latin_name=?, category_id=? where species_id=?",
-                [Species.common_name, Species.latin_name, Species.category_id, id]);
-            conn.end();
-            return;
-        });
+    async getFirstLetters(): Promise<LetterJson[]> {
+        const result = await this.pool.query(
+            "select distinct upper(left(common_name, 1)) as letter, hidden " +
+            "from species " +
+            "order by letter"
+        )
+        return result.rows.map((datum: LetterJson) => ({
+            letter: datum.letter,
+            hidden: datum.hidden
+        }))
+    }
+
+    async addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
+        const result = await this.pool.query(
+            "insert into species (`common_name`,`latin_name`,`category_id`,`hidden`) " +
+                "values ($1,$2,$3,$4) returning species_id",
+            [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]
+        )
+        return {
+            species_id: result.rows[0].species_id,
+            common_name: newSpecies.common_name,
+            latin_name: newSpecies.latin_name,
+            category_id: newSpecies.category_id,
+            hidden: newSpecies.hidden
+        }
+    }
+
+    async deleteSpecies(id: number): Promise<void> {
+        await this.pool.query("delete from species where species_id=$1", [id])
+    }
+
+    async updateSpecies(id: number, Species: NewSpeciesJson): Promise<void> {
+        await this.pool.query(
+            "update species set common_name=$1, latin_name=$2, category_id=$3 where species_id=$4",
+            [Species.common_name, Species.latin_name, Species.category_id, id]
+        )
     }
 }

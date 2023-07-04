@@ -19,81 +19,76 @@ export class CategoriesRouter extends AbstractRouter {
         const self = this;
 
         /* GET categories listing. */
-        this.router.get('/:id?', function (req, res, next) {
+        this.router.get('/:id?', async function (req, res, next) {
             if (req.params.id) {
-                const categoryId = Number(req.params.id);
-                self.categories.getCategoryById(categoryId).then(function (rows) {
-                    return self.authChecker.filterOutHidden(req, rows);
-                }).then(function (filteredRows) {
-                    return self.addSubcategories(filteredRows, req)
-                }).then(function(fullRows) {
-                    res.json(fullRows);
-                }).catch(function (err) {
-                    res.status(500).json(err);
-                });
+                const categoryId = Number(req.params.id)
+                try {
+                    const rows = await self.categories.getCategoryById(categoryId)
+                    const filteredRows = await self.authChecker.filterOutHidden(req, rows)
+                    const fullRows = await self.addSubcategories(filteredRows, req)
+                    res.json(fullRows)
+                } catch (err) {
+                    res.status(500).json({"error": err})
+                }
             } else {
-                self.categories.getBaseCategories().then(function (rows) {
-                    return self.authChecker.filterOutHidden(req, rows);
-                }).then(function (filteredRows) {
-                    return self.addSubcategories(filteredRows, req)
-                }).then(function(fullRows) {
-                    res.json(fullRows);
-                }).catch(function (err) {
-                    res.status(500).json(err);
-                });
+                try {
+                    const rows = await self.categories.getBaseCategories()
+                    const filteredRows = await self.authChecker.filterOutHidden(req, rows)
+                    const fullRows = await self.addSubcategories(filteredRows, req)
+                    res.json(fullRows)
+                } catch (err) {
+                    res.status(500).json({"error": err})
+                }
             }
-        });
+        })
 
         /* POST new category */
-        this.router.post('/', function (req, res, next) {
-            self.authChecker.isAdmin(req).then(function(isAdmin) {
-                if(isAdmin) {
-                    self.categories.addCategory(req.body).then(function (newCategory: CategoryJson) {
-                        res.json(newCategory);
-                    }).catch(function (err) {
-                        res.status(500).json(err);
-                    });
-                } else {
-                    res.status(403).json({"error": "Not authorized."});
+        this.router.post('/', async function (req, res, next) {
+            const isAdmin = await self.authChecker.isAdmin(req)
+            if (isAdmin) {
+                try {
+                    const newCategory = await self.categories.addCategory(req.body)
+                    res.json(newCategory)
+                } catch (err) {
+                    res.status(500).json({"error": err})
                 }
-            })
-
-        });
+            } else {
+                res.status(403).json({"error": "Not authorized."})
+            }
+        })
     }
 
-    addSubcategories(rows: CategoryJson[], req: Request): Promise<FullCategoryJson[]> {
+    async addSubcategories(rows: CategoryJson[], req: Request): Promise<FullCategoryJson[]> {
         const self = this;
         const children_promises: Promise<FullCategoryJson>[] = [];
         for (const category of rows) {
             const category_id = category.category_id;
             children_promises.push(
-                Promise.all([
-                    self.categories.getCategoriesByParentId(category_id),
-                    self.species.getSpeciesByCategoryId(category_id)
-                ]).then(function(children) {
-                    const subCategories = children[0];
-                    const species = children[1];
-                    return Promise.all([
+                async function ()  {
+                    const children = await Promise.all([
+                        self.categories.getCategoriesByParentId(category_id),
+                        self.species.getSpeciesByCategoryId(category_id)
+                    ])
+                    const [subCategories, species] = children
+                    const filteredChildren = await Promise.all([
                         self.authChecker.filterOutHidden(req, subCategories),
                         self.authChecker.filterOutHidden(req, species)
-                    ]);
-                }).then(function(filteredChildren) {
-                    const subCategories = filteredChildren[0];
-                    const species = filteredChildren[1];
-                    const row_result: FullCategoryJson = {
+                    ])
+                    const [filteredSubCategories, filteredSpecies] = filteredChildren
+                    const result: FullCategoryJson = {
                         category_id: category.category_id,
                         category_level_id: category.category_level_id,
                         name: category.name,
                         parent_category_id: category.parent_category_id,
                         hidden: category.hidden,
-                        sub_categories: subCategories,
-                        species: species
-                    };
-                    return row_result;
-                })
+                        sub_categories: filteredSubCategories,
+                        species: filteredSpecies
+                    }
+                    return result
+                }()
             );
         }
-        return Promise.all(children_promises);
+        return await Promise.all(children_promises);
     }
 }
 
