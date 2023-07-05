@@ -60,7 +60,7 @@ export class SpeciesProvider extends AbstractProvider {
     async getSpeciesByName(search: string): Promise<SpeciesJson[]> {
         const result = await this.pool.query(
             "select * from species " +
-            "where common_name like $1 or latin_name like $2 " +
+            "where common_name ILIKE $1 or latin_name ILIKE $2 " +
             "order by common_name",
             [search, search]
         )
@@ -70,7 +70,7 @@ export class SpeciesProvider extends AbstractProvider {
     async getSpeciesByCommonName(search: string): Promise<SpeciesJson[]> {
         const result = await this.pool.query(
             "select * from species " +
-            "where common_name like $1 " +
+            "where common_name ILIKE $1 " +
             "order by common_name",
             [search]
         )
