@@ -91,7 +91,7 @@ export class SpeciesProvider extends AbstractProvider {
 
     async addSpecies(newSpecies: NewSpeciesJson): Promise<SpeciesJson> {
         const result = await this.pool.query(
-            "insert into species (`common_name`,`latin_name`,`category_id`,`hidden`) " +
+            "insert into species (common_name,latin_name,category_id,hidden) " +
                 "values ($1,$2,$3,$4) returning species_id",
             [newSpecies.common_name, newSpecies.latin_name, newSpecies.category_id, newSpecies.hidden]
         )

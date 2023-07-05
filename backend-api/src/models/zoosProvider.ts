@@ -52,7 +52,7 @@ export class ZoosProvider extends AbstractProvider {
 
     async addZoo(newZoo: NewZooJson): Promise<ZooJson> {
         const result = await this.pool.query(
-            "insert into zoos (`name`,`postcode`,`latitude`,`longitude`,`link`) values ($1,$2,$3,$4,$5) returning zoo_id",
+            "insert into zoos (name,postcode,latitude,longitude,link) values ($1,$2,$3,$4,$5) returning zoo_id",
             [newZoo.name, newZoo.postcode, newZoo.latitude, newZoo.longitude, newZoo.link]
         )
         return {

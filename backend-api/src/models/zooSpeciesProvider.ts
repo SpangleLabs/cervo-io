@@ -33,7 +33,7 @@ export class ZooSpeciesProvider extends AbstractProvider {
 
     async addZooSpecies(newZooSpecies: NewZooSpeciesLinkJson): Promise<ZooSpeciesLinkJson> {
         const result = await this.pool.query(
-            "insert into zoo_species (`zoo_id`,`species_id`) values ($1,$2) returning zoo_species_id",
+            "insert into zoo_species (zoo_id,species_id) values ($1,$2) returning zoo_species_id",
             [newZooSpecies.zoo_id, newZooSpecies.species_id],
         )
         return {

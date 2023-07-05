@@ -38,7 +38,7 @@ export class CategoriesProvider extends AbstractProvider {
 
     async addCategory(newCategory: NewCategoryJson): Promise<CategoryJson> {
         const result = await this.pool.query(
-            "insert into categories (`name`,`category_level_id`,`parent_category_id`) values ($1,$2,$3) returning category_id",
+            "insert into categories (name,category_level_id,parent_category_id) values ($1,$2,$3) returning category_id",
             [newCategory.name, newCategory.category_level_id, newCategory.parent_category_id]
         )
         return {

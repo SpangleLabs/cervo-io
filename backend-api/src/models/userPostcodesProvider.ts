@@ -28,7 +28,7 @@ export class UserPostcodesProvider extends AbstractProvider {
 
     async addUserPostcode(newUserPostcode: NewUserPostcodeJson): Promise<UserPostcodeJson> {
         const result = await this.pool.query(
-            "insert into user_postcodes (`postcode_sector`) values ($1) returning user_postcode_id",
+            "insert into user_postcodes (postcode_sector) values ($1) returning user_postcode_id",
             [newUserPostcode.postcode_sector],
         )
         return {

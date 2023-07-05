@@ -20,7 +20,7 @@ export class ZooDistancesProvider extends AbstractProvider {
 
     async addZooDistance(ZooDistance: NewZooDistanceJson): Promise<ZooDistanceJson> {
         const result = await this.pool.query(
-            "insert into zoo_distances (`zoo_id`,`user_postcode_id`,`metres`) values ($1,$2,$3) returning zoo_distance_id",
+            "insert into zoo_distances (zoo_id,user_postcode_id,metres) values ($1,$2,$3) returning zoo_distance_id",
             [ZooDistance.zoo_id, ZooDistance.user_postcode_id, ZooDistance.metres]
         )
         return {

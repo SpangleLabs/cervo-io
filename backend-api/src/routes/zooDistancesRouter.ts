@@ -63,13 +63,12 @@ export class ZooDistancesRouter extends AbstractRouter {
     }
 
     async getOrCreatePostcode(postcodeSector: string): Promise<UserPostcodeJson> {
-        const self = this;
         const data = await this.userPostcodes.getUserPostcodeByPostcodeSector(postcodeSector)
         if (data.length === 0) {
             const userPostcode: NewUserPostcodeJson = {
                 postcode_sector: postcodeSector
             };
-            return self.userPostcodes.addUserPostcode(userPostcode);
+            return this.userPostcodes.addUserPostcode(userPostcode);
         }
         return data[0];
     }
@@ -159,7 +158,6 @@ export class ZooDistancesRouter extends AbstractRouter {
 
     async getOrCreateZooDistances(userPostcodeData: UserPostcodeJson, zooIdList: number[]): Promise<ZooDistanceJson[]> {
         const getCachedPromises = zooIdList.map(x => this.getCachedDistanceOrNot(userPostcodeData.user_postcode_id, x));
-        const self = this;
         const resultList = await Promise.all(getCachedPromises)
         const missingDistances: number[] = resultList.map((result, index) => {
             if (isBool(result)) {
@@ -171,7 +169,7 @@ export class ZooDistancesRouter extends AbstractRouter {
         const cachedDistances = new Map(
             resultList.filter(notBool).map(x => [x.zoo_id, x])
         );
-        const distances = await self.createZooDistances(userPostcodeData, missingDistances)
+        const distances = await this.createZooDistances(userPostcodeData, missingDistances)
         const newDistances = new Map(
             distances.map(x => [x.zoo_id, x])
         );

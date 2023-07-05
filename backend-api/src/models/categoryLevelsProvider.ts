@@ -22,7 +22,7 @@ export class CategoryLevelsProvider extends AbstractProvider {
 
     async addCategoryLevel(newCategoryLevel: NewCategoryLevelJson): Promise<CategoryLevelJson> {
         const result = await this.pool.query(
-            "insert into category_levels (`name`) values ($1) returning category_level_id",
+            "insert into category_levels (name) values ($1) returning category_level_id",
             [newCategoryLevel.name]
         )
         return {
