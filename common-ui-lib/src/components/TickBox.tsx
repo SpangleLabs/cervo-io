@@ -1,6 +1,6 @@
 import React from "react";
-import {BoxUnchecked} from "./images/boxUnchecked";
-import {BoxChecked} from "./images/boxChecked";
+import {BoxUnchecked} from "./images/BoxUnchecked";
+import {BoxChecked} from "./images/BoxChecked";
 
 export interface IsSelected {
     selected: boolean
