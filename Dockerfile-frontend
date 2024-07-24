@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+RUN apk add --update python3 make g++\
+   && rm -rf /var/cache/apk/*
+
+RUN mkdir /usr/cervo-api
+RUN mkdir /usr/cervo-api/common-lib
+RUN mkdir /usr/cervo-api/common-ui-lib
+RUN mkdir /usr/cervo-api/frontend-ui
+WORKDIR /usr/cervo-api/frontend-ui
+
+COPY common-lib /usr/cervo-api/common-lib
+COPY common-ui-lib /usr/cervo-api/common-ui-lib
+COPY frontend-ui /usr/cervo-api/frontend-ui
+
+RUN yarn
+RUN npm run build
+EXPOSE 1234/tcp
+
+ENTRYPOINT ["npm", "run", "serve"]
