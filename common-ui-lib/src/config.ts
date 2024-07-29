@@ -1,5 +1,5 @@
 
 export const config = {
-    "api_url": "http://api.cervo.io/"
+    "api_url": "https://cervo.io/api/"
 };
 
