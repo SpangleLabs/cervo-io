@@ -28,7 +28,7 @@ export const App: Application = express();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-App.use(cors());  // TODO: cut that down to only from cervo.io?
+App.use(cors());  // TODO: cut that down to only from cervo.spangle.org.uk?
 App.use(logger('dev'));
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({extended: false}));

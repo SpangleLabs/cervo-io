@@ -1,7 +1,7 @@
 {
   "name": "@cervoio/admin-ui",
   "version": "1.0.0",
-  "description": "Administration frontend for the cervo.io zoo listing website",
+  "description": "Administration frontend for the cervo.spangle.org.uk zoo listing website",
   "main": "src/main.js",
   "scripts": {
     "build": "parcel build src/*.html --public-url ./",

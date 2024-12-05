@@ -11,7 +11,7 @@ export const FAQPage: React.FunctionComponent = () => {
         <p>I am stripping postcodes down to postcode-sectors to preserve visitor's privacy and keep the cache a bit
             smaller, this will reduce the accuracy slightly, but not too much.</p>
 
-        <h3>Why is this system called cervo.io?</h3>
+        <h3>Why is this system called cervo?</h3>
         <p>"Cervo" the esperanto word for deer of the genus <span className="latin_name">cervus</span>, such as red deer
             and sika. Originally it was called "akvocervo", which is the esparanto word for Sambar, because I think they
             have a <a href="https://youtu.be/KTaSEwAQNM0?t=14s">cute honk!</a> But that name was too tricky.</p>
@@ -21,7 +21,7 @@ export const FAQPage: React.FunctionComponent = () => {
             maybe WAZA, but that will be some time.</p>
 
         <h3>You are missing a zoo</h3>
-        <p>Ah, whoops! Please contact me at zoos@cervo.io, tell me the details of the zoo, and I'll work on fixing
+        <p>Ah, whoops! Please contact me at cervo@spangle.org.uk, tell me the details of the zoo, and I'll work on fixing
             that.</p>
 
         <h3>Why do you call X, Y?</h3>
@@ -40,7 +40,7 @@ export const FAQPage: React.FunctionComponent = () => {
         <p>For logins, which are currently an admin-only issue, the IP address of the session token is stored, to ensure
             the token is not hijacked. Any admins (of which there is currently only me) may request that data be
             removed, which would just mean logging them out and deleting their current session token.</p>
-        <p>As for security, this whole site is <a href="https://github.com/joshcoales/cervo-io">published on github</a>
+        <p>As for security, this whole site is <a href="https://github.com/SpangleLabs/cervo-io">published on github</a>
             and can be audited. Passwords are hashed and salted with bcrypt, with a decent number of runs to ensure hash
             cracking would be difficult. There's no personal data stored within anyway, so there's not really a risk
             from that avenue.</p>

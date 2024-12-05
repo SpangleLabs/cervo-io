@@ -1,7 +1,7 @@
 {
   "name": "@cervoio/common-lib",
   "version": "0.0.0",
-  "description": "Common library for anything shared between frontend and backend of cervo.io",
+  "description": "Common library for anything shared between frontend and backend of cervo.spangle.org.uk",
   "main": "apiInterfaces.js",
   "scripts": {
     "test": "echo \"Error: no tests for common lib\" && exit 1"
